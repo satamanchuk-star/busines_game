@@ -160,9 +160,10 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:20px 24px;text-align:c
     <span class="nav-title">FMCG-цепочка</span>
   </div>
   <div class="nav-links">
-    <a href="#about" class="nav-link">О игре</a>
+    <a href="#about" class="nav-link">Об игре</a>
+    <a href="#roles" class="nav-link">Команды</a>
     <a href="#turns" class="nav-link">Правила</a>
-    <a href="#score" class="nav-link">Победитель</a>
+    <a href="#score" class="nav-link">Как победить</a>
     <a href="/play.html" class="btn-play-sm">ИГРАТЬ →</a>
   </div>
 </nav>
@@ -171,7 +172,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:20px 24px;text-align:c
 <section class="hero">
   <div class="hero-badge">⚡ Деловая игра · IBS · FMCG</div>
   <h1>FMCG-<span>цепочка</span></h1>
-  <p class="hero-sub">Управляйте звеном цепочки поставок. Договаривайтесь, зарабатывайте, не дайте цепочке рухнуть.</p>
+  <p class="hero-sub">Каждая команда управляет своим бизнесом в общей цепочке поставок продуктов: магазины заказывают товар, производители его выпускают, перевозчик доставляет. Зарабатывайте — но не обрушьте цепочку.</p>
   <div class="hero-meta">
     <span class="hero-meta-item">👥 До 32 участников</span>
     <span class="hero-meta-dot"></span>
@@ -210,45 +211,74 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:20px 24px;text-align:c
 
 <!-- ROLES -->
 <section id="roles">
-  <div class="section-tag">Акторы и роли</div>
-  <h2 class="section-title">8 команд, 32 участника,<br>одна цепочка</h2>
-  <p class="section-lead">Каждый актор — команда до 4 человек. Внутри команды роли розданы случайно: Директор ведёт переговоры, остальные готовят аналитику и решения.</p>
+  <div class="section-tag">Кто играет</div>
+  <h2 class="section-title">8 команд в одной цепочке:<br>магазины, производители, перевозчик</h2>
+  <p class="section-lead">Каждая команда — до 4 человек. Роли внутри раздаются случайно: директор ведёт переговоры с другими командами, остальные готовят прогноз, считают объёмы и цены. Все команды связаны: товар идёт от производителей через перевозчика в магазины.</p>
   <div class="roles-grid">
     <div class="role-card">
       <div class="role-ico">🛒</div>
-      <div class="role-name">Р1 — Дискаунтер</div>
-      <div class="role-desc">Низкие цены, высокий поток. Заказывает у поставщиков через дистрибьютора.</div>
-      <span class="role-tag">Ритейлер</span>
+      <div class="role-name">Дискаунтер</div>
+      <div class="role-desc">Магазин низких цен и большого потока. Закупает много и дёшево, давит на скидки.</div>
+      <span class="role-tag">Магазин (ритейлер)</span>
     </div>
     <div class="role-card">
       <div class="role-ico">🛒</div>
-      <div class="role-name">Р2 — Супермаркет</div>
-      <div class="role-desc">Баланс цены и сервиса. Широкий ассортимент по всем категориям.</div>
-      <span class="role-tag">Ритейлер</span>
+      <div class="role-name">Супермаркет</div>
+      <div class="role-desc">Магазин у дома: баланс цены и сервиса, широкий ассортимент по всем категориям.</div>
+      <span class="role-tag">Магазин (ритейлер)</span>
     </div>
     <div class="role-card">
       <div class="role-ico">🛒</div>
-      <div class="role-name">Р3 — Гипермаркет</div>
-      <div class="role-desc">Большой объём и широкий ассортимент. Ключевой клиент для поставщиков.</div>
-      <span class="role-tag">Ритейлер</span>
+      <div class="role-name">Гипермаркет</div>
+      <div class="role-desc">Огромный объём и ассортимент. Главный клиент для производителей.</div>
+      <span class="role-tag">Магазин (ритейлер)</span>
     </div>
     <div class="role-card">
       <div class="role-ico">🏭</div>
-      <div class="role-name">П1–П3 — Поставщики</div>
-      <div class="role-desc">Базовый, Fresh (скоропорт!) и Промо-хиты. Производят товар, дают скидки.</div>
-      <span class="role-tag">Поставщик</span>
+      <div class="role-name">Производители: Базовый · Fresh · Промо</div>
+      <div class="role-desc">Бакалея (долгий срок), Молочка и Фреш (быстро портятся!), Снеки и напитки под промо. Выпускают товар и дают скидки магазинам.</div>
+      <span class="role-tag">Производитель (поставщик)</span>
     </div>
     <div class="role-card">
       <div class="role-ico">🏭</div>
-      <div class="role-name">П4 — Импорт</div>
-      <div class="role-desc">Ограниченная мощность. В Туре 3 квота урезается — горячая точка дефицита.</div>
-      <span class="role-tag">Поставщик</span>
+      <div class="role-name">Производитель: Импорт</div>
+      <div class="role-desc">Деликатесы из-за рубежа. Мощность ограничена, в 3-м туре квоту урезают — главная точка дефицита.</div>
+      <span class="role-tag">Производитель (поставщик)</span>
     </div>
     <div class="role-card">
       <div class="role-ico">🚛</div>
-      <div class="role-name">Д — Дистрибьютор</div>
-      <div class="role-desc">Везёт товар от всех поставщиков ко всем ритейлерам. Устанавливает тариф.</div>
-      <span class="role-tag">Дистрибьютор</span>
+      <div class="role-name">Дистрибьютор (перевозчик)</div>
+      <div class="role-desc">Везёт товар от всех производителей во все магазины и назначает тариф за доставку. Один на всю цепочку.</div>
+      <span class="role-tag">Логистика</span>
+    </div>
+  </div>
+
+  <h3 style="font-size:18px;font-weight:700;margin:48px 0 6px">Чем торгуют — 4 категории товара</h3>
+  <p class="section-lead" style="margin-bottom:24px">У каждой категории свой характер. Именно из-за этих особенностей и возникают интересные решения.</p>
+  <div class="roles-grid">
+    <div class="role-card">
+      <div class="role-ico">🥫</div>
+      <div class="role-name">Бакалея</div>
+      <div class="role-desc">Крупы, консервы, бытовая химия. Долгий срок годности — можно спокойно держать запас.</div>
+      <span class="role-tag">Стабильный спрос</span>
+    </div>
+    <div class="role-card">
+      <div class="role-ico">🥛</div>
+      <div class="role-name">Молочка и Фреш</div>
+      <div class="role-desc">Молоко, овощи, зелень. Быстро портятся — перезаказал, не продал — списал в убыток.</div>
+      <span class="role-tag">Скоропорт</span>
+    </div>
+    <div class="role-card">
+      <div class="role-ico">🍫</div>
+      <div class="role-name">Снеки и напитки</div>
+      <div class="role-desc">Чипсы, шоколад, газировка. Сильно реагируют на промо: скидка → всплеск спроса.</div>
+      <span class="role-tag">Промо-чувствительные</span>
+    </div>
+    <div class="role-card">
+      <div class="role-ico">🧀</div>
+      <div class="role-name">Деликатесы (импорт)</div>
+      <div class="role-desc">Сыры, деликатесы из-за рубежа. Поставки ограничены — в кризис их не хватает на всех.</div>
+      <span class="role-tag">Дефицитные</span>
     </div>
   </div>
 </section>
@@ -266,7 +296,7 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:20px 24px;text-align:c
       <div>
         <div class="step-label">Брифинг</div>
         <div class="step-time">~2 мин</div>
-        <div class="step-desc">Спрос по К1–К4, событие тура, рыночные условия</div>
+        <div class="step-desc">Спрос на 4 категории товара, событие тура, условия рынка</div>
       </div>
     </div>
     <div class="turn-step">
@@ -308,24 +338,24 @@ footer{border-top:1px solid rgba(255,255,255,.06);padding:20px 24px;text-align:c
 
 <!-- SCORE -->
 <section id="score">
-  <div class="section-tag">Система победы</div>
+  <div class="section-tag">Цель игры — как победить</div>
   <h2 class="section-title">Побеждает умный, а не жадный</h2>
-  <p class="section-lead">Личная прибыль важна — но цепочка вознаграждает тех, кто служит ей. Бонус здоровья умножается на личный вклад каждой команды.</p>
+  <p class="section-lead">За каждый тур команда получает очки. Очки складываются из двух частей: сколько <strong>заработала лично</strong> ваша команда — плюс бонус за то, насколько <strong>здоровой</strong> осталась вся цепочка. Если гнаться только за своей прибылью и обрушить соседей — бонус потеряют все, включая вас.</p>
   <div class="score-grid">
     <div class="score-card">
-      <h3>🏆 Формула счёта</h3>
-      <p>Каждый тур команда получает очки. Чем здоровее цепочка — тем выше бонус для всех.</p>
+      <h3>🏆 Из чего складываются очки</h3>
+      <p>Своя прибыль — это понятно. «Здоровье цепочки» — это когда на полках есть товар, нет дефицита, никто не перезаказывает и ничего не портится. Чем оно выше — тем больше бонус, и он один на всех.</p>
       <div class="score-formula">
-        Счёт = <span class="hi">Прибыль</span> + <span class="hi">Здоровье × 250 × Вклад</span>
+        Очки за тур = <span class="hi">своя прибыль</span> + <span class="hi">бонус за здоровье цепочки</span>
       </div>
     </div>
     <div class="score-card">
-      <h3>🎖 Финальные награды</h3>
+      <h3>🎖 Награды в финале</h3>
       <div class="awards-list">
-        <div class="award">🏆 <span><strong>Гран-при</strong> — максимальный суммарный счёт</span></div>
-        <div class="award">🥇 <span><strong>Лучший ритейлер / поставщик / дист-р</strong></span></div>
-        <div class="award">🤝 <span><strong>Архитектор цепочки</strong> — лучший сервис</span></div>
-        <div class="award">📉 <span><strong>Антихлыст</strong> — самый стабильный объём</span></div>
+        <div class="award">🏆 <span><strong>Гран-при</strong> — больше всего очков за все 4 тура</span></div>
+        <div class="award">🥇 <span><strong>Лучший магазин / производитель / перевозчик</strong> — макс. прибыль в своём типе</span></div>
+        <div class="award">🤝 <span><strong>Архитектор цепочки</strong> — кто лучше всех держал товар на полках</span></div>
+        <div class="award">📉 <span><strong>Антихлыст</strong> — самые стабильные заказы без паники</span></div>
       </div>
     </div>
   </div>

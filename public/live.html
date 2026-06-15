@@ -173,8 +173,8 @@ body{background:linear-gradient(160deg,#060d1c 0%,#091425 100%);color:var(--W);f
 
 <script>
 const G = {
-  catIds:   ['К1','К2','К3','К4'],
-  catNames: ['Базовая','Fresh','Промо-хиты','Импорт/пр.'],
+  catIds:   ['Бакалея','Молочка','Снеки','Деликатесы'],
+  catNames: ['долгий срок','скоропорт','промо','импорт'],
   retIds:   ['R1','R2','R3'],
   supIds:   ['S1','S2','S3','S4'],
   allTeams: ['R1','R2','R3','S1','S2','S3','S4','D'],
@@ -183,13 +183,13 @@ const G = {
   roundNames:['Стартовый рынок','Промо-инициатива','Внешнее событие','Стабилизация'],
   events:[
     null,
-    {t:'📢 Промо-инициатива',d:'Спрос К3 вырос до 110 ед. Промо-буст ×1.5 — только при скидке ≥10% и промо=Да.'},
-    {t:'🚨 ДВОЙНОЙ ШОК',d:'Мощность дист-ра: 320→200. Квота П4: 70→30. Спрос: К2→130, К4→25. Приоритизируйте поставки!'},
-    {t:'📊 Стабилизация',d:'Рынок восстанавливается: К2=115, К3=90, К4=35. Восстановите сервис и маржу.'},
+    {t:'📢 Промо-инициатива',d:'Спрос на снеки вырос до 110 ед. Промо-буст ×1.5 — только при скидке ≥10% и включённом промо.'},
+    {t:'🚨 ДВОЙНОЙ ШОК',d:'Мощность перевозчика: 320→200. Квота Импорта: 70→30. Спрос: молочка→130, деликатесы→25. Приоритизируйте поставки!'},
+    {t:'📊 Стабилизация',d:'Рынок восстанавливается: молочка=115, снеки=90, деликатесы=35. Восстановите сервис и маржу.'},
   ],
   phaseName:{lobby:'Лобби',roles:'Распределение ролей',briefing:'Брифинг',negotiation:'Переговоры',decisions:'Ввод решений',results:'Итоги',final:'Финал'},
   phaseIco: {lobby:'🏠',roles:'🎲',briefing:'📋',negotiation:'🤝',decisions:'📝',results:'📊',final:'🏆'},
-  LBL:{R1:'Р1',R2:'Р2',R3:'Р3',S1:'П1',S2:'П2',S3:'П3',S4:'П4',D:'Д'},
+  LBL:{R1:'Дискаунтер',R2:'Супермаркет',R3:'Гипермаркет',S1:'Базовый',S2:'Fresh',S3:'Промо-хиты',S4:'Импорт',D:'Дистрибьютор'},
   CHARS:{'Жёсткий':{ico:'🦁',clr:'#f85149'},'Кооперативный':{ico:'🤝',clr:'#3fb950'},'Хитрый':{ico:'🦊',clr:'#d29922'},'Упрямый':{ico:'😤',clr:'#f0883e'},'Аналитик':{ico:'📊',clr:'#58a6ff'}},
   type:t=>['R1','R2','R3'].includes(t)?'ret':['S1','S2','S3','S4'].includes(t)?'sup':'dist',
 };
@@ -400,7 +400,7 @@ function renderNegotiation(r){
       <div class="cl">${cat} · Спрос</div>
       <div class="cv nt">${G.demand[r][i]}</div>
     </div>`).join('')}
-    <div class="ck"><div class="cl">Мощность дист-ра</div>
+    <div class="ck"><div class="cl">Мощность перевозчика</div>
       <div class="cv ${r===2?'bad':'ok'}">${G.distCap[r]}</div>
     </div>
   </div>`;
@@ -458,7 +458,7 @@ function renderResults(r){
     <div class="ck"><div class="cl">Дефицит ед.</div><div class="cv ${cDef>20?'bad':'wn'}">${f0(cDef)}</div></div>
     <div class="ck"><div class="cl">Перезапас ед.</div><div class="cv wn">${f0(cOv)}</div></div>
     <div class="ck"><div class="cl">Списания (Fresh)</div><div class="cv ${cWo>5?'bad':'wn'}">${f0(cWo)}</div></div>
-    <div class="ck"><div class="cl">Загрузка дист-ра</div><div class="cv ${res.dCoeff>.9?'ok':res.dCoeff>.6?'wn':'bad'}">${f1(res.dCoeff*100)}%</div></div>
+    <div class="ck"><div class="cl">Загрузка перевозчика</div><div class="cv ${res.dCoeff>.9?'ok':res.dCoeff>.6?'wn':'bad'}">${f1(res.dCoeff*100)}%</div></div>
   </div>
   <div class="res-grid">
     ${G.retIds.map((rid,ri)=>{
@@ -487,7 +487,7 @@ function renderResults(r){
           <span class="kpi-val wn">${f0(res.unsold?.[si]||0)}</span></div>
       </div>`;
     }).join('')}
-    <div class="res-card"><h4>🚛 ${G.LBL['D']} · ${gs.names?.['D']||'Дист-р'}</h4>
+    <div class="res-card"><h4>🚛 ${G.LBL['D']} · ${gs.names?.['D']||'Перевозчик'}</h4>
       <div class="kpi-row"><span class="kpi-lbl">Тариф</span>
         <span class="kpi-val nt">${f1(res.tariff||1.5)}</span></div>
       <div class="kpi-row"><span class="kpi-lbl">Загрузка</span>

@@ -56,7 +56,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .rc-hdr.ret{background:linear-gradient(135deg,#1a3565,#2b5ba8)}
 .rc-hdr.sup{background:linear-gradient(135deg,#1a5c30,#27ae60)}
 .rc-hdr.dist{background:linear-gradient(135deg,#5b2a8a,#8e44ad)}
-.rc-actor{font-size:22px;font-weight:900;letter-spacing:-.5px;line-height:1}
+.rc-actor{font-size:13px;font-weight:800;letter-spacing:0;line-height:1.1;text-transform:uppercase;opacity:.65}
 .rc-name{font-size:11px;opacity:.85;margin-top:3px;font-weight:500}
 .rc-type{font-size:9px;opacity:.65;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
 .rc-ico{position:absolute;right:12px;top:10px;font-size:26px;opacity:.7}
@@ -235,7 +235,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <!-- Р1 Дискаунтер -->
   <div class="role-card">
     <div class="rc-hdr ret">
-      <div class="rc-actor">Р1</div>
+      <div class="rc-actor">Магазин</div>
       <div class="rc-name">Дискаунтер</div>
       <div class="rc-type">Ритейлер · низкие цены</div>
       <div class="rc-ico">🛒</div>
@@ -252,7 +252,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
         <div class="role-ico">🏷️</div>
         <div class="role-info">
           <div class="rn">Категорийный менеджер</div>
-          <div class="rd">Ценовая политика и промо по категориям К1–К4</div>
+          <div class="rd">Ценовая политика и промо по всем категориям товара</div>
         </div>
       </div>
       <div class="role-row">
@@ -276,7 +276,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <!-- Р2 Супермаркет -->
   <div class="role-card">
     <div class="rc-hdr ret">
-      <div class="rc-actor">Р2</div>
+      <div class="rc-actor">Магазин</div>
       <div class="rc-name">Супермаркет</div>
       <div class="rc-type">Ритейлер · баланс цены и сервиса</div>
       <div class="rc-ico">🛒</div>
@@ -293,7 +293,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
         <div class="role-ico">🏷️</div>
         <div class="role-info">
           <div class="rn">Категорийный менеджер</div>
-          <div class="rd">Ценовая политика и промо по категориям К1–К4</div>
+          <div class="rd">Ценовая политика и промо по всем категориям товара</div>
         </div>
       </div>
       <div class="role-row">
@@ -317,7 +317,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <!-- Р3 Гипермаркет -->
   <div class="role-card">
     <div class="rc-hdr ret">
-      <div class="rc-actor">Р3</div>
+      <div class="rc-actor">Магазин</div>
       <div class="rc-name">Гипермаркет</div>
       <div class="rc-type">Ритейлер · большой объём</div>
       <div class="rc-ico">🛒</div>
@@ -334,14 +334,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
         <div class="role-ico">🏷️</div>
         <div class="role-info">
           <div class="rn">Категорийный менеджер</div>
-          <div class="rd">Широкий ассортимент, управление промо К1–К4</div>
+          <div class="rd">Широкий ассортимент, управление промо по всем категориям</div>
         </div>
       </div>
       <div class="role-row">
         <div class="role-ico">📦</div>
         <div class="role-info">
           <div class="rn">Менеджер закупок</div>
-          <div class="rd">Крупные объёмы. Минимизирует дефицит по К2 Fresh</div>
+          <div class="rd">Крупные объёмы. Минимизирует дефицит молочки и фреша</div>
         </div>
       </div>
       <div class="role-row">
@@ -352,19 +352,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
         </div>
       </div>
     </div>
-    <div class="rc-footer">🎯 Фокус: <strong>не перезаказать К2 Fresh — списания в убыток</strong></div>
+    <div class="rc-footer">🎯 Фокус: <strong>не перезаказать молочку и фреш — списания в убыток</strong></div>
   </div>
 </div>
 
 <!-- ПОСТАВЩИКИ -->
 <div class="role-cards-grid" style="margin-bottom:14px">
 
-  <!-- П1 Базовый -->
+  <!-- Производитель Базовый -->
   <div class="role-card">
     <div class="rc-hdr sup">
-      <div class="rc-actor">П1</div>
-      <div class="rc-name">Поставщик «Базовый»</div>
-      <div class="rc-type">Производство К1</div>
+      <div class="rc-actor">Производитель</div>
+      <div class="rc-name">Базовый</div>
+      <div class="rc-type">Производит бакалею</div>
       <div class="rc-ico">🏭</div>
     </div>
     <div class="rc-body">
@@ -400,12 +400,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     <div class="rc-footer">🎯 Фокус: <strong>загрузка мощности = прибыль, простой = убыток</strong></div>
   </div>
 
-  <!-- П2 Fresh -->
+  <!-- Производитель Fresh -->
   <div class="role-card">
     <div class="rc-hdr sup">
-      <div class="rc-actor">П2</div>
-      <div class="rc-name">Поставщик «Fresh»</div>
-      <div class="rc-type">Производство К2 · скоропорт</div>
+      <div class="rc-actor">Производитель</div>
+      <div class="rc-name">Fresh</div>
+      <div class="rc-type">Производит молочку и фреш · скоропорт</div>
       <div class="rc-ico">🥦</div>
     </div>
     <div class="rc-body">
@@ -438,15 +438,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
         </div>
       </div>
     </div>
-    <div class="rc-footer" style="background:#fff5f5">⚠️ Главный риск: <strong>перепроизводство = списания К2</strong></div>
+    <div class="rc-footer" style="background:#fff5f5">⚠️ Главный риск: <strong>перепроизводство = списания скоропорта</strong></div>
   </div>
 
-  <!-- П3 Промо-хиты -->
+  <!-- Производитель Промо-хиты -->
   <div class="role-card">
     <div class="rc-hdr sup">
-      <div class="rc-actor">П3</div>
-      <div class="rc-name">Поставщик «Промо»</div>
-      <div class="rc-type">Производство К3 · промо-хиты</div>
+      <div class="rc-actor">Производитель</div>
+      <div class="rc-name">Промо-хиты</div>
+      <div class="rc-type">Производит снеки и напитки · промо</div>
       <div class="rc-ico">🎁</div>
     </div>
     <div class="rc-body">
@@ -454,21 +454,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
         <div class="role-ico">🎩</div>
         <div class="role-info">
           <div class="rn lead">Генеральный директор</div>
-          <div class="rd">Стратегия. В Туре 2 — ключевые переговоры по промо-буст К3</div>
+          <div class="rd">Стратегия. В Туре 2 — ключевые переговоры по промо-бусту на снеки</div>
         </div>
       </div>
       <div class="role-row">
         <div class="role-ico">🏭</div>
         <div class="role-info">
           <div class="rn">Директор производства</div>
-          <div class="rd">Объём выпуска. В Туре 2 спрос К3 вырастает при промо</div>
+          <div class="rd">Объём выпуска. В Туре 2 спрос на снеки вырастает при промо</div>
         </div>
       </div>
       <div class="role-row">
         <div class="role-ico">💼</div>
         <div class="role-info">
           <div class="rn">Коммерческий директор</div>
-          <div class="rd">Скидка ≥10% ритейлеру → промо-буст × 1.5 по К3</div>
+          <div class="rd">Скидка ≥10% магазину → промо-буст × 1.5 на снеки</div>
         </div>
       </div>
       <div class="role-row">
@@ -482,12 +482,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     <div class="rc-footer">🎯 Фокус: <strong>Тур 2 — промо-окно, подготовиться заранее</strong></div>
   </div>
 
-  <!-- П4 Импорт -->
+  <!-- Производитель Импорт -->
   <div class="role-card">
     <div class="rc-hdr sup">
-      <div class="rc-actor">П4</div>
-      <div class="rc-name">Поставщик «Импорт»</div>
-      <div class="rc-type">Производство К4 · ограниченная квота</div>
+      <div class="rc-actor">Производитель</div>
+      <div class="rc-name">Импорт</div>
+      <div class="rc-type">Производит деликатесы · ограниченная квота</div>
       <div class="rc-ico">🚢</div>
     </div>
     <div class="rc-body">
@@ -528,7 +528,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div class="role-cards-grid" style="grid-template-columns:1fr 2fr;margin-bottom:32px">
   <div class="role-card">
     <div class="rc-hdr dist">
-      <div class="rc-actor">Д</div>
+      <div class="rc-actor">Перевозчик</div>
       <div class="rc-name">Дистрибьютор</div>
       <div class="rc-type">Логистика · все потоки</div>
       <div class="rc-ico">🚛</div>
@@ -559,7 +559,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
         <div class="role-ico">🧮</div>
         <div class="role-info">
           <div class="rn">Аналитик загрузки</div>
-          <div class="rd">Оптимизация тарифа. Высокий тариф = маржа дист-ра, но убивает здоровье</div>
+          <div class="rd">Оптимизация тарифа. Высокий тариф = маржа перевозчика, но убивает здоровье</div>
         </div>
       </div>
     </div>
@@ -733,7 +733,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
           <div class="ph-num">1</div>
           <div class="ph-text">
             <div class="pht">Брифинг (~2 мин)</div>
-            <div class="phd">Аналитик читает вводную: спрос К1–К4, событие тура, условия рынка</div>
+            <div class="phd">Аналитик читает вводную: спрос на 4 категории товара, событие тура, условия рынка</div>
           </div>
         </li>
         <li class="phase-item">
@@ -798,7 +798,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
         <li class="tip-item"><span class="tip-ico">📊</span><span>Заказывай близко к реальному спросу — перезаказ раскачивает цепочку (эффект хлыста)</span></li>
         <li class="tip-item"><span class="tip-ico">🗣️</span><span>Делись прогнозом с соседним звеном на переговорах — это поднимает здоровье и бонус всем</span></li>
         <li class="tip-item"><span class="tip-ico">⚡</span><span>Готовься к Туру 3: будет шок мощностей и квот. Договорись о приоритетах заранее</span></li>
-        <li class="tip-item"><span class="tip-ico">🎯</span><span>Промо К3 со скидкой ≥10% даёт буст ×1.5. Но кто-то должен произвести больше — обсуди с П3</span></li>
+        <li class="tip-item"><span class="tip-ico">🎯</span><span>Промо на снеки со скидкой ≥10% даёт буст ×1.5. Но кто-то должен произвести больше — обсуди с производителем «Промо-хиты»</span></li>
         <li class="tip-item"><span class="tip-ico">🚛</span><span>Тариф дистрибьютора влияет на всех. Слишком высокий — убивает здоровье цепочки и твой бонус</span></li>
       </ul>
     </div>
@@ -809,9 +809,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     <div class="qr-hdr" style="background:linear-gradient(135deg,#c0392b,#e74c3c)"><div class="qh-ico">🚫</div><h3>Не делай так</h3></div>
     <div class="qr-body">
       <ul class="tip-list">
-        <li class="tip-item"><span class="tip-ico">❌</span><span>«Закажу с запасом на всякий случай» — перезапас, списания К2, обвал здоровья цепочки</span></li>
+        <li class="tip-item"><span class="tip-ico">❌</span><span>«Закажу с запасом на всякий случай» — перезапас, списания скоропорта, обвал здоровья цепочки</span></li>
         <li class="tip-item"><span class="tip-ico">❌</span><span>Гнаться только за прибылью, игнорируя дефицит — теряешь бонус 250 у.е. × 4 тура = 1000 у.е.</span></li>
-        <li class="tip-item"><span class="tip-ico">❌</span><span>П2 (Fresh) — перепроизводить. Всё лишнее списывается напрямую в убыток</span></li>
+        <li class="tip-item"><span class="tip-ico">❌</span><span>Производителю Fresh — перепроизводить. Всё лишнее списывается напрямую в убыток</span></li>
         <li class="tip-item"><span class="tip-ico">❌</span><span>Промо со скидкой &lt;10% — буст НЕ даётся, маржа режется впустую</span></li>
         <li class="tip-item"><span class="tip-ico">❌</span><span>Дистрибьютор с тарифом выше разумного — цепочка задыхается, и твой бонус тоже падает</span></li>
       </ul>
@@ -858,7 +858,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
             <td class="t-num">Тур 2</td>
             <td>
               <span class="event-badge ev-promo">📢 ПРОМО</span><br>
-              К3 ×1.5 при скидке ≥10%. Спрос К3 = 110
+              Снеки ×1.5 при скидке ≥10%. Спрос на снеки = 110
             </td>
             <td>«Промо дало буст — но кто заплатил за него?»</td>
           </tr>
@@ -866,9 +866,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
             <td class="t-num">Тур 3</td>
             <td>
               <span class="event-badge ev-shock">🚨 ШОК</span><br>
-              Дист-р: 320→200. П4 квота: 70→30. К2↑ К4↓
+              Перевозчик: 320→200. Квота Импорта: 70→30. Молочка↑ Деликатесы↓
             </td>
-            <td>«Как дист-р распределил дефицит? Справедливо?»</td>
+            <td>«Как перевозчик распределил дефицит? Справедливо?»</td>
           </tr>
           <tr>
             <td class="t-num">Тур 4</td>

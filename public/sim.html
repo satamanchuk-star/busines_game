@@ -254,6 +254,12 @@ body{background:linear-gradient(160deg,#060d1c 0%,#091425 100%);color:var(--W);f
 .neg-hdr h2{font-size:16px;font-weight:700;margin-bottom:2px}
 .neg-hdr .rsub{font-size:11px;color:var(--W2)}
 .neg-sessions{display:flex;flex-direction:column;gap:14px;margin-bottom:14px}
+.neg-intro{background:rgba(74,135,212,.08);border:1px solid rgba(74,135,212,.25);border-left:3px solid var(--P);
+  border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;line-height:1.6;color:var(--W2)}
+.neg-intro b{color:var(--W);font-weight:700}
+.ns-stake{display:flex;gap:7px;align-items:flex-start;padding-top:7px;font-size:11px;line-height:1.5;color:var(--W2)}
+.ns-stake .ns-stake-ico{flex-shrink:0;opacity:.8}
+.ns-stake b{color:var(--W);font-weight:600}
 .neg-session{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);overflow:hidden;
   box-shadow:0 2px 12px rgba(0,0,0,.25)}
 .neg-session-hdr{padding:12px 16px;border-bottom:1px solid var(--bg3);background:rgba(255,255,255,.025)}
@@ -339,7 +345,7 @@ body{background:linear-gradient(160deg,#060d1c 0%,#091425 100%);color:var(--W);f
       <input type="range" id="p-noise" min="0" max="30" value="10" step="5" oninput="updParam('noise',this.value)">
     </div>
     <div class="param-item">
-      <label>Мощность дист-ра в Туре 3 <span class="pval" id="pv-shock">200 ед.</span></label>
+      <label>Мощность перевозчика в Туре 3 <span class="pval" id="pv-shock">200 ед.</span></label>
       <input type="range" id="p-shock" min="80" max="320" value="200" step="20" oninput="updParam('shock',this.value)">
     </div>
     <div class="param-item">
@@ -381,6 +387,7 @@ body{background:linear-gradient(160deg,#060d1c 0%,#091425 100%);color:var(--W);f
     </div>
     <div id="neg-sc-pill" class="sc-pill" style="margin-left:auto"></div>
   </div>
+  <div id="neg-intro" class="neg-intro"></div>
   <div class="neg-sessions" id="neg-sessions"></div>
   <div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid var(--bg3)">
     <button class="btn btn-S btn-sm" onclick="goSetup()">← Настройки</button>
@@ -448,7 +455,7 @@ body{background:linear-gradient(160deg,#060d1c 0%,#091425 100%);color:var(--W);f
       <div id="chart-profit"></div>
     </div>
     <div class="an-card">
-      <h3>🌊 Эффект хлыста — К1</h3>
+      <h3>🌊 Эффект хлыста — Бакалея</h3>
       <div id="chart-bullwhip"></div>
     </div>
     <div class="an-card">
@@ -488,7 +495,7 @@ const P = {
   distCap:[320,320,200,320],
   pBoost:1.5, pThr:.10, tCost:.8, hCost:1.0,
   salv:.8, // непроданный нескоропорт сохраняет 80% закупочной стоимости
-  catIds:['К1','К2','К3','К4'],
+  catIds:['Бакалея','Молочка','Снеки','Деликатесы'],
   roundNames:['Стартовый рынок','Промо-инициатива','Внешнее событие','Стабилизация'],
 };
 
@@ -572,7 +579,7 @@ const SCENARIOS = {
     desc:'Все ритейлеры жмут промо одновременно. Буст в Туре 2 — искусственный. После — запасы, дефицит и убытки.',
     strats:{R1:'Промо-фанат',R2:'Промо-фанат',R3:'Промо-фанат',S1:'Реактивный',S2:'Максималист',S3:'Максималист',S4:'Точный',D:'Оптимизатор'},
     params:{noise:10,shock:200,boost:20},
-    discuss:['В каком туре промо дало наибольший буст? Почему он оказался временным?','Кто заработал на промо-хаосе, а кто потерял?','Что произошло с запасами Fresh (К2) когда все одновременно заказали под промо?'],
+    discuss:['В каком туре промо дало наибольший буст? Почему он оказался временным?','Кто заработал на промо-хаосе, а кто потерял?','Что произошло с запасами Молочки и Фреша когда все одновременно заказали под промо?'],
   },
   ideal:{
     name:'🤝 Идеальная координация', color:'#3fb950',
@@ -583,7 +590,7 @@ const SCENARIOS = {
   },
   stress:{
     name:'💥 Стресс-тест', color:'#f85149',
-    desc:'Максимальный шок в Туре 3: мощность дист-ра 120 ед., квота П4 — 20 ед. Кто выживает? Кто теряет всё?',
+    desc:'Максимальный шок в Туре 3: мощность перевозчика 120 ед., квота Импорта — 20 ед. Кто выживает? Кто теряет всё?',
     strats:{R1:'Агрессивный',R2:'Рыночный',R3:'Рыночный',S1:'Осторожный',S2:'Осторожный',S3:'Реактивный',S4:'Точный',D:'Монополист'},
     params:{noise:20,shock:120,boost:15},
     discuss:['Как дистрибьютор должен был распределить ограниченные 120 ед.? Было ли это справедливо?','Кто принял правильное решение заранее, а кто пострадал от шока?','Какие буферные запасы помогли бы пережить этот шок?'],
@@ -601,8 +608,11 @@ const TEAM_ICO  = {R1:'🛒',R2:'🛒',R3:'🛒',S1:'🏭',S2:'🏭',S3:'🏭',S
 const TEAM_TYPE = {R1:'ret',R2:'ret',R3:'ret',S1:'sup',S2:'sup',S3:'sup',S4:'sup',D:'dist'};
 const TEAM_ROLE = {R1:'Дискаунтер',R2:'Супермаркет',R3:'Гипермаркет',
                    S1:'Базовый',S2:'Fresh',S3:'Промо-хиты',S4:'Импорт',D:'Дистрибьютор'};
-// Кириллические метки акторов (внутренние ключи R/S/D остаются для движка)
-const LBL = {R1:'Р1',R2:'Р2',R3:'Р3',S1:'П1',S2:'П2',S3:'П3',S4:'П4',D:'Д'};
+// Тип бизнеса команды (понятный префикс вместо кодов Р/П/Д)
+const TYPE = {R1:'Магазин',R2:'Магазин',R3:'Магазин',
+              S1:'Производитель',S2:'Производитель',S3:'Производитель',S4:'Производитель',D:'Перевозчик'};
+// LBL = различимое короткое имя для подписей/графиков (без кодов)
+const LBL = {...TEAM_ROLE};
 const turLabel = i => `Тур ${i+1}`;
 const DEMO_NAMES={
   R1:['Близко&Дёшево','ЦенаБит','АльфаМаркет'],R2:['УютМаркет','СвежийГород','МегаФреш'],
@@ -785,31 +795,52 @@ const SCENARIO_CHARS = {
 };
 
 // Negotiation pairs per round
+// why = «ставка» сделки: кто чего хочет и почему это важно (режим истории)
 const NEG_PAIRS = [
   // R0: Стартовый рынок
   [
-    {from:'R1',to:'S1',subj:'скидку на К1 (Базовый)',type:'dsc',fromWant:0.15,toWant:0.04},
-    {from:'R2',to:'D', subj:'тариф логистики',        type:'tar',fromWant:1.2, toWant:2.2 },
-    {from:'R3',to:'S4',subj:'поставку К4 (Импорт)',   type:'vol',fromWant:'45 ед.',toWant:'30 ед.'},
+    {from:'R1',to:'S1',subj:'скидку на бакалею',        type:'dsc',fromWant:0.15,toWant:0.04,
+     why:'Дискаунтер живёт за счёт низких цен и хочет скидку побольше, чтобы давить ценой на полке. Производитель бакалеи бережёт маржу — большая скидка съест его прибыль.'},
+    {from:'R2',to:'D', subj:'тариф за доставку',        type:'tar',fromWant:1.2, toWant:2.2,
+     why:'Супермаркет хочет платить за доставку поменьше. Перевозчик — единственный в цепочке и хочет тариф повыше: чем дороже доставка, тем больше его прибыль.'},
+    {from:'R3',to:'S4',subj:'объём поставки деликатесов',type:'vol',fromWant:'45 ед.',toWant:'30 ед.',
+     why:'Гипермаркет хочет забрать побольше деликатесов — на них высокая наценка. Но мощность импортного производителя ограничена, и он не готов обещать так много.'},
   ],
   // R1: Промо-инициатива
   [
-    {from:'R1',to:'S3',subj:'промо-скидку на К3',type:'dsc',fromWant:0.18,toWant:0.06,promo:true},
-    {from:'R2',to:'S2',subj:'промо Fresh К2',    type:'dsc',fromWant:0.14,toWant:0.05,promo:true},
-    {from:'D', to:'R3',subj:'надбавку за объём', type:'tar',fromWant:2.0, toWant:1.4 },
+    {from:'R1',to:'S3',subj:'промо-скидку на снеки',     type:'dsc',fromWant:0.18,toWant:0.06,promo:true,
+     why:'Открылось промо-окно: скидка ≥10% даёт всплеск спроса на снеки. Дискаунтер хочет глубокую скидку, чтобы запустить буст. Производитель снеков боится отдать товар почти даром.'},
+    {from:'R2',to:'S2',subj:'промо-скидку на молочку',   type:'dsc',fromWant:0.14,toWant:0.05,promo:true,
+     why:'Супермаркет хочет промо на молочку. Опасность: молочка быстро портится — если все закажут под промо, а спрос не выкупит, излишки придётся списать в убыток.'},
+    {from:'D', to:'R3',subj:'надбавку за большой объём',  type:'tar',fromWant:2.0, toWant:1.4,
+     why:'Перевозчик хочет надбавку с гипермаркета за крупную партию под промо. Гипермаркет упирается: лишняя надбавка убьёт всю выгоду от промо.'},
   ],
   // R2: Внешнее событие (шок)
   [
-    {from:'D', to:'R1',subj:'приоритет при дефиците мощностей',type:'pri',fromWant:'60 ед.',toWant:'100 ед.'},
-    {from:'D', to:'R2',subj:'приоритет при дефиците мощностей',type:'pri',fromWant:'50 ед.',toWant:'90 ед.' },
-    {from:'S4',to:'R3',subj:'распределение квоты К4 (15 ед.)', type:'vol',fromWant:'10 ед.',toWant:'15 ед.'},
+    {from:'D', to:'R1',subj:'приоритет в доставке при дефиците',type:'pri',fromWant:'60 ед.',toWant:'100 ед.',
+     why:'Шок: мощность перевозчика резко урезана, на всех не хватит. Дискаунтер требует, чтобы его заказы везли в первую очередь. Перевозчик решает, кому достанется дефицитная доставка.'},
+    {from:'D', to:'R2',subj:'приоритет в доставке при дефиците',type:'pri',fromWant:'50 ед.',toWant:'90 ед.',
+     why:'Супермаркет тоже борется за приоритет в доставке. Кого перевозчик поставит в очередь первым — тот наполнит полки, остальные останутся с пустыми.'},
+    {from:'S4',to:'R3',subj:'долю в дефицитной квоте деликатесов',type:'vol',fromWant:'10 ед.',toWant:'15 ед.',
+     why:'Квоту на импортные деликатесы урезали — товара на всех не хватает. Гипермаркет хочет урвать побольше, импортный производитель готов дать меньше, чем тот просит.'},
   ],
   // R3: Стабилизация
   [
-    {from:'R1',to:'S1',subj:'долгосрочную скидку К1',type:'dsc',fromWant:0.12,toWant:0.03},
-    {from:'R3',to:'S4',subj:'восстановление объёма К4',type:'vol',fromWant:'50 ед.',toWant:'40 ед.'},
-    {from:'R2',to:'D', subj:'снижение тарифа',          type:'tar',fromWant:1.3, toWant:1.9 },
+    {from:'R1',to:'S1',subj:'долгосрочную скидку на бакалею',type:'dsc',fromWant:0.12,toWant:0.03,
+     why:'Рынок успокоился. Дискаунтер предлагает зафиксировать скидку на бакалею надолго — стабильность в обмен на цену. Производитель взвешивает: предсказуемый поток против меньшей маржи.'},
+    {from:'R3',to:'S4',subj:'восстановление объёма деликатесов',type:'vol',fromWant:'50 ед.',toWant:'40 ед.',
+     why:'После шока гипермаркет хочет вернуть прежние объёмы деликатесов. Импортный производитель осторожен: восстанавливать мощность быстро рискованно.'},
+    {from:'R2',to:'D', subj:'снижение тарифа за доставку',  type:'tar',fromWant:1.3, toWant:1.9,
+     why:'Супермаркет давит на перевозчика: кризис прошёл, пора снижать тариф. Перевозчик не спешит расставаться с высокой маржой, которую закрепил во время шока.'},
   ],
+];
+
+// Вводная по ситуации тура (режим истории — «что происходит и почему»)
+const NEG_INTRO = [
+  '<b>Тур 1. Рынок открывается.</b> Команды впервые прощупывают друг друга. Магазины хотят закупать дешевле, производители — держать маржу, перевозчик — задрать тариф. От этих сделок зависят стартовые позиции на весь матч.',
+  '<b>Тур 2. Промо-инициатива.</b> Скидка ≥10% даёт всплеск спроса — соблазнительно для всех. Но если все ударят промо одновременно, цепочку захлестнёт перезаказ, а скоропорт пойдёт в списание. Кто сторгует выгодную скидку, не подставив соседей?',
+  '<b>Тур 3. Внешний шок.</b> Мощность перевозчика и квота на импорт резко урезаны — товара на всех не хватит. Переговоры идут не про цену, а про выживание: кому достанется дефицитная доставка и квота.',
+  '<b>Тур 4. Стабилизация.</b> Кризис позади. Время фиксировать долгосрочные условия и восстанавливать объёмы. Кто закрепит выгодные договорённости на финал — тот и заберёт призовые места.',
 ];
 
 // ━━━ SIM STATE ━━━
@@ -847,7 +878,7 @@ function renderCharGrid() {
       <div class="ts-top">
         <span class="ts-ico">${TEAM_ICO[tid]}</span>
         <div>
-          <div class="ts-id">${LBL[tid]} · ${TEAM_ROLE[tid]}</div>
+          <div class="ts-id">${TYPE[tid]} · ${TEAM_ROLE[tid]}</div>
           <div class="ts-name" id="cg-nm-${tid}" style="color:${ch.clr};font-size:12px;font-weight:700">${ch.ico} ${cur}</div>
         </div>
       </div>
@@ -896,7 +927,7 @@ function renderStratGrid() {
     return `<div class="ts-item">
       <div class="ts-top">
         <span class="ts-ico">${TEAM_ICO[tid]}</span>
-        <div><div class="ts-id">${LBL[tid]}</div><div class="ts-name">${TEAM_ROLE[tid]}</div></div>
+        <div><div class="ts-id">${TYPE[tid]}</div><div class="ts-name">${TEAM_ROLE[tid]}</div></div>
       </div>
       <select onchange="updStrat('${tid}',this.value)" id="sel-${tid}">
         ${opts.map(o=>`<option value="${o}" ${o===cur?'selected':''}>${o}</option>`).join('')}
@@ -991,7 +1022,7 @@ function genNarrative(tid, dec, res) {
     } else if(totalDef>5) lines.push(`🟡 Небольшой дефицит <b>${f0(totalDef)} ед.</b>`);
     else lines.push(`✅ Полки заполнены, дефицит минимален.`);
 
-    if(totalWoff>2) lines.push(`🗑 Fresh К2: <b>${f0(totalWoff)} ед.</b> списано — потери ${f0(totalWoff*P.cost[1])} у.е.`);
+    if(totalWoff>2) lines.push(`🗑 Молочка/Фреш: <b>${f0(totalWoff)} ед.</b> испортилось и списано — потери ${f0(totalWoff*P.cost[1])} у.е.`);
     else if(totalOver>15) lines.push(`📦 Перезаказ <b>${f0(totalOver)} ед.</b> — холдинг ${f0(totalOver*P.hCost)} у.е.`);
     return {lines, osa, profit};
 
@@ -1026,7 +1057,7 @@ const DISCUSS = [
    'Кто «угадал» с производством? Какую информацию им понадобилось бы знать заранее?'],
   ['Промо дало буст — но кто заплатил за этот буст? (подсказка: скидки съели маржу поставщика)',
    'Если бы все промо шли в разное время — как бы изменился результат?'],
-  ['Дист-р получил ограничение. Чьи заказы он должен был выполнить в первую очередь — и почему?',
+  ['Перевозчик получил ограничение. Чьи заказы он должен был выполнить в первую очередь — и почему?',
    'Кто подготовился к шоку заранее? Что они сделали правильно в Туре 2?'],
   ['Кто быстрее адаптировался к изменившемуся рынку? Какая стратегия доказала устойчивость?',
    'Если бы все знали исход Тура 3 заранее — что изменили бы в Туре 1?'],
@@ -1046,10 +1077,10 @@ function genTeachMoment(r, res) {
     d:`Дефицит <b>${f0(totalDef)} ед.</b> — ритейлеры теряли покупателей в пиковые часы.`});
   if(totalOver>30) moments.push({lvl:'warn',ico:'📦',t:'Перезапас в системе',
     d:`<b>${f0(totalOver)} ед.</b> лишнего товара заморозили деньги. Цепочка работала неэффективно.`});
-  if(totalWoff>8) moments.push({lvl:'crit',ico:'🗑',t:'Списания Fresh',
-    d:`<b>${f0(totalWoff)} ед.</b> скоропортящегося товара выброшено. Стоимость: ${f0(totalWoff*P.cost[1])} у.е.`});
+  if(totalWoff>8) moments.push({lvl:'crit',ico:'🗑',t:'Списания скоропорта',
+    d:`<b>${f0(totalWoff)} ед.</b> Молочки и Фреша испортилось и выброшено. Стоимость: ${f0(totalWoff*P.cost[1])} у.е.`});
   if(dCoeff<0.65) moments.push({lvl:'warn',ico:'🚛',t:'Узкое место — логистика',
-    d:`Дист-р использован на <b>${f0(dCoeff*100)}%</b>. Ограничение мощностей стало главной причиной дефицита.`});
+    d:`Перевозчик загружен на <b>${f0(dCoeff*100)}%</b>. Ограничение мощностей стало главной причиной дефицита.`});
   if(moments.length===0) moments.push({lvl:'good',ico:'✅',t:'Тур прошёл без критических проблем',
     d:`OSA ${f0(avgOSA*100)}%, дефицит ${f0(totalDef)} ед. Результат выше среднего для этого сценария.`});
 
@@ -1124,7 +1155,7 @@ function renderRosters() {
       <div class="roster-hdr">
         <span class="rh-ico">${TEAM_ICO[tid]}</span>
         <div>
-          <div class="rh-id">${LBL[tid]} · ${TEAM_ROLE[tid]}</div>
+          <div class="rh-id">${TYPE[tid]} · ${TEAM_ROLE[tid]}</div>
           <div class="rh-nm">${SIM.names[tid]}</div>
         </div>
         <span class="roster-team-size">${slots.length} чел.</span>
@@ -1162,7 +1193,7 @@ function renderRound(r) {
   document.getElementById('r-sub').textContent=[
     'Первый тур. Команды обнаруживают рынок и принимают решения.',
     'Промо-окно открыто. Скидка ≥10% + промо → буст спроса.',
-    '⚠️ Внешнее событие — шок для дистрибьютора и квоты П4.',
+    '⚠️ Внешнее событие — шок для перевозчика и квоты Импорта.',
     'Рынок стабилизируется. Кто адаптировался — тот выиграл.',
   ][r];
   const pill=document.getElementById('r-sc-pill');
@@ -1170,9 +1201,9 @@ function renderRound(r) {
 
   // Event
   const evts=[null,
-    {type:'promo',ico:'📣',t:'Промо-инициатива',d:'К3 спрос → 110 ед. Буст ×'+f1(SIM.params.boost/10)+' при скидке ≥10% + промо=Да.'},
-    {type:'shock',ico:'🚨',t:'ДВОЙНОЙ ШОК',d:`Дист-р ограничен до ${SIM.params.shock} ед. П4 квота: ${Math.min(30,Math.round(SIM.params.shock/6))} ед. Спрос К2→130, К4→25.`},
-    {type:'info',ico:'📊',t:'Стабилизация',d:'К2=115, К3=90, К4=35. Финальный тур — восстанавливайте маржу.'},
+    {type:'promo',ico:'📣',t:'Промо-инициатива',d:'Спрос на Снеки → 110 ед. Буст ×'+f1(SIM.params.boost/10)+' при скидке ≥10% и включённом промо.'},
+    {type:'shock',ico:'🚨',t:'ДВОЙНОЙ ШОК',d:`Перевозчик ограничен до ${SIM.params.shock} ед. Квота Импорта: ${Math.min(30,Math.round(SIM.params.shock/6))} ед. Спрос на Молочку → 130, на Деликатесы → 25.`},
+    {type:'info',ico:'📊',t:'Стабилизация',d:'Молочка = 115, Снеки = 90, Деликатесы = 35. Финальный тур — восстанавливайте маржу.'},
   ];
   const ev=evts[r];
   document.getElementById('r-evt').innerHTML=ev
@@ -1190,7 +1221,7 @@ function renderRound(r) {
     return `<div class="tcard ${type}" id="tc-${r}-${tid}">
       <div class="tc-top">
         <span class="tc-ico">${TEAM_ICO[tid]}</span>
-        <div><div class="tc-id">${LBL[tid]} · ${TEAM_ROLE[tid]}</div><div class="tc-nm">${SIM.names[tid]}</div>
+        <div><div class="tc-id">${TYPE[tid]} · ${TEAM_ROLE[tid]}</div><div class="tc-nm">${SIM.names[tid]}</div>
         <div class="tc-strat">${SIM.strats[tid]}</div></div>
       </div>
       <div class="tc-lines">${narr.lines.map(l=>`<span>${l}</span>`).join('')}</div>
@@ -1523,7 +1554,7 @@ function renderInsights() {
   const k1Prod=SIM.results.map((_,r)=>SIM.results[r].prod[0]);
   const varOf=arr=>{const m=arr.reduce((s,v)=>s+v,0)/arr.length;return arr.reduce((s,v)=>s+(v-m)**2,0)/arr.length;};
   const bwRatio=varOf(k1Prod)/Math.max(varOf(k1Dem),1);
-  if(bwRatio>3.5) insights.push({lvl:'crit',h:'🌊 Эффект хлыста обнаружен',t:`Дисперсия производства в <b>${f1(bwRatio)}×</b> превысила дисперсию спроса по категории К1. Каждое звено усиливало сигнал — классический bullwhip.`});
+  if(bwRatio>3.5) insights.push({lvl:'crit',h:'🌊 Эффект хлыста обнаружен',t:`Колебания производства в <b>${f1(bwRatio)}×</b> сильнее колебаний реального спроса на Бакалею. Каждое звено усиливало сигнал — классический «эффект хлыста».`});
   else if(bwRatio>1.5) insights.push({lvl:'warn',h:'🌊 Умеренный эффект хлыста',t:`Дисперсия производства в <b>${f1(bwRatio)}×</b> превысила спрос. Цепочка частично раскачалась.`});
   else insights.push({lvl:'good',h:'✅ Эффект хлыста минимален',t:`Производство синхронизировано со спросом. Коэффициент усиления ${f1(bwRatio)}×.`});
 
@@ -1532,18 +1563,18 @@ function renderInsights() {
   const totWoff=SIM.results.reduce((s,r)=>s+r.woff.flat().reduce((a,v)=>a+v,0),0);
   if(totDef>120) insights.push({lvl:'crit',h:'🔴 Критический хронический дефицит',t:`За 4 тура дефицит составил <b>${f0(totDef)} ед.</b> Покупатели регулярно не находили товар. Причина: несинхронизированное планирование.`});
   else if(totDef>40) insights.push({lvl:'warn',h:'🟡 Дефицит в пиковые периоды',t:`Суммарно <b>${f0(totDef)} ед.</b> недоставлено покупателям — преимущественно в турах с шоком или промо.`});
-  if(totWoff>20) insights.push({lvl:'crit',h:'🗑 Высокие потери Fresh',t:`Списано <b>${f0(totWoff)} ед.</b> скоропортящегося товара. Поставщик П2 перепроизводил на фоне нескоординированных заказов.`});
+  if(totWoff>20) insights.push({lvl:'crit',h:'🗑 Высокие потери скоропорта',t:`Списано <b>${f0(totWoff)} ед.</b> Молочки и Фреша. Производитель Fresh выпускал больше, чем магазины могли продать на фоне несогласованных заказов.`});
 
   // Distributor analysis
   const dTariff=SIM.decisions[0].tariff;
   const dProfit=SIM.totals['D'];
   const chainPft=RETS.reduce((s,t)=>s+SIM.totals[t],0)+SUPS.reduce((s,t)=>s+SIM.totals[t],0);
   const distShare=dProfit/(dProfit+chainPft+1);
-  if(distShare>0.35) insights.push({lvl:'warn',h:'🚛 Дистрибьютор аккумулировал избыточную маржу',t:`Тариф ${f1(dTariff)} у.е./ед. обеспечил дист-ру <b>${f0(distShare*100)}%</b> совокупной прибыли цепочки. Высокий тариф ограничил маржу поставщиков и ритейлеров.`});
+  if(distShare>0.35) insights.push({lvl:'warn',h:'🚛 Перевозчик забрал слишком большую маржу',t:`Тариф ${f1(dTariff)} у.е./ед. дал перевозчику <b>${f0(distShare*100)}%</b> всей прибыли цепочки. Высокий тариф урезал маржу производителей и магазинов.`});
 
   // Scenario-specific
   if(SIM.scenarioId==='ideal') insights.push({lvl:'good',h:'📐 Эффект координации',t:`В этом сценарии прибыль цепочки на <b>30-50%</b> выше хаотичных сценариев. Это «потенциал координации» — то, что теряется когда каждый оптимизирует себя.`});
-  if(SIM.scenarioId==='stress') insights.push({lvl:'crit',h:'💥 Концентрация риска',t:`Шок ударил неравномерно: ритейлеры с большой долей К4 пострадали несравнимо сильнее. Диверсификация поставщиков — ключевой механизм защиты.`});
+  if(SIM.scenarioId==='stress') insights.push({lvl:'crit',h:'💥 Концентрация риска',t:`Шок ударил неравномерно: магазины с большой долей Деликатесов (импорт) пострадали несравнимо сильнее. Диверсификация поставщиков — ключевой механизм защиты.`});
 
   document.getElementById('an-insights').innerHTML=insights.map(ins=>
     `<div class="insight ${ins.lvl}"><div class="ih">${ins.h}</div><div class="it">${ins.t}</div></div>`
@@ -1554,7 +1585,7 @@ function renderDebrief() {
   const qs=[
     ...SCENARIOS[SIM.scenarioId].discuss,
     'Что бы вы согласовали с другими командами до начала игры, зная её исход?',
-    'Как изменился бы результат, если бы П2 и ритейлеры обменялись прогнозами спроса?',
+    'Как изменился бы результат, если бы производитель Fresh и магазины обменялись прогнозами спроса?',
   ];
   document.getElementById('debrief-list').innerHTML=
     qs.map(q=>`<li>${q}</li>`).join('');
@@ -1652,6 +1683,9 @@ function renderNegScreen(r) {
   const pill = document.getElementById('neg-sc-pill');
   pill.textContent = sc.name; pill.style.color = sc.color; pill.style.borderColor = sc.color;
 
+  const introEl = document.getElementById('neg-intro');
+  if (introEl) introEl.innerHTML = NEG_INTRO[r] || '';
+
   const pairs = NEG_PAIRS[r];
   const sessions = pairs.map(pair => genNegDialogue(pair, r));
   SIM.negSessions = sessions;
@@ -1687,6 +1721,7 @@ function renderNegScreen(r) {
           <span class="ns-subj-text">${pair.subj}</span>
           <div id="neg-out-${si}" class="neg-outcome-badge">…</div>
         </div>
+        ${pair.why ? `<div class="ns-stake"><span class="ns-stake-ico">🎯</span><span>${pair.why}</span></div>` : ''}
       </div>
       <div class="neg-chat" id="neg-chat-${si}"></div>
     </div>`;
