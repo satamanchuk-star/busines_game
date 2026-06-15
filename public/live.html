@@ -104,6 +104,26 @@ body{background:linear-gradient(160deg,#060d1c 0%,#091425 100%);color:var(--W);f
 .winner-card .wtype{font-size:12px;color:var(--W2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
 .winner-card .wname{font-size:20px;font-weight:700;color:#ffd700}
 /* ── Chain KPI ── */
+/* ── Карта переговоров ── */
+.nmap{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);padding:16px;margin-bottom:16px}
+.nmap-row{display:flex;gap:10px;justify-content:center}
+.nmap-mid{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 0}
+.nmap-link{font-size:12px;color:var(--W2)}
+.nmap-node{flex:1;max-width:150px;text-align:center;background:var(--bg3);border-radius:10px;padding:10px 8px;border:1px solid var(--W3)}
+.nmap-node.sup{border-color:#2e8b57}.nmap-node.ret{border-color:var(--P)}.nmap-node.dist{border-color:#8e6fd0;background:#241a3d}
+.nmap-ico{font-size:24px;line-height:1}
+.nmap-nm{font-size:14px;font-weight:700;color:var(--W);margin-top:3px}
+.nmap-team{font-size:11px;color:var(--W2)}
+.hot-section{margin-bottom:16px}
+.hot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.hot-card{background:var(--bg2);border:1px solid var(--bg3);border-left:3px solid var(--WN);border-radius:10px;padding:12px 14px}
+.hot-card.struck{border-left-color:var(--OK);background:rgba(63,185,80,.08)}
+.hot-pair{font-size:15px;color:var(--W)}
+.hot-arrow{color:var(--P);margin:0 4px}
+.hot-subj{font-size:13px;color:var(--W2);margin-top:4px}
+.hot-status{font-size:12px;color:var(--WN);margin-top:6px;font-weight:600}
+.hot-card.struck .hot-status{color:var(--OK)}
+.hot-note{font-size:12px;color:var(--W2);margin-top:10px}
 .chain-kpi{display:flex;gap:14px}
 .ck{background:var(--bg2);border-radius:var(--r);padding:14px 18px;flex:1;border:1px solid var(--bg3)}
 .ck .cl{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--W2);margin-bottom:4px}
@@ -193,6 +213,22 @@ const G = {
   CHARS:{'Жёсткий':{ico:'🦁',clr:'#f85149'},'Кооперативный':{ico:'🤝',clr:'#3fb950'},'Хитрый':{ico:'🦊',clr:'#d29922'},'Упрямый':{ico:'😤',clr:'#f0883e'},'Аналитик':{ico:'📊',clr:'#58a6ff'}},
   type:t=>['R1','R2','R3'].includes(t)?'ret':['S1','S2','S3','S4'].includes(t)?'sup':'dist',
 };
+// «Горячие» сделки тура — что подсветить на карте переговоров
+const NEG_HOT = [
+  [ {from:'R1',to:'S1',subj:'скидку на бакалею'},
+    {from:'R2',to:'D', subj:'тариф за доставку'},
+    {from:'R3',to:'S4',subj:'объём поставки деликатесов'} ],
+  [ {from:'R1',to:'S3',subj:'промо-скидку на снеки'},
+    {from:'R2',to:'S2',subj:'промо-скидку на молочку'},
+    {from:'R3',to:'D', subj:'надбавку за большой объём'} ],
+  [ {from:'R1',to:'D', subj:'приоритет в доставке при дефиците'},
+    {from:'R2',to:'D', subj:'приоритет в доставке при дефиците'},
+    {from:'R3',to:'S4',subj:'долю в дефицитной квоте деликатесов'} ],
+  [ {from:'R1',to:'S1',subj:'долгосрочную скидку на бакалею'},
+    {from:'R3',to:'S4',subj:'восстановление объёма деликатесов'},
+    {from:'R2',to:'D', subj:'снижение тарифа за доставку'} ],
+];
+
 // Метка актора + имя
 function lblName(t){ return `${G.LBL[t]||t} · ${gs?.names?.[t]||t}`; }
 function hexA(hex,a){const h=hex.replace('#','');return `rgba(${parseInt(h.slice(0,2),16)},${parseInt(h.slice(2,4),16)},${parseInt(h.slice(4,6),16)},${a})`;}
@@ -386,15 +422,44 @@ function renderBriefing(r){
 }
 
 function renderNegotiation(r){
-  return `<div class="phase-screen" style="flex:0;margin-bottom:16px">
+  const hot = NEG_HOT[r] || [];
+  const deals = (gs.agreements||[]).filter(a=>a.round===r);
+  // карта цепочки: производители (верх), перевозчик (центр), магазины (низ)
+  const node = (t)=>`<div class="nmap-node ${G.type(t)}">
+      <div class="nmap-ico">${t==='D'?'🚛':G.type(t)==='sup'?'🏭':'🛒'}</div>
+      <div class="nmap-nm">${G.LBL[t]}</div>
+      <div class="nmap-team">${gs?.names?.[t]||''}</div>
+    </div>`;
+  return `<div class="phase-screen" style="flex:0;margin-bottom:14px">
     <div class="ps-ico">🤝</div>
     <div class="ps-ph">Переговоры</div>
-    <div class="ps-rd">${G.roundNames[r]} · Согласуйте условия поставок и тарифы</div>
+    <div class="ps-rd">${G.roundNames[r]} · Договоритесь вживую, итог зафиксируйте в своём устройстве</div>
   </div>
-  <div class="sub-section">
-    <div class="sub-title">Команды онлайн</div>
-    <div class="sub-grid" id="live-subgrid">${renderSubCells()}</div>
+
+  <div class="nmap">
+    <div class="nmap-row">${G.supIds.map(node).join('')}</div>
+    <div class="nmap-mid">
+      <div class="nmap-link">▲ Магазины закупают у производителей · скидки и объёмы ▲</div>
+      ${node('D')}
+      <div class="nmap-link">▼ Перевозчик доставляет всем · тариф и приоритет ▼</div>
+    </div>
+    <div class="nmap-row">${G.retIds.map(node).join('')}</div>
   </div>
+
+  <div class="hot-section">
+    <div class="sub-title">🔥 Горячие сделки этого тура — на них стоит сфокусироваться</div>
+    <div class="hot-grid">
+      ${hot.map(d=>{
+        const struck = deals.some(a=>(a.from===d.from&&a.to===d.to)||(a.from===d.to&&a.to===d.from));
+        return `<div class="hot-card${struck?' struck':''}">
+          <div class="hot-pair"><b>${G.LBL[d.from]}</b> <span class="hot-arrow">⇄</span> <b>${G.LBL[d.to]}</b></div>
+          <div class="hot-subj">${d.subj}</div>
+          <div class="hot-status">${struck?'✅ договорились':'⏳ обсуждается'}</div>
+        </div>`;}).join('')}
+    </div>
+    <div class="hot-note">Можно торговаться и за рамками подсвеченных пар: магазин ↔ любой производитель, любой ↔ перевозчик. Всего сделок заключено: <b>${deals.length}</b></div>
+  </div>
+
   <div class="chain-kpi">
     ${G.catIds.map((cat,i)=>`<div class="ck">
       <div class="cl">${cat} · Спрос</div>
