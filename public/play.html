@@ -477,6 +477,50 @@ const G = {
 };
 
 // ═══════════════════════════════════════
+// ДОСЬЕ КОМАНД: кто вы, цель, чем занимаетесь
+// (стартовые параметры считаются из экономики G)
+// ═══════════════════════════════════════
+const DOSSIER = {
+  R1:{what:'Сеть жёстких дискаунтеров. Низкие цены, огромный поток покупателей. Закупаете много и давите на скидки.',
+      goal:'Заработать на обороте: дешёвая закупка + высокий объём продаж. Полки не должны пустеть.'},
+  R2:{what:'Супермаркеты у дома. Баланс цены и сервиса, ровный спрос по всем категориям.',
+      goal:'Стабильная маржа без провалов сервиса. Не упустить промо, не словить списания.'},
+  R3:{what:'Сеть гипермаркетов. Самые большие объёмы и широкий ассортимент — главный клиент для всех производителей.',
+      goal:'Максимум продаж за счёт масштаба. Особое внимание — импортным деликатесам с высокой наценкой.'},
+  S1:{what:'Производитель бакалеи (крупы, консервы). Долгий срок годности — можно работать с запасом.',
+      goal:'Стабильная маржа и высокий fill-rate. Не перепроизводить — хранение стоит денег.'},
+  S2:{what:'Производитель молочки и фреша. Товар быстро портится — что не продано, идёт в убыток.',
+      goal:'Маржа без списаний. Производить ровно под спрос, не больше.'},
+  S3:{what:'Производитель снеков и напитков. Сильно реагируют на промо.',
+      goal:'Поймать промо-волну: при скидке ≥10% спрос растёт ×1.5. Успеть произвести под буст.'},
+  S4:{what:'Импортёр деликатесов. Высокая наценка, но мощность ограничена и в Туре 3 квоту режут.',
+      goal:'Сохранить высокую маржу/ед. и пережить урезание квоты. Дефицит можно конвертировать в цену.'},
+  D: {what:'Единственный перевозчик в цепочке. Возите товар от всех производителей во все магазины.',
+      goal:'Заработать на тарифе, но не задушить цепочку: слишком высокий тариф роняет общий бонус здоровья.'},
+};
+// Стартовые параметры команды (числа из экономики) → массив строк
+function teamParams(tid){
+  const p=[];
+  if(G.retIds.includes(tid)){
+    const ri=G.retIds.indexOf(tid);
+    const shares=G.catIds.map((c,ci)=>`${c} ${Math.round(G.demand[0][ci]*G.fShare[ci][ri])} ед.`);
+    p.push(['Ваша доля спроса (Тур 1)', shares.join(' · ')]);
+    p.push(['Рычаги цены','Агрессивная −8% / Стандарт / Премиум +12%']);
+    p.push(['Цель сервиса','OSA ≥ 85% — держите полки полными']);
+  } else if(G.supIds.includes(tid)){
+    const si=G.supIds.indexOf(tid);
+    p.push(['Мощность','до '+G.maxProd[si]+' ед./тур'+(si===3?' (в Туре 3 квота 30 ед.)':'')]);
+    p.push(['Себестоимость',G.cost[si]+' у.е./ед. · отпускная база '+G.optBase[si]+' у.е.']);
+    p.push(['Особенность', G.fresh[si]?'⚠️ Скоропорт — остаток списывается в убыток':'Долгий срок — остаток сохраняет 80% стоимости']);
+  } else {
+    p.push(['Мощность доставки', G.distCap[0]+' ед./тур (в Туре 3 — '+G.distCap[2]+' ед.)']);
+    p.push(['Себестоимость перевозки','0.8 у.е./ед.']);
+    p.push(['Тариф','диапазон 1.0–3.0 у.е./ед., старт 1.5']);
+  }
+  return p;
+}
+
+// ═══════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════
 let gs = null;        // game state from server
@@ -1184,19 +1228,65 @@ function renderMyRosterCard(full) {
     return full ? `<div class="waiting"><div class="ico">🎲</div><h3>Ожидаем раздачу ролей</h3>
       <p style="margin-top:8px;font-size:13px;color:var(--g5)">Ведущий вот-вот раздаст роли вашей команде</p></div>` : '';
   }
-  return `<div class="card ${full?'':'mb3'}">
-    <div class="card-t">🎲 Роли вашей команды${full?'':' (свернуто)'}</div>
-    ${full?'<p style="font-size:12px;color:var(--g5);margin-bottom:8px">🎩 Директор ведёт переговоры — его характер задаёт позицию команды. Распределите эти роли между собой.</p>':''}
-    <div style="display:grid;grid-template-columns:repeat(${full?2:4},1fr);gap:8px">
+  if (!full) {
+    return `<div class="card mb3">
+      <div class="card-t">🎲 Роли вашей команды (свернуто)</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+      ${roster.map(s=>{const ch=G.CHARS[s.char]||{ico:'',clr:'#888'};
+        return `<div style="background:var(--g1);border-radius:8px;padding:8px 10px;border:1px solid var(--g3)">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:16px">${s.role.ico}</span>
+            <span style="font-size:12px;font-weight:700;color:${s.role.lead?'var(--A)':'var(--g9)'}">${s.role.title}</span>
+          </div>
+          <span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:9px;background:${hexA(ch.clr,.14)};color:${ch.clr}">${ch.ico} ${s.char}</span>
+        </div>`;}).join('')}
+      </div>
+    </div>`;
+  }
+  // FULL: досье команды + подробные роли
+  return renderDossierCard() + `<div class="card">
+    <div class="card-t">🎲 Роли вашей команды</div>
+    <p style="font-size:12px;color:var(--g5);margin-bottom:10px">🎩 Директор ведёт переговоры — его характер задаёт позицию команды. Распределите роли между собой и прочитайте свою.</p>
+    <div style="display:flex;flex-direction:column;gap:8px">
     ${roster.map(s=>{const ch=G.CHARS[s.char]||{ico:'',clr:'#888'};
-      return `<div style="background:var(--g1);border-radius:8px;padding:8px 10px;border:1px solid var(--g3)">
-        <div style="display:flex;align-items:center;gap:6px">
-          <span style="font-size:16px">${s.role.ico}</span>
-          <span style="font-size:12px;font-weight:700;color:${s.role.lead?'var(--A)':'var(--g9)'}">${s.role.title}</span>
+      return `<div style="background:var(--g1);border-radius:10px;padding:11px 13px;border:1px solid var(--g3);border-left:3px solid ${s.role.lead?'var(--A)':'var(--g3)'}">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span style="font-size:18px">${s.role.ico}</span>
+          <span style="font-size:14px;font-weight:700;color:${s.role.lead?'var(--A)':'var(--g9)'}">${s.role.title}</span>
+          ${s.role.lead?'<span style="font-size:9px;font-weight:700;background:var(--A);color:#fff;padding:1px 7px;border-radius:9px">ВЕДЁТ ПЕРЕГОВОРЫ</span>':''}
+          <span style="font-size:10px;font-weight:700;padding:1px 8px;border-radius:9px;background:${hexA(ch.clr,.14)};color:${ch.clr};margin-left:auto">${ch.ico} ${s.char} — ${CHAR_DESC(s.char)}</span>
         </div>
-        ${full?`<div style="font-size:11px;color:var(--g5);margin:3px 0">${s.role.duty}</div>`:''}
-        <span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:9px;background:${hexA(ch.clr,.14)};color:${ch.clr}">${ch.ico} ${s.char}${full&&G.CHARS[s.char]?' — '+CHAR_DESC(s.char):''}</span>
+        ${s.role.desc?`<div style="font-size:12px;color:var(--g7);margin-top:6px;line-height:1.5">${s.role.desc}</div>`:''}
+        ${s.role.decide?`<div style="font-size:11px;color:var(--g5);margin-top:5px"><b style="color:var(--g7)">Что решает:</b> ${s.role.decide}</div>`:''}
+        ${s.role.watch?`<div style="font-size:11px;color:var(--g5);margin-top:3px"><b style="color:var(--g7)">На что смотреть:</b> ${s.role.watch}</div>`:''}
       </div>`;}).join('')}
+    </div>
+  </div>`;
+}
+
+// Досье команды: кто вы, цель, стартовые параметры
+function renderDossierCard() {
+  const tid = me.teamId;
+  const d = DOSSIER[tid];
+  if (!d) return '';
+  const ico = G.retIds.includes(tid)?'🛒':G.supIds.includes(tid)?'🏭':'🚛';
+  const typ = G.retIds.includes(tid)?'Магазин':G.supIds.includes(tid)?'Производитель':'Перевозчик';
+  const params = teamParams(tid);
+  return `<div class="card" style="border-left:3px solid var(--P)">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <span style="font-size:28px">${ico}</span>
+      <div>
+        <div style="font-size:11px;color:var(--g5);text-transform:uppercase;letter-spacing:.5px">${typ}</div>
+        <div style="font-size:18px;font-weight:800;color:var(--g9)">${G.LBL[tid]} · ${gs.names?.[tid]||tid}</div>
+      </div>
+    </div>
+    <div style="font-size:13px;color:var(--g7);line-height:1.55;margin-bottom:8px">${d.what}</div>
+    <div style="background:#eef4ff;border-radius:8px;padding:9px 12px;font-size:12px;color:#1e40af;margin-bottom:10px">
+      🎯 <b>Ваша цель:</b> ${d.goal}</div>
+    <div style="font-size:11px;color:var(--g5);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Стартовые параметры</div>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      ${params.map(([k,v])=>`<div style="display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:4px 0;border-bottom:1px solid var(--g2)">
+        <span style="color:var(--g5)">${k}</span><span style="color:var(--g9);font-weight:600;text-align:right">${v}</span></div>`).join('')}
     </div>
   </div>`;
 }
