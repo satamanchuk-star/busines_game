@@ -883,19 +883,27 @@ function renderAdminBriefing(r) {
 
 function renderAdminDecisions(r) {
   const dc = G.distCap[r];
+  // Инициализация из ПОДАННЫХ решений команд (а не дефолтов): корректно при любом тайминге
+  const dec = gs.decisions?.[r] || {};
+  const dDist = dec['D']?.data || {};
+  const supDat = G.supIds.map(sid=>dec[sid]?.data || null);
+  const retDat = G.retIds.map(rid=>dec[rid]?.data || null);
+  const op = (v,o)=>v===o?' selected':'';
+
   let h = `<div class="pg-h fbet">
     <div><div class="pg-title">Тур ${r+1} — ${G.roundNames[r]} · Ввод решений</div>
-    <div class="pg-sub">Вводите решения команд по мере согласования. Подтверждённые авто-отмечаются.</div></div>
+    <div class="pg-sub">Поля заполняются из решений команд автоматически. Можно скорректировать перед расчётом.</div></div>
     <div style="font-size:12px;color:var(--g5)">Подано: <strong>${(gs.submitted||[]).length}/${G.allTeams.length}</strong></div>
   </div>`;
 
   // Dist
+  const tarV = dDist.tariff ?? 1.5, capV = dDist.distCap ?? dc;
   h += `<div class="dist-bar">
-    <h4>🚛 ${gs.names['D']}</h4>
+    <h4>🚛 ${gs.names['D']}${dec['D']?' <span class="sub-ok">✓</span>':''}</h4>
     <div class="fld" style="min-width:120px"><label>Тариф у.е./ед.</label>
-      <input type="number" id="d-tar" value="1.5" min="1" max="3" step="0.1"></div>
+      <input type="number" id="d-tar" value="${tarV}" min="1" max="3" step="0.1"></div>
     <div class="fld" style="min-width:120px"><label>Мощность ед.</label>
-      <input type="number" id="d-cap" value="${dc}" min="0" max="500"></div>
+      <input type="number" id="d-cap" value="${capV}" min="0" max="500"></div>
     <div style="font-size:12px;color:var(--g5)">Маржа = (тариф − 0.8) × объём</div>
   </div>`;
 
@@ -903,9 +911,10 @@ function renderAdminDecisions(r) {
   h += `<div class="sup-grid">`;
   G.supIds.forEach((sid,si)=>{
     const maxQ=G.maxProd[si], defQ=r===2&&si===3?30:maxQ;
-    h+=`<div class="sup-card"><h4>🏭 ${gs.names[sid]}</h4>
+    const prodV = supDat[si]?.prod ?? defQ;
+    h+=`<div class="sup-card"><h4>🏭 ${gs.names[sid]}${dec[sid]?' <span class="sub-ok">✓</span>':''}</h4>
       <div class="fld"><label>Производство</label>
-        <input type="number" id="sp-${si}" value="${defQ}" min="0" max="${maxQ}">
+        <input type="number" id="sp-${si}" value="${prodV}" min="0" max="${maxQ}">
         <span style="font-size:10px;color:var(--g5)">Макс ${maxQ}${r===2&&si===3?' / Квота 30':''}</span>
       </div></div>`;
   });
@@ -915,26 +924,33 @@ function renderAdminDecisions(r) {
   h += `<div class="ret-grid">`;
   G.retIds.forEach((rid,ri)=>{
     const isSub = (gs.submitted||[]).includes(rid);
+    const rd = retDat[ri];
     h += `<div class="ret-card"><div class="ret-hdr r${ri}">
       🛒 ${gs.names[rid]}
       ${isSub?`<span class="sub-ok">✓ подано</span>`:`<span class="sub-wait">ожидание</span>`}
     </div><div class="ret-body">`;
     G.catIds.forEach((cat,ci)=>{
-      const defOrd = Math.round(G.demand[r][ci]*G.fShare[ci][ri]);
-      h += `<div class="cat-row" id="cr-${ri}-${ci}">
+      const cd = rd?.cats?.[ci];
+      const defOrd = cd?.ord ?? Math.round(G.demand[r][ci]*G.fShare[ci][ri]);
+      const asm = cd ? !!cd.asm : true;
+      const prc = cd?.prc ?? 1, prm = cd?.prm ?? 0;
+      // Скидка по категории ci = скидка поставщика ci этому ритейлеру ri.
+      // Если поставщик не подал — фолбэк на скидку из решения магазина (хранится долей).
+      const dscV = (supDat[ci]?.discounts?.[ri]) ?? (cd?.dsc!=null ? cd.dsc*100 : 0);
+      h += `<div class="cat-row${asm?'':' off'}" id="cr-${ri}-${ci}">
         <div class="cat-rt">
           <span class="cat-nm" style="color:${G.catColor[ci]}">${cat} ${G.catNames[ci]}</span>
-          <label class="tgl"><input type="checkbox" id="a-${ri}-${ci}" checked onchange="togRow(${ri},${ci})"><span class="tgl-s"></span></label>
+          <label class="tgl"><input type="checkbox" id="a-${ri}-${ci}" ${asm?'checked':''} onchange="togRow(${ri},${ci})"><span class="tgl-s"></span></label>
         </div>
         <div class="frow">
           <div class="fld"><label>Заказ</label><input type="number" id="o-${ri}-${ci}" value="${defOrd}" min="0"></div>
           <div class="fld"><label>Цена</label><select id="p-${ri}-${ci}">
-            <option value="0">Агрессивная</option><option value="1" selected>Стандарт</option><option value="2">Премиальная</option>
+            <option value="0"${op(prc,0)}>Агрессивная</option><option value="1"${op(prc,1)}>Стандарт</option><option value="2"${op(prc,2)}>Премиальная</option>
           </select></div>
         </div>
         <div class="frow">
-          <div class="fld"><label>Промо</label><select id="pm-${ri}-${ci}"><option value="0">Нет</option><option value="1">Да</option></select></div>
-          <div class="fld"><label>Скидка пост. %</label><input type="number" id="ds-${ri}-${ci}" value="0" min="0" max="50"></div>
+          <div class="fld"><label>Промо</label><select id="pm-${ri}-${ci}"><option value="0"${op(prm,0)}>Нет</option><option value="1"${op(prm,1)}>Да</option></select></div>
+          <div class="fld"><label>Скидка пост. %</label><input type="number" id="ds-${ri}-${ci}" value="${Math.round(dscV)}" min="0" max="50"></div>
         </div>
       </div>`;
     });
@@ -1192,8 +1208,8 @@ function renderTeamMain() {
         <div class="cv">${dem[i]}</div><div class="cc">${!prev?'—':chg>0?`▲ +${chg}`:chg<0?`▼ ${chg}`:'—'}</div></div>`;
     });
     h += `</div>`;
-    if (phase==='negotiation') h += `<div class="card"><div class="card-t">💬 Используйте панель «Предложения» справа для переговоров</div>
-      <p style="font-size:13px;color:var(--g5)">Отправляйте предложения другим командам. Принятые предложения автоматически попадут в вашу форму решений.</p></div>`;
+    if (phase==='negotiation') h += `<div class="card"><div class="card-t">💬 Используйте панель «Переговоры» справа</div>
+      <p style="font-size:13px;color:var(--g5)">Скидка, тариф и объём при принятии автоматически попадут в вашу форму решений. «Приоритет» — договорённость на честность: учитывайте её сами при вводе.</p></div>`;
     return h;
   }
 
@@ -1465,7 +1481,7 @@ function renderTeamSide() {
 
   // Send proposal form
   if (phase==='negotiation'||phase==='decisions') {
-    const others = G.allTeams.filter(t=>t!==tid);
+    const others = negPartners(tid);
     h += `<div class="prop-form"><h4>📤 Отправить предложение</h4>
       <div class="fld" style="margin-bottom:6px"><label>Кому</label>
         <select id="prop-to" onchange="updPropTypes()">${others.map(t=>`<option value="${t}">${G.LBL[t]||t} · ${gs.names[t]||t}</option>`).join('')}</select></div>
@@ -1616,6 +1632,13 @@ const DEAL_TYPES = {
   tariff:  {label:'Тариф у.е./ед.',vlabel:'Тариф, у.е./ед.',   cat:false, unit:' у.е./ед.'},
   priority:{label:'Приоритет ед.', vlabel:'Приоритет в доставке, ед.', cat:false, unit:' ед.'},
 };
+// с кем эта команда может вести переговоры (по цепочке, как на карте)
+function negPartners(tid){
+  const t=G.type(tid);
+  if(t==='ret')  return [...G.supIds,'D'];
+  if(t==='sup')  return [...G.retIds,'D'];
+  return [...G.retIds,...G.supIds]; // перевозчик — со всеми
+}
 // какие типы сделок уместны для пары команд
 function dealTypesFor(a,b){
   const set=new Set();
