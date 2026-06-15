@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>IBS · FMCG-цепочка · Лаборатория</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060d1c;--bg2:#0d1a33;--bg3:#1a3565;--bg4:#243d6b;
+  --P:#4a87d4;--PD:#2b5ba8;
+  --OK:#3fb950;--WN:#d29922;--BD:#f85149;--PU:#bc8cff;--OR:#f0883e;
+  --W:#e6edf3;--W2:#8b9db5;--W3:#2e4d73;--r:10px;
+}
+body{background:linear-gradient(160deg,#060d1c 0%,#091425 100%);color:var(--W);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* ── Header ── */
+.hdr{background:linear-gradient(135deg,#1a3565 0%,#2b5ba8 100%);border-bottom:1px solid rgba(74,135,212,.25);padding:11px 22px;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.4)}
+.hdr h1{font-size:15px;font-weight:700;color:#fff}
+.ibs-logo{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;background:#fff;border-radius:5px;flex-shrink:0}
+.ibs-logo span{font-family:'Arial Black',Arial,sans-serif;font-size:13px;font-weight:900;color:#1a3565;letter-spacing:-.5px}
+.rdots{display:flex;gap:5px}
+.rdot{width:24px;height:24px;border-radius:50%;border:2px solid var(--W3);
+  display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--W3)}
+.rdot.cur{border-color:var(--P);color:var(--P);background:rgba(88,166,255,.12)}
+.rdot.done{border-color:var(--OK);background:var(--OK);color:#000}
+
+/* ── Screens ── */
+.scr{display:none;animation:fadeIn .3s ease}.scr.on{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══════════════ SETUP ═══════════════ */
+#s-setup{padding:22px 24px;max-width:1100px;margin:0 auto}
+.setup-title{font-size:22px;font-weight:700;color:var(--W);margin-bottom:4px}
+.setup-sub{font-size:13px;color:var(--W2);margin-bottom:20px}
+.section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--W3);margin-bottom:10px}
+
+/* Scenario cards */
+.scenario-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:22px}
+.sc-card{background:var(--bg2);border:2px solid var(--bg3);border-radius:var(--r);
+  padding:14px 13px;cursor:pointer;transition:all .18s;text-align:left}
+.sc-card:hover{border-color:var(--W3);transform:translateY(-2px)}
+.sc-card.sel{transform:translateY(-2px);box-shadow:0 0 0 2px var(--sc-color)}
+.sc-card .sc-ico{font-size:24px;margin-bottom:7px}
+.sc-card .sc-name{font-size:12px;font-weight:700;color:var(--W);margin-bottom:4px;line-height:1.3}
+.sc-card .sc-desc{font-size:11px;color:var(--W2);line-height:1.4}
+
+/* Team strategies */
+.team-strat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}
+.ts-item{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);padding:11px 12px}
+.ts-item .ts-top{display:flex;align-items:center;gap:6px;margin-bottom:7px}
+.ts-item .ts-ico{font-size:16px}
+.ts-item .ts-id{font-size:10px;font-weight:700;color:var(--W3);letter-spacing:.4px}
+.ts-item .ts-name{font-size:12px;font-weight:700;color:var(--W)}
+.ts-item select{width:100%;background:var(--bg3);border:1px solid var(--W3);border-radius:6px;
+  color:var(--W);font-size:11px;padding:5px 7px;cursor:pointer}
+.ts-item select:focus{outline:none;border-color:var(--P)}
+.ts-desc{font-size:10px;color:var(--W3);margin-top:4px;min-height:13px}
+
+/* Param sliders */
+.params-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.param-item label{font-size:11px;color:var(--W2);display:flex;justify-content:space-between;
+  margin-bottom:5px}
+.param-item .pval{color:var(--P);font-weight:700}
+.param-item input[type=range]{width:100%;cursor:pointer;accent-color:var(--P)}
+
+/* ═══════════════ ROUND ═══════════════ */
+#s-round{padding:20px 24px;max-width:1200px;margin:0 auto}
+.round-hdr{background:var(--bg2);border:1px solid var(--bg3);border-radius:14px;
+  padding:16px 22px;margin-bottom:14px;display:flex;align-items:center;gap:18px}
+.rnum{font-size:44px;font-weight:700;line-height:1;min-width:52px;text-align:center}
+.rinfo h2{font-size:18px;font-weight:700;margin-bottom:3px}
+.rinfo .rsub{font-size:12px;color:var(--W2)}
+.sc-pill{margin-left:auto;border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;
+  border:1px solid currentColor;opacity:.85}
+
+/* Event */
+.evt{border-radius:var(--r);padding:12px 16px;margin-bottom:14px;display:flex;gap:12px}
+.evt.shock{background:linear-gradient(135deg,#3d0f0f,#5c1a1a);border:1px solid var(--BD)}
+.evt.promo{background:linear-gradient(135deg,#1a2d0f,#2d4a1a);border:1px solid var(--OK)}
+.evt.info{background:linear-gradient(135deg,#0f1f3d,#1a2d5c);border:1px solid var(--P)}
+.evt .eico{font-size:24px}.evt h3{font-size:13px;font-weight:700;margin-bottom:3px}
+.evt.shock h3{color:var(--BD)}.evt.promo h3{color:var(--OK)}.evt.info h3{color:var(--P)}
+.evt p{font-size:12px;color:var(--W2);line-height:1.5}
+
+/* Two-column layout */
+.round-cols{display:grid;grid-template-columns:1fr 320px;gap:14px;align-items:start}
+.cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+
+/* Team card */
+.tcard{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);
+  padding:11px 12px;opacity:0;transform:translateY(8px);transition:opacity .3s,transform .3s}
+.tcard.vis{opacity:1;transform:translateY(0)}
+.tcard.ret{border-top:2px solid var(--P)}.tcard.sup{border-top:2px solid var(--OK)}.tcard.dist{border-top:2px solid var(--PU)}
+.tc-top{display:flex;align-items:center;gap:7px;margin-bottom:8px;padding-bottom:7px;border-bottom:1px solid var(--bg3)}
+.tc-ico{font-size:16px}.tc-id{font-size:9px;font-weight:700;color:var(--W3);letter-spacing:.3px}
+.tc-nm{font-size:12px;font-weight:700;color:var(--W)}
+.tc-strat{font-size:9px;margin-top:1px;color:var(--W3)}
+.tc-lines{font-size:11px;color:var(--W2);line-height:1.6;margin-bottom:7px}
+.tc-lines span{display:block}
+.pb-row{display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px}
+.pb-lbl{color:var(--W3)}.pb-val{font-weight:700}
+.pb-val.ok{color:var(--OK)}.pb-val.bad{color:var(--BD)}.pb-val.wn{color:var(--WN)}
+.pb-track{height:3px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.pb-fill{height:100%;border-radius:2px;transition:width .8s ease .3s}
+
+/* Right panel */
+.right-panel{display:flex;flex-direction:column;gap:12px}
+.rpanel{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);padding:13px 14px}
+.rpanel h3{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--W3);margin-bottom:10px}
+
+/* Chain KPIs */
+.ckpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.ckpi{background:var(--bg3);border-radius:7px;padding:8px 10px}
+.ckpi .cl{font-size:9px;text-transform:uppercase;letter-spacing:.3px;color:var(--W3);margin-bottom:2px}
+.ckpi .cv{font-size:19px;font-weight:700}
+.cv.ok{color:var(--OK)}.cv.bad{color:var(--BD)}.cv.wn{color:var(--WN)}.cv.nt{color:var(--W)}
+
+/* Teaching moment */
+.teach{border-radius:var(--r);padding:12px 14px}
+.teach.crit{background:rgba(248,81,73,.10);border:1px solid rgba(248,81,73,.3)}
+.teach.warn{background:rgba(210,153,34,.10);border:1px solid rgba(210,153,34,.3)}
+.teach.good{background:rgba(63,185,80,.10);border:1px solid rgba(63,185,80,.3)}
+.teach.info{background:rgba(88,166,255,.10);border:1px solid rgba(88,166,255,.3)}
+.teach .tt{font-size:11px;font-weight:700;margin-bottom:5px;display:flex;align-items:center;gap=5px}
+.teach.crit .tt{color:var(--BD)}.teach.warn .tt{color:var(--WN)}.teach.good .tt{color:var(--OK)}.teach.info .tt{color:var(--P)}
+.teach .td{font-size:11px;color:var(--W2);line-height:1.5}
+.discuss-q{background:rgba(188,140,255,.10);border:1px solid rgba(188,140,255,.3);
+  border-radius:var(--r);padding:12px 14px}
+.discuss-q .dqt{font-size:10px;font-weight:700;color:var(--PU);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+.discuss-q .dqq{font-size:12px;color:var(--W);font-style:italic}
+
+/* Mini leaderboard */
+.lb-row{display:flex;align-items:center;gap:7px;padding:3px 0;border-bottom:1px solid var(--bg3)}
+.lb-row:last-child{border-bottom:none}
+.lb-pos{font-size:11px;font-weight:700;color:var(--W3);min-width:16px;text-align:center}
+.lb-nm{flex:1;font-size:11px;font-weight:600;color:var(--W);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-bar{flex:2;height:3px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.lb-barf{height:100%;border-radius:2px;transition:width .7s ease}
+.lb-pft{font-size:11px;font-weight:700;min-width:55px;text-align:right}
+
+/* Bottom nav */
+.nav-bar{margin-top:16px;display:flex;align-items:center;justify-content:space-between;
+  padding:12px 0;border-top:1px solid var(--bg3)}
+.nav-prog{display:flex;gap:6px}
+.np{width:8px;height:8px;border-radius:50%;background:var(--bg4);transition:all .3s}
+.np.done{background:var(--OK)}.np.cur{background:var(--P);transform:scale(1.3)}
+
+/* ═══════════════ ANALYTICS ═══════════════ */
+#s-analytics{padding:22px 24px;max-width:1100px;margin:0 auto}
+.an-hero{display:flex;align-items:center;gap:20px;margin-bottom:24px;
+  background:var(--bg2);border:1px solid var(--bg3);border-radius:14px;padding:18px 22px}
+.an-trophy{font-size:52px}
+.an-title h2{font-size:22px;font-weight:700;color:#ffd700;margin-bottom:4px}
+.an-title p{font-size:13px;color:var(--W2)}
+.winners{display:flex;gap:10px;margin-left:auto;flex-wrap:wrap}
+.wcard{background:var(--bg3);border:1.5px solid var(--WN);border-radius:10px;
+  padding:10px 16px;text-align:center;min-width:140px}
+.wcard .wt{font-size:9px;text-transform:uppercase;letter-spacing:.4px;color:var(--W2);margin-bottom:3px}
+.wcard .wn{font-size:15px;font-weight:700;color:#ffd700}
+.wcard .ws{font-size:10px;color:var(--W2);margin-top:2px}
+
+/* Awards */
+.awards-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.award{border-radius:var(--r);padding:14px 16px;border:1.5px solid;background:var(--bg2)}
+.award .aw-ico{font-size:24px;float:right;line-height:1}
+.award .aw-t{font-size:10px;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;font-weight:700}
+.award .aw-nm{font-size:15px;font-weight:700;color:var(--W)}
+.award .aw-s{font-size:11px;color:var(--W2);margin-top:3px}
+@media(max-width:900px){.awards-row{grid-template-columns:1fr}}
+
+.an-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.an-card{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);padding:16px 18px}
+.an-card h3{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--W2);margin-bottom:12px}
+
+/* SVG charts */
+.chart-svg{width:100%;height:180px;overflow:visible}
+.chart-axis{font-size:9px;fill:var(--W3)}
+.chart-label{font-size:10px;fill:var(--W2)}
+.chart-val{font-size:10px;font-weight:700}
+
+/* Insights */
+.insights{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.insight{background:var(--bg2);border-radius:var(--r);padding:13px 16px;border-left:3px solid}
+.insight.crit{border-color:var(--BD)}.insight.warn{border-color:var(--WN)}.insight.good{border-color:var(--OK)}.insight.info{border-color:var(--P)}
+.insight .ih{font-size:12px;font-weight:700;color:var(--W);margin-bottom:4px}
+.insight.crit .ih{color:var(--BD)}.insight.warn .ih{color:var(--WN)}.insight.good .ih{color:var(--OK)}.insight.info .ih{color:var(--P)}
+.insight .it{font-size:12px;color:var(--W2);line-height:1.55}
+
+/* Efficiency table */
+.eff-tbl{width:100%;border-collapse:collapse;font-size:11px}
+.eff-tbl th{font-size:9px;text-transform:uppercase;letter-spacing:.4px;color:var(--W3);
+  padding:5px 8px;text-align:left;border-bottom:1px solid var(--bg3)}
+.eff-tbl td{padding:7px 8px;border-bottom:1px solid var(--bg4)}
+.eff-tbl .ok{color:var(--OK);font-weight:700}.eff-tbl .bad{color:var(--BD);font-weight:700}.eff-tbl .wn{color:var(--WN);font-weight:700}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;border-radius:8px;
+  border:none;cursor:pointer;font-size:14px;font-weight:600;transition:all .15s}
+.btn-P{background:var(--P);color:#fff}.btn-P:hover{opacity:.85;transform:translateY(-1px)}
+.btn-S{background:var(--bg3);color:var(--W2);border:1px solid var(--W3)}.btn-S:hover{background:var(--bg4)}
+.btn-lg{padding:13px 32px;font-size:15px;border-radius:10px}
+.btn-sm{padding:6px 15px;font-size:12px}
+.btn-back{color:var(--W2);font-size:13px;text-decoration:none;background:transparent;border:none;cursor:pointer;padding:5px 8px}
+
+/* Debrief */
+.debrief{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);padding:16px 18px;margin-bottom:14px}
+.debrief h3{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--W2);margin-bottom:10px}
+.debrief ol{padding-left:18px;line-height:1.95;font-size:12px;color:var(--W2)}
+
+/* ── Character grid ── */
+.char-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px}
+.ch-item{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);padding:11px 12px}
+.ch-item .ts-top{display:flex;align-items:center;gap:6px;margin-bottom:7px}
+.ch-item select{width:100%;background:var(--bg3);border:1px solid var(--W3);border-radius:6px;
+  color:var(--W);font-size:11px;padding:5px 7px;cursor:pointer}
+.ch-item select:focus{outline:none;border-color:var(--P)}
+
+/* ── Role distribution screen ── */
+#s-roles{padding:20px 24px;max-width:1180px;margin:0 auto}
+.roles-intro{display:flex;align-items:flex-start;gap:16px;background:var(--bg2);
+  border:1px solid var(--bg3);border-radius:14px;padding:16px 20px;margin-bottom:16px}
+.roles-intro .ri-ico{font-size:36px}
+.roles-intro h2{font-size:18px;font-weight:700;margin-bottom:4px}
+.roles-intro p{font-size:12px;color:var(--W2);line-height:1.55}
+.team-roster-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.roster{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);
+  padding:12px 13px;opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s}
+.roster.vis{opacity:1;transform:translateY(0)}
+.roster.ret{border-top:3px solid var(--P)}.roster.sup{border-top:3px solid var(--OK)}.roster.dist{border-top:3px solid var(--PU)}
+.roster-hdr{display:flex;align-items:center;gap:8px;margin-bottom:9px;padding-bottom:8px;border-bottom:1px solid var(--bg3)}
+.roster-hdr .rh-ico{font-size:20px}
+.roster-hdr .rh-id{font-size:13px;font-weight:700;color:var(--W)}
+.roster-hdr .rh-role{font-size:10px;color:var(--W3)}
+.roster-hdr .rh-nm{font-size:11px;color:var(--W2);margin-top:1px}
+.player-slot{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px dashed var(--bg3)}
+.player-slot:last-child{border-bottom:none}
+.ps-roleico{font-size:15px;flex-shrink:0;width:20px;text-align:center;margin-top:1px}
+.ps-body{flex:1;min-width:0}
+.ps-role{font-size:11px;font-weight:700;color:var(--W)}
+.ps-role.lead{color:var(--WN)}
+.ps-duty{font-size:9px;color:var(--W3);line-height:1.35}
+.ps-char{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;
+  padding:1px 6px;border-radius:10px;margin-top:3px}
+.roster-team-size{font-size:9px;color:var(--W3);margin-left:auto}
+
+/* ── Negotiation screen ── */
+#s-neg{padding:20px 24px;max-width:960px;margin:0 auto}
+.neg-hdr{background:var(--bg2);border:1px solid var(--bg3);border-radius:14px;
+  padding:14px 20px;margin-bottom:14px;display:flex;align-items:center;gap:16px}
+.neg-hdr .rnum{font-size:36px}
+.neg-hdr h2{font-size:16px;font-weight:700;margin-bottom:2px}
+.neg-hdr .rsub{font-size:11px;color:var(--W2)}
+.neg-sessions{display:flex;flex-direction:column;gap:14px;margin-bottom:14px}
+.neg-session{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);overflow:hidden;
+  box-shadow:0 2px 12px rgba(0,0,0,.25)}
+.neg-session-hdr{padding:12px 16px;border-bottom:1px solid var(--bg3);background:rgba(255,255,255,.025)}
+.ns-combatants{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.ns-fighter{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.ns-fighter-r{justify-content:flex-end}
+.ns-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:19px;border:2px solid;flex-shrink:0}
+.ns-char-name{font-size:12px;font-weight:700;white-space:nowrap}
+.ns-team-name{font-size:10px;color:var(--W3);white-space:nowrap}
+.ns-vs{font-size:12px;color:var(--W3);font-weight:700;flex-shrink:0;padding:0 4px}
+.ns-subject-row{display:flex;align-items:center;gap:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)}
+.ns-subj-tag{font-size:10px;color:var(--W3);white-space:nowrap;flex-shrink:0}
+.ns-subj-text{font-size:11px;color:var(--W);font-weight:600;flex:1}
+.neg-outcome-badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;
+  opacity:0;transform:scale(.85);transition:opacity .35s,transform .35s;white-space:nowrap;flex-shrink:0}
+.neg-outcome-badge.show{opacity:1;transform:scale(1)}
+.neg-chat{padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-height:80px}
+.neg-msg{display:flex;gap:9px;animation:msgIn .3s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.neg-msg.right{flex-direction:row-reverse;align-self:flex-end;max-width:88%}
+.neg-msg.left{align-self:flex-start;max-width:88%}
+.msg-ico{font-size:20px;flex-shrink:0;margin-top:3px}
+.msg-body{display:flex;flex-direction:column;gap:3px}
+.msg-who{font-size:9px;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+.neg-msg.right .msg-who{text-align:right}
+.msg-bubble{border-radius:14px;padding:9px 13px;font-size:13px;line-height:1.55}
+.neg-msg.left  .msg-bubble{background:var(--bg4);color:var(--W);border-bottom-left-radius:3px}
+.neg-msg.right .msg-bubble{background:var(--PD);color:#fff;border-bottom-right-radius:3px}
+.msg-bubble.failed{opacity:.55;font-style:italic}
+.msg-offer-tag{font-size:11px;font-weight:700;margin-top:4px;padding:4px 11px;border-radius:20px;
+  display:inline-block;border:1px solid;letter-spacing:.2px}
+.neg-msg.left  .msg-offer-tag{background:rgba(88,166,255,.12);color:var(--P);border-color:rgba(88,166,255,.3);align-self:flex-start}
+.neg-msg.right .msg-offer-tag{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.25);align-self:flex-end}
+.typing-indicator{opacity:.7}
+.typing-dots{display:inline-flex;gap:4px;padding:10px 14px;background:var(--bg4);border-radius:14px;border-bottom-left-radius:3px}
+.typing-dots span{width:6px;height:6px;background:var(--W3);border-radius:50%;animation:typingBounce 1.1s ease-in-out infinite}
+.typing-dots span:nth-child(2){animation-delay:.18s}
+.typing-dots span:nth-child(3){animation-delay:.36s}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+@media(max-width:900px){.round-cols{grid-template-columns:1fr}.scenario-grid{grid-template-columns:repeat(3,1fr)}.an-grid{grid-template-columns:1fr}.cards-grid{grid-template-columns:repeat(2,1fr)}.team-strat-grid{grid-template-columns:repeat(2,1fr)}.params-row{grid-template-columns:1fr}.char-grid{grid-template-columns:repeat(2,1fr)}.team-roster-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="/" class="btn-back" style="color:rgba(255,255,255,.7)">← Назад</a>
+    <div class="ibs-logo"><span>IBS</span></div>
+    <h1>FMCG-цепочка <span style="font-size:11px;opacity:.65;font-weight:400">· Лаборатория</span></h1>
+  </div>
+  <div class="rdots" id="hdr-dots"></div>
+  <div id="hdr-sc" style="font-size:12px;color:var(--W2)"></div>
+</header>
+
+<!-- ═════ SETUP ═════ -->
+<div id="s-setup" class="scr on">
+  <div class="setup-title">Настройка симуляции</div>
+  <div class="setup-sub">Выберите сценарий и стратегию каждой команды — затем запустите 4 тура с разбором.</div>
+
+  <div class="section-label">Сценарий</div>
+  <div class="scenario-grid" id="sc-grid"></div>
+
+  <div class="section-label">Стратегии команд <span style="font-weight:400;color:var(--W3)">(сценарий задаёт дефолт, можно изменить)</span></div>
+  <div class="team-strat-grid" id="strat-grid"></div>
+
+  <div class="section-label">Характер Директора команды <span style="font-weight:400;color:var(--W3)">(ведёт переговоры — кто уступит в торгах, кто нет)</span></div>
+  <div class="char-grid" id="char-grid"></div>
+
+  <div class="section-label">Размер команды</div>
+  <div class="params-row" style="grid-template-columns:1fr">
+    <div class="param-item">
+      <label>Игроков в каждой команде <span class="pval" id="pv-team">4</span></label>
+      <input type="range" id="p-team" min="1" max="4" value="4" step="1" oninput="updParam('team',this.value)">
+    </div>
+  </div>
+
+  <div class="section-label">Параметры рынка</div>
+  <div class="params-row">
+    <div class="param-item">
+      <label>Шум спроса <span class="pval" id="pv-noise">±10%</span></label>
+      <input type="range" id="p-noise" min="0" max="30" value="10" step="5" oninput="updParam('noise',this.value)">
+    </div>
+    <div class="param-item">
+      <label>Мощность дист-ра в Туре 3 <span class="pval" id="pv-shock">200 ед.</span></label>
+      <input type="range" id="p-shock" min="80" max="320" value="200" step="20" oninput="updParam('shock',this.value)">
+    </div>
+    <div class="param-item">
+      <label>Промо-буст <span class="pval" id="pv-boost">×1.5</span></label>
+      <input type="range" id="p-boost" min="10" max="25" value="15" step="1" oninput="updParam('boost',this.value)">
+    </div>
+  </div>
+
+  <button class="btn btn-P btn-lg" onclick="runSim()">▶ Запустить симуляцию</button>
+</div>
+
+<!-- ═════ ROLE DISTRIBUTION ═════ -->
+<div id="s-roles" class="scr">
+  <div class="roles-intro">
+    <div class="ri-ico">🎲</div>
+    <div>
+      <h2>Распределение ролей и характеров</h2>
+      <p>Каждый актор цепочки — это <b>команда до 4 человек</b>. Внутри команды роли и характеры розданы случайно. <b>Директор</b> (🎩) принимает финальное решение и ведёт переговоры — его характер определяет переговорную позицию команды.</p>
+    </div>
+    <div id="roles-sc-pill" class="sc-pill" style="margin-left:auto"></div>
+  </div>
+  <div class="team-roster-grid" id="roster-grid"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid var(--bg3)">
+    <button class="btn btn-S btn-sm" onclick="goSetup()">← Настройки</button>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-S" onclick="reshuffleRoles()">🔀 Перетасовать</button>
+      <button class="btn btn-P" onclick="rolesToGame()">Начать игру →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═════ NEGOTIATION ═════ -->
+<div id="s-neg" class="scr">
+  <div class="neg-hdr">
+    <div class="rnum" id="neg-r-num" style="color:var(--P)">1</div>
+    <div>
+      <h2>💬 Переговоры перед туром <span id="neg-r-name" style="color:var(--W2);font-weight:400"></span></h2>
+      <div class="rsub">Команды договариваются об условиях — скидках, тарифах, объёмах. Характер переговорщика определяет исход.</div>
+    </div>
+    <div id="neg-sc-pill" class="sc-pill" style="margin-left:auto"></div>
+  </div>
+  <div class="neg-sessions" id="neg-sessions"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid var(--bg3)">
+    <button class="btn btn-S btn-sm" onclick="goSetup()">← Настройки</button>
+    <button class="btn btn-P" id="neg-next-btn" onclick="negToRound()" style="display:none">К итогам тура →</button>
+  </div>
+</div>
+
+<!-- ═════ ROUND ═════ -->
+<div id="s-round" class="scr">
+  <div class="round-hdr">
+    <div class="rnum" id="r-num" style="color:var(--P)">1</div>
+    <div class="rinfo">
+      <h2 id="r-name">Тур</h2>
+      <div class="rsub" id="r-sub"></div>
+    </div>
+    <div id="r-sc-pill" class="sc-pill"></div>
+  </div>
+  <div id="r-evt"></div>
+  <div class="round-cols">
+    <div>
+      <div class="section-label" style="margin-bottom:7px">Что сделала каждая команда</div>
+      <div class="cards-grid" id="r-cards"></div>
+    </div>
+    <div class="right-panel">
+      <div class="rpanel">
+        <h3>Состояние цепочки</h3>
+        <div class="ckpi-grid" id="r-kpi"></div>
+      </div>
+      <div id="r-teach"></div>
+      <div id="r-minilb" class="rpanel"></div>
+    </div>
+  </div>
+  <div id="r-discuss" style="margin-top:12px"></div>
+  <div class="nav-bar">
+    <div class="nav-prog" id="nav-prog"></div>
+    <button class="btn btn-P" id="next-btn" onclick="nextRound()">Следующий тур →</button>
+  </div>
+</div>
+
+<!-- ═════ ANALYTICS ═════ -->
+<div id="s-analytics" class="scr">
+  <div class="an-hero">
+    <div class="an-trophy">🏆</div>
+    <div class="an-title">
+      <h2>Финальный разбор</h2>
+      <p id="an-sc-label"></p>
+    </div>
+    <div class="winners" id="an-winners"></div>
+  </div>
+
+  <div class="section-label">🏅 Награды</div>
+  <div class="awards-row" id="an-awards"></div>
+
+  <div class="an-card" style="margin-bottom:14px">
+    <h3>🏆 Итоговый счёт = Прибыль команды + Бонус здоровья цепочки</h3>
+    <div id="chart-score"></div>
+  </div>
+
+  <div class="section-label">Автоматические выводы</div>
+  <div class="insights" id="an-insights"></div>
+
+  <div class="an-grid">
+    <div class="an-card">
+      <h3>📈 Прибыль по турам</h3>
+      <div id="chart-profit"></div>
+    </div>
+    <div class="an-card">
+      <h3>🌊 Эффект хлыста — К1</h3>
+      <div id="chart-bullwhip"></div>
+    </div>
+    <div class="an-card">
+      <h3>💧 Воронка потерь цепочки</h3>
+      <div id="chart-waterfall"></div>
+    </div>
+    <div class="an-card">
+      <h3>📊 Эффективность по турам</h3>
+      <div id="chart-table"></div>
+    </div>
+  </div>
+
+  <div class="debrief">
+    <h3>💬 Вопросы для дебрифа</h3>
+    <ol id="debrief-list"></ol>
+  </div>
+
+  <div style="text-align:center">
+    <button class="btn btn-P btn-lg" onclick="goSetup()">🔄 Новая симуляция</button>
+    &nbsp;&nbsp;
+    <a href="/" class="btn btn-S btn-lg" style="text-decoration:none">← На главную</a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ SCRIPT ═══════════════════════════════════ -->
+<script>
+'use strict';
+
+// ━━━ CONSTANTS (exact copy from server.js) ━━━
+const RETS = ['R1','R2','R3'], SUPS = ['S1','S2','S3','S4'], ALL = [...RETS,...SUPS,'D'];
+const P = {
+  cost:[6,8,7,14], opt:[10,13,12,22], rosn:[14,18,20,32],
+  fresh:[false,true,false,false], maxProd:[200,140,120,70],
+  fShare:[[.45,.30,.25],[.20,.40,.40],[.45,.30,.25],[.10,.35,.55]],
+  price:[{pm:.92,dm:1.2},{pm:1,dm:1},{pm:1.12,dm:.85}],
+  demand:[[120,90,70,45],[125,95,110,50],[110,130,80,25],[120,115,90,35]],
+  distCap:[320,320,200,320],
+  pBoost:1.5, pThr:.10, tCost:.8, hCost:1.0,
+  salv:.8, // непроданный нескоропорт сохраняет 80% закупочной стоимости
+  catIds:['К1','К2','К3','К4'],
+  roundNames:['Стартовый рынок','Промо-инициатива','Внешнее событие','Стабилизация'],
+};
+
+// ━━━ CALCULATION ENGINE (exact from server.js) ━━━
+function calcRound(r, d) {
+  const {tariff, distCap, sups, rets} = d;
+  const prod  = SUPS.map((_,si)=>Math.min(sups[si]||0, P.maxProd[si]));
+  const oFS   = SUPS.map((_,si)=>RETS.reduce((s,_,ri)=>s+(rets[ri]?.[si]?.ord||0),0));
+  const avail = prod.slice();
+  const sC    = SUPS.map((_,si)=>oFS[si]>0?Math.min(1,avail[si]/oFS[si]):1);
+  const aS    = RETS.map((_,ri)=>SUPS.map((_,ci)=>(rets[ri]?.[ci]?.ord||0)*sC[ci]));
+  const totAS = aS.reduce((s,row)=>s+row.reduce((a,v)=>a+v,0),0);
+  const dC    = totAS>0?Math.min(1,distCap/totAS):1;
+  const del   = aS.map(row=>row.map(v=>v*dC));
+  const aD    = RETS.map((_,ri)=>SUPS.map((_,ci)=>{
+    const x=rets[ri]?.[ci]; if(!x?.asm)return 0;
+    let v=P.demand[r][ci]*P.fShare[ci][ri]*P.price[x.prc||1].dm;
+    if(x.prm&&(x.dsc||0)>=P.pThr) v*=P.pBoost; return v;
+  }));
+  const sold=[],def=[],over=[],woff=[];
+  RETS.forEach((_,ri)=>{sold.push([]);def.push([]);over.push([]);woff.push([]);
+    SUPS.forEach((_,ci)=>{
+      const s=Math.min(del[ri][ci],aD[ri][ci]),ov=Math.max(0,del[ri][ci]-s);
+      sold[ri].push(s); def[ri].push(Math.max(0,aD[ri][ci]-s));
+      over[ri].push(ov); woff[ri].push(P.fresh[ci]?ov:0);
+    });
+  });
+  // Ритейлер платит за всё поставленное; Fresh-перезапас — полная потеря,
+  // прочий перезапас сохраняет salv×закупка минус холдинг
+  const retProfit=RETS.map((_,ri)=>{let p=0;
+    SUPS.forEach((_,ci)=>{const x=rets[ri]?.[ci];if(!x?.asm)return;
+      const opt=P.opt[ci]*(1-(x.dsc||0)),rosn=P.rosn[ci]*P.price[x.prc||1].pm;
+      const salv=P.fresh[ci]?0:P.salv*opt*over[ri][ci];
+      const hold=P.fresh[ci]?0:over[ri][ci]*P.hCost;
+      p+=rosn*sold[ri][ci]-(opt+tariff)*del[ri][ci]+salv-hold;});return p;});
+  const tD=SUPS.map((_,si)=>RETS.reduce((s,_,ri)=>s+del[ri][si],0));
+  const supProfit=SUPS.map((_,si)=>{let rev=0;
+    RETS.forEach((_,ri)=>{const opt=P.opt[si]*(1-((rets[ri]?.[si]?.dsc)||0));rev+=opt*del[ri][si];});
+    return rev-prod[si]*P.cost[si];});
+  const totDel=del.reduce((s,row)=>s+row.reduce((a,v)=>a+v,0),0);
+  const retOSA=RETS.map((_,ri)=>{const td=aD[ri].reduce((s,v)=>s+v,0);
+    return td>0?aD[ri].reduce((a,_,ci)=>a+sold[ri][ci],0)/td:1;});
+  return {r,tariff,distCap,dCoeff:dC,totDelivered:totDel,prod,ordFromSup:oFS,supCoeff:sC,
+    del,actDem:aD,sold,def,over,woff,retProfit,supProfit,
+    dProfit:(tariff-P.tCost)*totDel,retOSA,totDel:tD,
+    unsold:SUPS.map((_,si)=>Math.max(0,avail[si]-tD[si]))};
+}
+
+// ━━━ STRATEGIES ━━━
+const STRATS = {
+  ret:{
+    'Агрессивный':    {of:[1.15,1.28],pc:0.65,dr:[0.12,0.20],prc:0,desc:'Низкие цены, перезаказ, промо'},
+    'Консервативный': {of:[0.72,0.88],pc:0.06,dr:[0,0.04],   prc:1,desc:'Недозаказ, минимум риска'},
+    'Рыночный':       {of:[0.95,1.08],pc:0.28,dr:[0.05,0.11], prc:1,desc:'Баланс объёма и маржи'},
+    'Промо-фанат':    {of:[1.08,1.22],pc:0.88,dr:[0.14,0.22], prc:0,desc:'Максимум промо на всех кат.'},
+  },
+  sup:{
+    'Максималист':  {pf:[0.97,1.00],desc:'Всегда на пределе мощностей'},
+    'Осторожный':   {pf:[0.60,0.74],desc:'Производит только под твёрдые заказы'},
+    'Точный':       {pf:[0.90,1.01],desc:'Планирует близко к ожидаемому спросу'},
+    'Реактивный':   {pf:[0.80,0.92],desc:'Умеренно консервативен'},
+  },
+  dist:{
+    'Монополист':   {tr:[1.90,2.50],desc:'Высокий тариф — максимизирует прибыль'},
+    'Партнёр':      {tr:[1.10,1.38],desc:'Низкий тариф — поддерживает цепочку'},
+    'Оптимизатор':  {tr:[1.48,1.72],desc:'Балансирует тариф и загрузку'},
+  },
+};
+
+// ━━━ SCENARIOS ━━━
+const SCENARIOS = {
+  bullwhip:{
+    name:'🌊 Эффект хлыста', color:'#58a6ff',
+    desc:'Ритейлеры гонятся за спросом и перезаказывают. Поставщики следуют за заказами. Цепочка раскачивается.',
+    strats:{R1:'Агрессивный',R2:'Агрессивный',R3:'Агрессивный',S1:'Максималист',S2:'Максималист',S3:'Максималист',S4:'Максималист',D:'Монополист'},
+    params:{noise:15,shock:200,boost:15},
+    discuss:['Насколько сильнее «раскачались» заказы поставщиков по сравнению с колебаниями спроса?','Кто проиграл больше всего от перезапаса в Туре 3?','Как бы изменилась ситуация, если бы ритейлеры делились прогнозами с поставщиками?'],
+  },
+  promo:{
+    name:'🎪 Промо-хаос', color:'#f0883e',
+    desc:'Все ритейлеры жмут промо одновременно. Буст в Туре 2 — искусственный. После — запасы, дефицит и убытки.',
+    strats:{R1:'Промо-фанат',R2:'Промо-фанат',R3:'Промо-фанат',S1:'Реактивный',S2:'Максималист',S3:'Максималист',S4:'Точный',D:'Оптимизатор'},
+    params:{noise:10,shock:200,boost:20},
+    discuss:['В каком туре промо дало наибольший буст? Почему он оказался временным?','Кто заработал на промо-хаосе, а кто потерял?','Что произошло с запасами Fresh (К2) когда все одновременно заказали под промо?'],
+  },
+  ideal:{
+    name:'🤝 Идеальная координация', color:'#3fb950',
+    desc:'Команды делятся прогнозами и заказывают точно. Это базовый уровень — используйте для сравнения.',
+    strats:{R1:'Рыночный',R2:'Рыночный',R3:'Рыночный',S1:'Точный',S2:'Точный',S3:'Точный',S4:'Точный',D:'Партнёр'},
+    params:{noise:4,shock:200,boost:15},
+    discuss:['Насколько выше прибыль цепочки по сравнению со сценарием «Хаос»?','Какая минимальная координация нужна для такого результата?','Что мешает реализовать этот сценарий на практике?'],
+  },
+  stress:{
+    name:'💥 Стресс-тест', color:'#f85149',
+    desc:'Максимальный шок в Туре 3: мощность дист-ра 120 ед., квота П4 — 20 ед. Кто выживает? Кто теряет всё?',
+    strats:{R1:'Агрессивный',R2:'Рыночный',R3:'Рыночный',S1:'Осторожный',S2:'Осторожный',S3:'Реактивный',S4:'Точный',D:'Монополист'},
+    params:{noise:20,shock:120,boost:15},
+    discuss:['Как дистрибьютор должен был распределить ограниченные 120 ед.? Было ли это справедливо?','Кто принял правильное решение заранее, а кто пострадал от шока?','Какие буферные запасы помогли бы пережить этот шок?'],
+  },
+  free:{
+    name:'🎲 Свободный рынок', color:'#bc8cff',
+    desc:'Смешанные стратегии — каждый за себя, переговоры не сложились. Реалистичный сценарий без координации.',
+    strats:{R1:'Агрессивный',R2:'Рыночный',R3:'Промо-фанат',S1:'Реактивный',S2:'Максималист',S3:'Точный',S4:'Осторожный',D:'Оптимизатор'},
+    params:{noise:12,shock:200,boost:15},
+    discuss:['Чья стратегия оказалась наиболее выигрышной? Почему?','Где стратегии команд конфликтовали друг с другом?','Что нужно согласовать минимально, чтобы улучшить общий результат?'],
+  },
+};
+
+const TEAM_ICO  = {R1:'🛒',R2:'🛒',R3:'🛒',S1:'🏭',S2:'🏭',S3:'🏭',S4:'🏭',D:'🚛'};
+const TEAM_TYPE = {R1:'ret',R2:'ret',R3:'ret',S1:'sup',S2:'sup',S3:'sup',S4:'sup',D:'dist'};
+const TEAM_ROLE = {R1:'Дискаунтер',R2:'Супермаркет',R3:'Гипермаркет',
+                   S1:'Базовый',S2:'Fresh',S3:'Промо-хиты',S4:'Импорт',D:'Дистрибьютор'};
+// Кириллические метки акторов (внутренние ключи R/S/D остаются для движка)
+const LBL = {R1:'Р1',R2:'Р2',R3:'Р3',S1:'П1',S2:'П2',S3:'П3',S4:'П4',D:'Д'};
+const turLabel = i => `Тур ${i+1}`;
+const DEMO_NAMES={
+  R1:['Близко&Дёшево','ЦенаБит','АльфаМаркет'],R2:['УютМаркет','СвежийГород','МегаФреш'],
+  R3:['ГиперКолосс','МаксМолл','КупольТорг'],S1:['АгроПром','МассФуд','БазисСнаб'],
+  S2:['ФрешЛайн','СвежестьПлюс','ЗеленьПро'],S3:['ПромоСила','БустФуд','АктивПром'],
+  S4:['ИмпортЭлит','ПремиумФуд','ЕвроТрейд'],D:['ЛогоМакс','ТрансФуд','ЭффектДист'],
+};
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+const rnd  = (a,b) => a+Math.random()*(b-a);
+const f0   = v => Math.round(v||0);
+const f1   = v => parseFloat(v||0).toFixed(1);
+const clamp01 = v => Math.max(0,Math.min(1,v));
+
+// ━━━ СИСТЕМА СЧЁТА ━━━
+const BONUS_FUND = 250; // фонд здоровья цепочки за тур (у.е.)
+
+// Прибыль конкретной команды за тур
+function roundProfit(res, tid) {
+  const ri=RETS.indexOf(tid), si=SUPS.indexOf(tid);
+  if(ri>=0) return res.retProfit[ri];
+  if(si>=0) return res.supProfit[si];
+  return res.dProfit;
+}
+
+// Личный вклад в здоровье [0..1]: Р — OSA, П — fill rate, Д — доля довезённого
+function contribOf(res, tid) {
+  const ri=RETS.indexOf(tid), si=SUPS.indexOf(tid);
+  if(ri>=0) return clamp01(res.retOSA[ri]);
+  if(si>=0) return clamp01(res.supCoeff[si]);
+  return clamp01(res.dCoeff);
+}
+
+// Индекс здоровья цепочки за тур H ∈ [0,1] + компоненты
+function chainHealth(res, r) {
+  const OSA      = res.retOSA.reduce((s,v)=>s+v,0)/RETS.length;
+  const totalDef = res.def.flat().reduce((s,v)=>s+v,0);
+  const totalWoff= res.woff.flat().reduce((s,v)=>s+v,0);
+  // Эффект хлыста: заказы vs ФАКТИЧЕСКИЙ спрос (цена/промо меняют его легально)
+  const totalOrd = RETS.reduce((s,_,ri)=>s+SUPS.reduce((a,_,ci)=>a+(SIM.decisions[r].rets[ri][ci].ord||0),0),0);
+  const totalDem = res.actDem.flat().reduce((s,v)=>s+v,0);
+  const amp      = totalOrd/Math.max(totalDem,1);
+  const Deficit  = 1 - clamp01(totalDef/150);
+  const Bullwhip = 1 - clamp01((amp-1)/1.5);
+  const Waste    = 1 - clamp01(totalWoff/30);
+  const H = 0.35*OSA + 0.25*Deficit + 0.25*Bullwhip + 0.15*Waste;
+  return {H:clamp01(H), OSA, Deficit, Bullwhip, Waste, amp, totalDef, totalWoff};
+}
+
+// ━━━ CHARACTERS ━━━
+const CHARS = {
+  'Жёсткий': {ico:'🦁',clr:'#f85149',desc:'Диктует условия. Не идёт на уступки.',
+    conc:0.08,dmd:1.55,thr:0.88,
+    open:[
+      '{V} — моё условие. Это не старт переговоров, это финал.',
+      'Ценю ваше время, поэтому сразу: {V}. Других вариантов нет.',
+      'Рынок на моей стороне. Работаем на {V} или ищите другого.',
+      '{V}. Точка. Дальше обсуждать нечего.',
+      'Скажу один раз: {V}. Можем сэкономить время.',
+    ],
+    ctr:[
+      'Нет. {V} — это максимум.',
+      'Слышу вас. Ответ: нет. Стою на {V}.',
+      'Ваш вариант мне неинтересен. {V}, как сказал.',
+      'Это не торг. Мой потолок — {V}. Финально.',
+    ],
+    ok:['Принято. {V}. Работаем.','Фиксируем {V}. Договор в силе.','{V}. Согласен. Двигаемся дальше.'],
+    no:['Сделки нет. Советую пересмотреть позицию.','Без взаимопонимания — не работаем. Удачи.','Ваши условия неприемлемы. Разговор окончен.']
+  },
+  'Кооперативный': {ico:'🤝',clr:'#3fb950',desc:'Ищет взаимную выгоду. Легко уступает.',
+    conc:0.60,dmd:1.15,thr:0.50,
+    open:[
+      'Предлагаю {V} — думаю, это честно для нас обоих.',
+      'Хочу найти решение, при котором все выигрывают. Моя стартовая позиция — {V}.',
+      'Смотрите: {V} выгодно нам обоим. Вы получаете стабильность, я — предсказуемый поток.',
+      'Для меня важна долгосрочная работа с вами. Поэтому {V} — честное предложение.',
+    ],
+    ctr:[
+      'Понимаю вашу логику. Готов сдвинуться до {V} — надеюсь, это снимает вопрос.',
+      'Хорошо, давайте {V}. Я иду навстречу — рассчитываю на взаимность.',
+      'Могу сделать {V}. Это значительная уступка, но ради партнёрства — стоит.',
+      'Слышу вас. {V} — пробую вам навстречу. Устроит?',
+    ],
+    ok:[
+      'Отлично! {V} — договорились. Рад работать с вами.',
+      'Принято. {V}. Вот так и строится сильная цепочка!',
+      'Супер, {V}. Хорошая сделка для всех звеньев.',
+    ],
+    no:['Жаль, не договорились. Но я открыт — вернёмся к теме позже.','Не сложилось. Надежды не теряю, давайте думать дальше.']
+  },
+  'Хитрый': {ico:'🦊',clr:'#d29922',desc:'Завышает запрос. Делает ложные уступки.',
+    conc:0.35,dmd:1.80,thr:0.72,
+    open:[
+      'Знаю, звучит амбициозно, но {V} — это реальная рыночная ставка прямо сейчас.',
+      'Между нами: мог бы запросить выше. Специально для вас — {V}.',
+      'Начну с {V}. Я понимаю, что много. Но у меня есть данные, которые это обосновывают.',
+      'Рынок сейчас позволяет требовать больше. Вам — как партнёру — предлагаю {V}.',
+    ],
+    ctr:[
+      'Хорошо, специально для вас — {V}. Это уже на грани моей рентабельности.',
+      'Вижу, что вы серьёзный партнёр. Уступаю до {V} — ниже буквально себе в убыток.',
+      'Последняя уступка: {V}. Дальше физически не могу двигаться.',
+      'Скрипя сердцем: {V}. Это дно для меня. Всё.',
+    ],
+    ok:[
+      '{V}. Принимаю. Умеете торговаться — уважаю.',
+      'Согласен на {V}. Что ж, неплохая работа с вашей стороны.',
+      'Ладно, {V}. Вы меня убедили. Фиксируем.',
+    ],
+    no:['Пока не готов. Подумайте — мои условия разумные.','Жаль. Но я не тороплюсь — рынок на моей стороне.']
+  },
+  'Упрямый': {ico:'😤',clr:'#f0883e',desc:'Держит позицию. Не реагирует на аргументы.',
+    conc:0.05,dmd:1.30,thr:0.92,
+    open:[
+      '{V}. Это моя позиция.',
+      'Говорю один раз: {V}.',
+      'Нужно {V}. Точка.',
+    ],
+    ctr:[
+      'Нет. {V}.',
+      'Позиция не меняется. {V}.',
+      'Уже сказал: {V}. Повторять не стану.',
+      'Слышал вас. Ответ прежний: {V}.',
+    ],
+    ok:['Хорошо. {V}.','Ладно. {V}.','Принято. {V}.'],
+    no:['Нет.','Договорённости нет.','Нет смысла продолжать.']
+  },
+  'Аналитик': {ico:'📊',clr:'#58a6ff',desc:'Обосновывает цифрами. Принимает взвешенно.',
+    conc:0.42,dmd:1.22,thr:0.68,
+    open:[
+      'По нашей модели оптимальная точка — {V}. Минимизирует издержки обеих сторон.',
+      'Сделал расчёт. При текущей конфигурации рынка справедливое значение — {V}.',
+      '{V} — это равновесная точка. Отклонение в любую сторону снижает суммарную маржу цепочки.',
+      'Смотрите цифры: при {V} ROI выше у обеих сторон, чем при любом другом варианте.',
+    ],
+    ctr:[
+      'Пересчитал с вашими вводными. Получается {V}. Математика не врёт.',
+      'Ваш запрос не сходится экономически. Компромисс: {V} — обоснованно.',
+      'С учётом маржи обеих сторон оптимум — {V}. Это не прихоть, это арифметика.',
+      'Модель говорит: {V} — единственное устойчивое решение.',
+    ],
+    ok:[
+      'Цифры сошлись: {V}. Принято. Хорошее решение.',
+      '{V} — математически верно. Фиксируем.',
+      'Данные подтверждают: {V} работает для нас обоих. Принято.',
+    ],
+    no:['Экономически не обосновано при текущих параметрах. Отказываюсь.','Модель не сходится. Согласиться не могу.']
+  },
+};
+
+// ━━━ ВНУТРИКОМАНДНЫЕ РОЛИ (до 4 на команду; роль[0] = Директор, ведёт переговоры) ━━━
+const ROLE_SETS = {
+  ret: [
+    {ico:'🎩',title:'Директор сети',       duty:'Финальное решение, переговоры', lead:true},
+    {ico:'🏷️',title:'Категорийный менеджер',duty:'Цена и промо'},
+    {ico:'📦',title:'Менеджер закупок',     duty:'Объёмы заказов поставщикам'},
+    {ico:'📈',title:'Аналитик спроса',      duty:'Прогноз и чтение рынка'},
+  ],
+  sup: [
+    {ico:'🎩',title:'Генеральный директор', duty:'Стратегия, переговоры', lead:true},
+    {ico:'🏭',title:'Директор производства',duty:'Объём выпуска'},
+    {ico:'💼',title:'Коммерческий директор',duty:'Отпускные цены и скидки'},
+    {ico:'📊',title:'Планировщик S&OP',     duty:'Баланс мощности и спроса'},
+  ],
+  dist: [
+    {ico:'🎩',title:'Управляющий директор', duty:'Тариф, переговоры', lead:true},
+    {ico:'🚚',title:'Директор логистики',   duty:'Распределение мощностей'},
+    {ico:'🤝',title:'Менеджер по клиентам', duty:'Приоритеты при дефиците'},
+    {ico:'🧮',title:'Аналитик загрузки',    duty:'Оптимизация тарифа'},
+  ],
+};
+const hexA = (hex,a) => {const h=hex.replace('#','');return `rgba(${parseInt(h.slice(0,2),16)},${parseInt(h.slice(2,4),16)},${parseInt(h.slice(4,6),16)},${a})`;};
+
+// Default characters per scenario
+const SCENARIO_CHARS = {
+  bullwhip:{R1:'Жёсткий',R2:'Жёсткий',R3:'Жёсткий',S1:'Упрямый',S2:'Упрямый',S3:'Упрямый',S4:'Жёсткий',D:'Жёсткий'},
+  promo:   {R1:'Хитрый',R2:'Хитрый',R3:'Хитрый',S1:'Аналитик',S2:'Кооперативный',S3:'Кооперативный',S4:'Аналитик',D:'Упрямый'},
+  ideal:   {R1:'Кооперативный',R2:'Кооперативный',R3:'Кооперативный',S1:'Кооперативный',S2:'Кооперативный',S3:'Кооперативный',S4:'Кооперативный',D:'Кооперативный'},
+  stress:  {R1:'Жёсткий',R2:'Аналитик',R3:'Аналитик',S1:'Упрямый',S2:'Упрямый',S3:'Аналитик',S4:'Кооперативный',D:'Жёсткий'},
+  free:    {R1:'Жёсткий',R2:'Хитрый',R3:'Кооперативный',S1:'Аналитик',S2:'Упрямый',S3:'Кооперативный',S4:'Аналитик',D:'Хитрый'},
+};
+
+// Negotiation pairs per round
+const NEG_PAIRS = [
+  // R0: Стартовый рынок
+  [
+    {from:'R1',to:'S1',subj:'скидку на К1 (Базовый)',type:'dsc',fromWant:0.15,toWant:0.04},
+    {from:'R2',to:'D', subj:'тариф логистики',        type:'tar',fromWant:1.2, toWant:2.2 },
+    {from:'R3',to:'S4',subj:'поставку К4 (Импорт)',   type:'vol',fromWant:'45 ед.',toWant:'30 ед.'},
+  ],
+  // R1: Промо-инициатива
+  [
+    {from:'R1',to:'S3',subj:'промо-скидку на К3',type:'dsc',fromWant:0.18,toWant:0.06,promo:true},
+    {from:'R2',to:'S2',subj:'промо Fresh К2',    type:'dsc',fromWant:0.14,toWant:0.05,promo:true},
+    {from:'D', to:'R3',subj:'надбавку за объём', type:'tar',fromWant:2.0, toWant:1.4 },
+  ],
+  // R2: Внешнее событие (шок)
+  [
+    {from:'D', to:'R1',subj:'приоритет при дефиците мощностей',type:'pri',fromWant:'60 ед.',toWant:'100 ед.'},
+    {from:'D', to:'R2',subj:'приоритет при дефиците мощностей',type:'pri',fromWant:'50 ед.',toWant:'90 ед.' },
+    {from:'S4',to:'R3',subj:'распределение квоты К4 (15 ед.)', type:'vol',fromWant:'10 ед.',toWant:'15 ед.'},
+  ],
+  // R3: Стабилизация
+  [
+    {from:'R1',to:'S1',subj:'долгосрочную скидку К1',type:'dsc',fromWant:0.12,toWant:0.03},
+    {from:'R3',to:'S4',subj:'восстановление объёма К4',type:'vol',fromWant:'50 ед.',toWant:'40 ед.'},
+    {from:'R2',to:'D', subj:'снижение тарифа',          type:'tar',fromWant:1.3, toWant:1.9 },
+  ],
+];
+
+// ━━━ SIM STATE ━━━
+let SIM = {scenarioId:'bullwhip', strats:{...SCENARIOS.bullwhip.strats},
+           chars:{...SCENARIO_CHARS.bullwhip}, teamSize:4, rosters:{},
+           params:{noise:15,shock:200,boost:15}, names:{},
+           decisions:[], results:[], narratives:[], totals:{}, scores:{}, round:-1,
+           negSessions:[], negPairs:[], negOutcomes:{}};
+
+// ━━━ SETUP UI ━━━
+function initSetupUI() {
+  // Scenario grid
+  const sg = document.getElementById('sc-grid');
+  sg.innerHTML = Object.entries(SCENARIOS).map(([id,sc])=>
+    `<div class="sc-card ${SIM.scenarioId===id?'sel':''}" id="sc-${id}"
+       style="--sc-color:${sc.color};${SIM.scenarioId===id?`border-color:${sc.color}`:''}"
+       onclick="selScenario('${id}')">
+      <div class="sc-ico">${sc.name.split(' ')[0]}</div>
+      <div class="sc-name">${sc.name.split(' ').slice(1).join(' ')}</div>
+      <div class="sc-desc">${sc.desc}</div>
+    </div>`
+  ).join('');
+  renderStratGrid();
+  renderCharGrid();
+}
+
+function renderCharGrid() {
+  const cg = document.getElementById('char-grid');
+  if (!cg) return;
+  const charNames = Object.keys(CHARS);
+  cg.innerHTML = ALL.map(tid => {
+    const cur = SIM.chars[tid] || 'Кооперативный';
+    const ch = CHARS[cur];
+    return `<div class="ch-item" id="cg-${tid}">
+      <div class="ts-top">
+        <span class="ts-ico">${TEAM_ICO[tid]}</span>
+        <div>
+          <div class="ts-id">${LBL[tid]} · ${TEAM_ROLE[tid]}</div>
+          <div class="ts-name" id="cg-nm-${tid}" style="color:${ch.clr};font-size:12px;font-weight:700">${ch.ico} ${cur}</div>
+        </div>
+      </div>
+      <select onchange="updChar('${tid}',this.value)" id="csel-${tid}">
+        ${charNames.map(cn=>`<option value="${cn}" ${cn===cur?'selected':''}>${CHARS[cn].ico} ${cn}</option>`).join('')}
+      </select>
+      <div class="ts-desc" id="cdesc-${tid}" style="color:${ch.clr}">${ch.desc}</div>
+    </div>`;
+  }).join('');
+}
+
+function updChar(tid, val) {
+  SIM.chars[tid] = val;
+  const ch = CHARS[val];
+  const nm = document.getElementById(`cg-nm-${tid}`);
+  const dc = document.getElementById(`cdesc-${tid}`);
+  if (nm) { nm.textContent = `${ch.ico} ${val}`; nm.style.color = ch.clr; }
+  if (dc) { dc.textContent = ch.desc; dc.style.color = ch.clr; }
+}
+
+function selScenario(id) {
+  SIM.scenarioId = id;
+  const sc = SCENARIOS[id];
+  SIM.strats = {...sc.strats};
+  SIM.chars = {...(SCENARIO_CHARS[id] || SCENARIO_CHARS.bullwhip)};
+  document.getElementById('p-noise').value = sc.params.noise;
+  document.getElementById('p-shock').value = sc.params.shock;
+  document.getElementById('p-boost').value = sc.params.boost;
+  updParam('noise',sc.params.noise); updParam('shock',sc.params.shock); updParam('boost',sc.params.boost);
+  document.querySelectorAll('.sc-card').forEach(el=>{
+    const sid=el.id.replace('sc-',''),s=SCENARIOS[sid];
+    el.classList.toggle('sel',sid===id);
+    el.style.borderColor = sid===id ? s.color : '';
+  });
+  renderStratGrid();
+  renderCharGrid();
+}
+
+function renderStratGrid() {
+  const sg = document.getElementById('strat-grid');
+  sg.innerHTML = ALL.map(tid => {
+    const type = TEAM_TYPE[tid];
+    const opts = Object.keys(STRATS[type]);
+    const cur = SIM.strats[tid] || opts[0];
+    const desc = STRATS[type][cur]?.desc||'';
+    return `<div class="ts-item">
+      <div class="ts-top">
+        <span class="ts-ico">${TEAM_ICO[tid]}</span>
+        <div><div class="ts-id">${LBL[tid]}</div><div class="ts-name">${TEAM_ROLE[tid]}</div></div>
+      </div>
+      <select onchange="updStrat('${tid}',this.value)" id="sel-${tid}">
+        ${opts.map(o=>`<option value="${o}" ${o===cur?'selected':''}>${o}</option>`).join('')}
+      </select>
+      <div class="ts-desc" id="desc-${tid}">${desc}</div>
+    </div>`;
+  }).join('');
+}
+
+function updStrat(tid, val) {
+  SIM.strats[tid] = val;
+  const type = TEAM_TYPE[tid];
+  document.getElementById(`desc-${tid}`).textContent = STRATS[type][val]?.desc||'';
+}
+
+function updParam(key, val) {
+  if(key==='team'){ SIM.teamSize=parseInt(val); document.getElementById('pv-team').textContent=val; return; }
+  SIM.params[key] = parseFloat(val);
+  if(key==='noise') document.getElementById('pv-noise').textContent = `±${val}%`;
+  if(key==='shock') document.getElementById('pv-shock').textContent = `${val} ед.`;
+  if(key==='boost') document.getElementById('pv-boost').textContent = `×${(val/10).toFixed(1)}`;
+}
+
+// ━━━ DECISION GENERATOR ━━━
+function genDecisions(r) {
+  const dem = P.demand[r];
+  const noise = SIM.params.noise/100;
+  const boostVal = SIM.params.boost/10;
+  const shockCap = SIM.params.shock;
+
+  // Suppliers
+  const totalDem = SUPS.map((_,si)=>RETS.reduce((s,_,ri)=>s+dem[si]*P.fShare[si][ri],0));
+  const s4cap = r===2 ? Math.min(30, Math.round(shockCap/6)) : P.maxProd[3];
+  const sups = SUPS.map((_,si)=>{
+    const st = STRATS.sup[SIM.strats[SUPS[si]]];
+    const [lo,hi] = st.pf;
+    const cap = si===3 ? s4cap : P.maxProd[si];
+    const nz = 1+rnd(-noise, noise);
+    return Math.round(Math.min(cap, totalDem[si]*rnd(lo,hi)*nz));
+  });
+
+  const dc = r===2 ? shockCap : P.distCap[r];
+  const st_d = STRATS.dist[SIM.strats['D']];
+  const tariff = parseFloat(rnd(st_d.tr[0], st_d.tr[1]).toFixed(1));
+
+  const rets = RETS.map((rid,ri)=>{
+    const st = STRATS.ret[SIM.strats[rid]];
+    const [lo,hi] = st.of;
+    const nz = 1+rnd(-noise*0.5, noise*0.5);
+    return SUPS.map((_,ci)=>{
+      const baseDem = dem[ci]*P.fShare[ci][ri];
+      const dm = P.price[st.prc].dm;
+      const prm = Math.random() < st.pc ? 1 : 0;
+      const dsc = prm ? parseFloat(rnd(st.dr[0],st.dr[1]).toFixed(2))
+                      : (Math.random()<0.2 ? parseFloat(rnd(0.02,0.06).toFixed(2)) : 0);
+      // Заказ планируется под ОЖИДАЕМЫЙ спрос: база × ценовой эффект × промо-буст (если включён)
+      const expDem = baseDem*dm*((prm && dsc>=P.pThr) ? boostVal : 1);
+      const ord = Math.max(1, Math.round(expDem*rnd(lo,hi)*nz));
+      return {asm:1, ord, prc:st.prc, prm, dsc};
+    });
+  });
+
+  return {tariff, distCap:dc, sups, rets};
+}
+
+// ━━━ NARRATIVE GENERATOR ━━━
+function genNarrative(tid, dec, res) {
+  const lines = [], prcN=['агрессивную','стандартную','премиальную'];
+  if (RETS.includes(tid)) {
+    const ri=RETS.indexOf(tid), cats=dec.rets[ri];
+    const osa=res.retOSA[ri], profit=res.retProfit[ri];
+    const totalDef=res.def[ri].reduce((s,v)=>s+v,0);
+    const totalOver=res.over[ri].reduce((s,v)=>s+v,0);
+    const totalWoff=res.woff[ri].reduce((s,v)=>s+v,0);
+    const mainPrc=cats.reduce((a,c)=>c.prc>a?c.prc:a,0);
+    const promoCats=cats.map((c,ci)=>c.prm?P.catIds[ci]:null).filter(Boolean);
+    const promoOK=cats.some((c)=>c.prm&&c.dsc>=P.pThr);
+    const totalOrd=cats.reduce((s,c)=>s+c.ord,0);
+    const totalDel=res.del[ri].reduce((s,v)=>s+v,0);
+    const dsc=cats.reduce((mx,c)=>c.dsc>mx?c.dsc:mx,0);
+
+    lines.push(`Цена: <b>${prcN[mainPrc]}</b>. Заказ: <b>${f0(totalOrd)} ед.</b> — доставлено <b>${f0(totalDel)} ед.</b>`);
+
+    if (promoCats.length) {
+      if(promoOK) lines.push(`🎯 Промо по <b>${promoCats.join(', ')}</b> (скидка ${f0(dsc*100)}%) — буст ×${(SIM.params.boost/10).toFixed(1)} ✅`);
+      else lines.push(`📋 Промо по <b>${promoCats.join(', ')}</b>, скидка ${f0(dsc*100)}% < 10% — буст НЕ сработал.`);
+    }
+
+    if(totalDef>20) {
+      const wc=P.catIds[res.def[ri].indexOf(Math.max(...res.def[ri]))];
+      lines.push(`🔴 Дефицит <b>${f0(totalDef)} ед.</b> (пик — ${wc}). Покупатели уходили.`);
+    } else if(totalDef>5) lines.push(`🟡 Небольшой дефицит <b>${f0(totalDef)} ед.</b>`);
+    else lines.push(`✅ Полки заполнены, дефицит минимален.`);
+
+    if(totalWoff>2) lines.push(`🗑 Fresh К2: <b>${f0(totalWoff)} ед.</b> списано — потери ${f0(totalWoff*P.cost[1])} у.е.`);
+    else if(totalOver>15) lines.push(`📦 Перезаказ <b>${f0(totalOver)} ед.</b> — холдинг ${f0(totalOver*P.hCost)} у.е.`);
+    return {lines, osa, profit};
+
+  } else if (SUPS.includes(tid)) {
+    const si=SUPS.indexOf(tid);
+    const prod=res.prod[si], del=res.totDel[si], ord=res.ordFromSup[si];
+    const unsold=res.unsold[si], profit=res.supProfit[si];
+    const fr=ord>0?Math.min(1,del/ord):1, isFr=P.fresh[si];
+    lines.push(`Производство: <b>${f0(prod)} ед.</b> из ${P.maxProd[si]} макс. Заказано: <b>${f0(ord)} ед.</b>`);
+    if(SUPS.indexOf(tid)===3&&SIM.params.shock<100) lines.push(`⚠️ Стресс-квота: ${f0(prod)} ед. — острый дефицит импорта.`);
+    if(fr>=0.96) lines.push(`✅ Fill-rate <b>${f0(fr*100)}%</b> — заказы выполнены.`);
+    else if(fr>=0.78) lines.push(`🟡 Fill-rate <b>${f0(fr*100)}%</b> — нехватка ${f0(ord-del)} ед.`);
+    else lines.push(`🔴 Fill-rate <b>${f0(fr*100)}%</b> — дефицит ${f0(ord-del)} ед. у ритейлеров.`);
+    if(isFr&&unsold>3) lines.push(`🗑 <b>${f0(unsold)} ед. Fresh</b> списано — убыток ${f0(unsold*P.cost[si])} у.е.`);
+    else if(!isFr&&unsold>12) lines.push(`📦 Остаток <b>${f0(unsold)} ед.</b> на складе.`);
+    return {lines, osa:fr, profit};
+
+  } else {
+    const profit=res.dProfit, dCoeff=res.dCoeff, delivered=res.totDelivered;
+    lines.push(`Тариф <b>${f1(dec.tariff)} у.е./ед.</b> Перевезено: <b>${f0(delivered)} ед.</b>`);
+    if(dCoeff>=0.96) lines.push(`🔥 Загрузка <b>${f0(dCoeff*100)}%</b> — мощности на пределе.`);
+    else if(dCoeff>=0.72) lines.push(`✅ Загрузка <b>${f0(dCoeff*100)}%</b> — штатная работа.`);
+    else lines.push(`📉 Загрузка <b>${f0(dCoeff*100)}%</b> — значительный простой мощностей.`);
+    if(res.r===2) lines.push(`⚠️ Шок: лимит ${f0(SIM.params.shock)} ед. — приоритизация поставок.`);
+    return {lines, osa:dCoeff, profit};
+  }
+}
+
+// ━━━ TEACHING MOMENTS ━━━
+const DISCUSS = [
+  ['Кто заказал значительно больше спроса? Зачем? Во сколько это обошлось цепочке?',
+   'Кто «угадал» с производством? Какую информацию им понадобилось бы знать заранее?'],
+  ['Промо дало буст — но кто заплатил за этот буст? (подсказка: скидки съели маржу поставщика)',
+   'Если бы все промо шли в разное время — как бы изменился результат?'],
+  ['Дист-р получил ограничение. Чьи заказы он должен был выполнить в первую очередь — и почему?',
+   'Кто подготовился к шоку заранее? Что они сделали правильно в Туре 2?'],
+  ['Кто быстрее адаптировался к изменившемуся рынку? Какая стратегия доказала устойчивость?',
+   'Если бы все знали исход Тура 3 заранее — что изменили бы в Туре 1?'],
+];
+
+function genTeachMoment(r, res) {
+  const totalDef = res.def.flat().reduce((s,v)=>s+v,0);
+  const avgOSA = res.retOSA.reduce((s,v)=>s+v,0)/3;
+  const dCoeff = res.dCoeff;
+  const totalOver = res.over.flat().reduce((s,v)=>s+v,0);
+  const totalWoff = res.woff.flat().reduce((s,v)=>s+v,0);
+
+  const moments = [];
+  if(totalDef>50) moments.push({lvl:'crit',ico:'🔴',t:'Критический дефицит',
+    d:`<b>${f0(totalDef)} ед.</b> не дошло до покупателей. OSA ср. ${f0(avgOSA*100)}%. Цепочка не справилась с обеспечением полок.`});
+  else if(totalDef>15) moments.push({lvl:'warn',ico:'🟡',t:'Умеренный дефицит',
+    d:`Дефицит <b>${f0(totalDef)} ед.</b> — ритейлеры теряли покупателей в пиковые часы.`});
+  if(totalOver>30) moments.push({lvl:'warn',ico:'📦',t:'Перезапас в системе',
+    d:`<b>${f0(totalOver)} ед.</b> лишнего товара заморозили деньги. Цепочка работала неэффективно.`});
+  if(totalWoff>8) moments.push({lvl:'crit',ico:'🗑',t:'Списания Fresh',
+    d:`<b>${f0(totalWoff)} ед.</b> скоропортящегося товара выброшено. Стоимость: ${f0(totalWoff*P.cost[1])} у.е.`});
+  if(dCoeff<0.65) moments.push({lvl:'warn',ico:'🚛',t:'Узкое место — логистика',
+    d:`Дист-р использован на <b>${f0(dCoeff*100)}%</b>. Ограничение мощностей стало главной причиной дефицита.`});
+  if(moments.length===0) moments.push({lvl:'good',ico:'✅',t:'Тур прошёл без критических проблем',
+    d:`OSA ${f0(avgOSA*100)}%, дефицит ${f0(totalDef)} ед. Результат выше среднего для этого сценария.`});
+
+  return moments.slice(0,2);
+}
+
+// ━━━ RUN SIMULATION ━━━
+function runSim() {
+  ALL.forEach(tid=>{ SIM.names[tid]=pick(DEMO_NAMES[tid]); });
+  SIM.decisions=[]; SIM.results=[]; SIM.narratives=[];
+  for(let r=0;r<4;r++){
+    const dec=genDecisions(r);
+    // Re-apply boost patch before calc
+    const origBoost=P.pBoost; P.pBoost=SIM.params.boost/10;
+    const res=calcRound(r,dec);
+    P.pBoost=origBoost;
+    const narr={}; ALL.forEach(tid=>{narr[tid]=genNarrative(tid,dec,res);});
+    SIM.decisions.push(dec); SIM.results.push(res); SIM.narratives.push(narr);
+  }
+  SIM.totals={};
+  ALL.forEach(tid=>{
+    let p=0; SIM.results.forEach((res)=>{p+=roundProfit(res,tid);}); SIM.totals[tid]=p;
+  });
+  // Здоровье цепочки и накопленный счёт по турам (бонус = H × фонд × личный вклад)
+  SIM.health=[]; SIM.scoreCum=[]; SIM.scores={}; SIM.bonuses={};
+  const running={}, runBonus={}; ALL.forEach(t=>{running[t]=0; runBonus[t]=0;});
+  SIM.results.forEach((res,r)=>{
+    const h=chainHealth(res,r); SIM.health.push(h);
+    const snap={};
+    ALL.forEach(tid=>{
+      const bn = h.H*BONUS_FUND*contribOf(res,tid);
+      running[tid]+= roundProfit(res,tid) + bn; runBonus[tid]+=bn;
+      snap[tid]=running[tid];
+    });
+    SIM.scoreCum.push(snap);
+  });
+  ALL.forEach(t=>{SIM.scores[t]=running[t]; SIM.bonuses[t]=runBonus[t];});
+  SIM.round=0;
+  SIM.negOutcomes={};
+  dealRoles();
+  const sc=SCENARIOS[SIM.scenarioId];
+  document.getElementById('hdr-sc').textContent=sc.name;
+  showScr('s-roles');
+  renderRosters();
+}
+
+// ━━━ РАЗДАЧА РОЛЕЙ ━━━
+function dealRoles() {
+  SIM.rosters={};
+  const charNames=Object.keys(CHARS);
+  const n=Math.max(1,Math.min(4,SIM.teamSize||4));
+  ALL.forEach(tid=>{
+    const roleSet=ROLE_SETS[TEAM_TYPE[tid]];
+    const slots=[];
+    for(let i=0;i<n;i++){
+      // Директор (i===0) сохраняет характер из настройки (он ведёт переговоры); прочие — случайно
+      const charName = i===0 ? (SIM.chars[tid]||pick(charNames)) : pick(charNames);
+      slots.push({role:roleSet[i], char:charName});
+    }
+    SIM.rosters[tid]=slots;
+  });
+}
+
+function renderRosters() {
+  const sc=SCENARIOS[SIM.scenarioId];
+  const pill=document.getElementById('roles-sc-pill');
+  pill.textContent=sc.name; pill.style.color=sc.color; pill.style.borderColor=sc.color;
+  const grid=document.getElementById('roster-grid');
+  grid.innerHTML=ALL.map(tid=>{
+    const slots=SIM.rosters[tid];
+    return `<div class="roster ${TEAM_TYPE[tid]}" id="roster-${tid}">
+      <div class="roster-hdr">
+        <span class="rh-ico">${TEAM_ICO[tid]}</span>
+        <div>
+          <div class="rh-id">${LBL[tid]} · ${TEAM_ROLE[tid]}</div>
+          <div class="rh-nm">${SIM.names[tid]}</div>
+        </div>
+        <span class="roster-team-size">${slots.length} чел.</span>
+      </div>
+      ${slots.map(s=>{const ch=CHARS[s.char];
+        return `<div class="player-slot">
+          <span class="ps-roleico">${s.role.ico}</span>
+          <div class="ps-body">
+            <div class="ps-role ${s.role.lead?'lead':''}">${s.role.title}</div>
+            <div class="ps-duty">${s.role.duty}</div>
+            <span class="ps-char" style="background:${hexA(ch.clr,.16)};color:${ch.clr}">${ch.ico} ${s.char}</span>
+          </div>
+        </div>`;}).join('')}
+    </div>`;
+  }).join('');
+  ALL.forEach((tid,i)=>setTimeout(()=>{
+    const el=document.getElementById(`roster-${tid}`); if(el)el.classList.add('vis');
+  },i*90));
+  updateDots(-1);
+}
+
+function reshuffleRoles(){ dealRoles(); renderRosters(); }
+function rolesToGame(){ showScr('s-neg'); renderNegScreen(0); }
+
+// ━━━ RENDER ROUND ━━━
+function renderRound(r) {
+  updateDots(r);
+  const res=SIM.results[r], dec=SIM.decisions[r];
+  const sc=SCENARIOS[SIM.scenarioId];
+
+  // Header
+  document.getElementById('r-num').textContent=r+1;
+  document.getElementById('r-num').style.color=sc.color;
+  document.getElementById('r-name').textContent=P.roundNames[r];
+  document.getElementById('r-sub').textContent=[
+    'Первый тур. Команды обнаруживают рынок и принимают решения.',
+    'Промо-окно открыто. Скидка ≥10% + промо → буст спроса.',
+    '⚠️ Внешнее событие — шок для дистрибьютора и квоты П4.',
+    'Рынок стабилизируется. Кто адаптировался — тот выиграл.',
+  ][r];
+  const pill=document.getElementById('r-sc-pill');
+  pill.textContent=sc.name; pill.style.color=sc.color; pill.style.borderColor=sc.color;
+
+  // Event
+  const evts=[null,
+    {type:'promo',ico:'📣',t:'Промо-инициатива',d:'К3 спрос → 110 ед. Буст ×'+f1(SIM.params.boost/10)+' при скидке ≥10% + промо=Да.'},
+    {type:'shock',ico:'🚨',t:'ДВОЙНОЙ ШОК',d:`Дист-р ограничен до ${SIM.params.shock} ед. П4 квота: ${Math.min(30,Math.round(SIM.params.shock/6))} ед. Спрос К2→130, К4→25.`},
+    {type:'info',ico:'📊',t:'Стабилизация',d:'К2=115, К3=90, К4=35. Финальный тур — восстанавливайте маржу.'},
+  ];
+  const ev=evts[r];
+  document.getElementById('r-evt').innerHTML=ev
+    ?`<div class="evt ${ev.type}"><div class="eico">${ev.ico}</div>
+       <div><h3>${ev.t}</h3><p>${ev.d}</p></div></div>`:'' ;
+
+  // Cards
+  const cardsEl=document.getElementById('r-cards');
+  const maxPft=Math.max(...ALL.map(t=>Math.abs(SIM.narratives[r][t].profit)),1);
+  cardsEl.innerHTML=ALL.map(tid=>{
+    const type=TEAM_TYPE[tid], narr=SIM.narratives[r][tid];
+    const p=narr.profit, pc=p>=0?'ok':'bad';
+    const bw=Math.min(100,Math.abs(p)/maxPft*100);
+    const bc=p>=0?'var(--OK)':'var(--BD)';
+    return `<div class="tcard ${type}" id="tc-${r}-${tid}">
+      <div class="tc-top">
+        <span class="tc-ico">${TEAM_ICO[tid]}</span>
+        <div><div class="tc-id">${LBL[tid]} · ${TEAM_ROLE[tid]}</div><div class="tc-nm">${SIM.names[tid]}</div>
+        <div class="tc-strat">${SIM.strats[tid]}</div></div>
+      </div>
+      <div class="tc-lines">${narr.lines.map(l=>`<span>${l}</span>`).join('')}</div>
+      <div class="pb-row"><span class="pb-lbl">Прибыль</span>
+        <span class="pb-val ${pc}">${p>=0?'+':''}${f0(p)} у.е.</span></div>
+      <div class="pb-track"><div class="pb-fill" id="pbf-${r}-${tid}" style="width:0%;background:${bc}"></div></div>
+    </div>`;
+  }).join('');
+
+  // KPIs
+  const totalDef=res.def.flat().reduce((s,v)=>s+v,0);
+  const totalWoff=res.woff.flat().reduce((s,v)=>s+v,0);
+  const totalSold=res.sold.flat().reduce((s,v)=>s+v,0);
+  const avgOSA=res.retOSA.reduce((s,v)=>s+v,0)/3;
+  const H=SIM.health[r].H;
+  document.getElementById('r-kpi').innerHTML=`
+    <div class="ckpi"><div class="cl">Продано</div><div class="cv ok">${f0(totalSold)}</div></div>
+    <div class="ckpi"><div class="cl">Дефицит</div><div class="cv ${totalDef>40?'bad':totalDef>10?'wn':'ok'}">${f0(totalDef)}</div></div>
+    <div class="ckpi"><div class="cl">OSA ср.</div><div class="cv ${avgOSA>=.9?'ok':avgOSA>=.75?'wn':'bad'}">${f0(avgOSA*100)}%</div></div>
+    <div class="ckpi"><div class="cl">Списания</div><div class="cv ${totalWoff>5?'bad':totalWoff>1?'wn':'ok'}">${f0(totalWoff)}</div></div>
+    <div class="ckpi"><div class="cl">Дист. загр.</div><div class="cv ${res.dCoeff>=.9?'ok':res.dCoeff>=.65?'wn':'bad'}">${f0(res.dCoeff*100)}%</div></div>
+    <div class="ckpi" style="grid-column:1/-1;background:${hexA(sc.color,.12)};border:1px solid ${hexA(sc.color,.4)}">
+      <div class="cl">❤️ Здоровье цепочки (фонд ${f0(H*BONUS_FUND)} у.е. × вклад команды)</div>
+      <div class="cv ${H>=.75?'ok':H>=.5?'wn':'bad'}">${f0(H*100)}%</div></div>
+  `;
+
+  // Teaching moment
+  const moments=genTeachMoment(r,res);
+  document.getElementById('r-teach').innerHTML=moments.map(m=>
+    `<div class="teach ${m.lvl}"><div class="tt">${m.ico} ${m.t}</div><div class="td">${m.d}</div></div>`
+  ).join('');
+
+  // Mini leaderboard — по накопленному СЧЁТУ (прибыль + здоровье)
+  const cumScore=SIM.scoreCum[r];
+  const sorted=[...ALL].sort((a,b)=>cumScore[b]-cumScore[a]);
+  const maxAbs=Math.max(...Object.values(cumScore).map(Math.abs),1);
+  document.getElementById('r-minilb').innerHTML=`<h3>Рейтинг (∑ счёт = прибыль + здоровье)</h3>`+
+    sorted.map((tid,i)=>{const p=cumScore[tid],clr=p>=0?'var(--OK)':'var(--BD)';
+      return `<div class="lb-row">
+        <div class="lb-pos">${i+1}</div>
+        <div class="lb-nm">${LBL[tid]} ${SIM.names[tid]}</div>
+        <div class="lb-bar"><div class="lb-barf" style="width:${Math.min(100,Math.abs(p)/maxAbs*100)}%;background:${clr}"></div></div>
+        <div class="lb-pft" style="color:${clr}">${p>=0?'+':''}${f0(p)}</div>
+      </div>`;
+    }).join('');
+
+  // Discussion
+  const qs=DISCUSS[r];
+  document.getElementById('r-discuss').innerHTML=`
+    <div class="discuss-q">
+      <div class="dqt">💬 Вопрос для обсуждения</div>
+      <div class="dqq">${pick(qs)}</div>
+    </div>`;
+
+  // Nav
+  document.getElementById('nav-prog').innerHTML=[0,1,2,3].map(i=>
+    `<div class="np ${i<r?'done':i===r?'cur':''}"></div>`).join('');
+  const nb=document.getElementById('next-btn');
+  nb.textContent = r<3 ? `Тур ${r+2} →` : '📊 Финальный разбор →';
+
+  // Animate cards
+  ALL.forEach((tid,i)=>setTimeout(()=>{
+    const el=document.getElementById(`tc-${r}-${tid}`); if(!el)return;
+    el.classList.add('vis');
+    setTimeout(()=>{const pb=document.getElementById(`pbf-${r}-${tid}`);
+      if(pb) pb.style.width=Math.min(100,Math.abs(SIM.narratives[r][tid].profit)/maxPft*100)+'%';
+    },200);
+  },i*120));
+}
+
+function negToRound() {
+  showScr('s-round');
+  renderRound(SIM.round);
+}
+
+function nextRound() {
+  SIM.round++;
+  if(SIM.round>=4){renderAnalytics();showScr('s-analytics');}
+  else{showScr('s-neg');renderNegScreen(SIM.round);}
+}
+
+// ━━━ ANALYTICS ━━━
+function renderAnalytics() {
+  const sc=SCENARIOS[SIM.scenarioId];
+  document.getElementById('an-sc-label').textContent=`Сценарий: ${sc.name} · 4 тура завершены`;
+  updateDots(4);
+
+  // Winners
+  const retWin=RETS.reduce((a,b)=>SIM.totals[a]>SIM.totals[b]?a:b);
+  const supWin=SUPS.reduce((a,b)=>SIM.totals[a]>SIM.totals[b]?a:b);
+  document.getElementById('an-winners').innerHTML=`
+    <div class="wcard"><div class="wt">🛒 Ритейлер</div><div class="wn">${SIM.names[retWin]}</div><div class="ws">${LBL[retWin]} · ${f0(SIM.totals[retWin])} у.е.</div></div>
+    <div class="wcard"><div class="wt">🏭 Поставщик</div><div class="wn">${SIM.names[supWin]}</div><div class="ws">${LBL[supWin]} · ${f0(SIM.totals[supWin])} у.е.</div></div>
+    <div class="wcard" style="border-color:var(--PU)"><div class="wt">🚛 Дистрибьютор</div><div class="wn">${SIM.names['D']}</div><div class="ws">${LBL['D']} · ${f0(SIM.totals['D'])} у.е.</div></div>
+  `;
+
+  // Awards + score
+  renderAwards();
+  renderScoreChart();
+  // Charts
+  renderProfitChart();
+  renderBullwhipChart();
+  renderWaterfallChart();
+  renderEffTable();
+  renderInsights();
+  renderDebrief();
+}
+
+// ━━━ НАГРАДЫ ━━━
+function renderAwards() {
+  // Гран-при — максимальный итоговый счёт
+  const grand=ALL.reduce((a,b)=>SIM.scores[a]>=SIM.scores[b]?a:b);
+  // Архитектор цепочки — лучшее «служение» (OSA / fill-rate / сбалансированная загрузка)
+  const service={};
+  ALL.forEach(tid=>{
+    const ri=RETS.indexOf(tid),si=SUPS.indexOf(tid); let acc=0;
+    SIM.results.forEach(res=>{
+      if(ri>=0) acc+=res.retOSA[ri];
+      else if(si>=0){const ord=res.ordFromSup[si]; acc+= ord>0?Math.min(1,res.totDel[si]/ord):1;}
+      else acc+= 1-Math.abs(res.dCoeff-0.9);
+    });
+    service[tid]=acc/SIM.results.length;
+  });
+  const architect=ALL.reduce((a,b)=>service[a]>=service[b]?a:b);
+  // Антихлыст — минимальный коэффициент вариации собственного объёма
+  const cv={};
+  ALL.forEach(tid=>{
+    const ri=RETS.indexOf(tid),si=SUPS.indexOf(tid);
+    const series=SIM.results.map((res,r)=>{
+      if(ri>=0) return SUPS.reduce((s,_,ci)=>s+SIM.decisions[r].rets[ri][ci].ord,0);
+      if(si>=0) return res.prod[si];
+      return res.totDelivered;
+    });
+    const m=series.reduce((s,v)=>s+v,0)/series.length;
+    const v=series.reduce((s,x)=>s+(x-m)**2,0)/series.length;
+    cv[tid]= m>0?Math.sqrt(v)/m:0;
+  });
+  const antiwhip=ALL.reduce((a,b)=>cv[a]<=cv[b]?a:b);
+
+  const card=(t,ico,tid,sub,clr)=>`<div class="award" style="border-color:${clr}">
+    <span class="aw-ico">${ico}</span>
+    <div class="aw-t" style="color:${clr}">${t}</div>
+    <div class="aw-nm">${LBL[tid]} · ${SIM.names[tid]}</div>
+    <div class="aw-s">${sub}</div></div>`;
+  document.getElementById('an-awards').innerHTML=
+    card('Гран-при','🏆',grand,`Итоговый счёт ${f0(SIM.scores[grand])} у.е.`,'#ffd700')+
+    card('Архитектор цепочки','🤝',architect,`Служение цепочке ${f0(service[architect]*100)}%`,'#3fb950')+
+    card('Антихлыст','📉',antiwhip,`Самый стабильный объём (CV ${f1(cv[antiwhip]*100)}%)`,'#58a6ff');
+}
+
+function renderScoreChart() {
+  const sorted=[...ALL].sort((a,b)=>SIM.scores[b]-SIM.scores[a]);
+  const maxV=Math.max(...ALL.map(t=>Math.max(SIM.scores[t],SIM.totals[t]+SIM.bonuses[t],Math.abs(SIM.totals[t]))),1);
+  document.getElementById('chart-score').innerHTML=
+    `<div style="font-size:10px;color:var(--W3);margin-bottom:10px">
+       <span style="color:var(--OK)">▰</span> личная прибыль ·
+       <span style="color:var(--PU)">▰</span> бонус здоровья (фонд ${BONUS_FUND} у.е./тур × H × личный вклад) ·
+       <span style="color:var(--BD)">▰</span> убыток</div>`+
+    sorted.map((tid,i)=>{
+      const pf=SIM.totals[tid], bonus=SIM.bonuses[tid];
+      const pfW=Math.max(0,pf)/maxV*100, bnW=bonus/maxV*100, negW=pf<0?Math.abs(pf)/maxV*100:0;
+      const bars = negW>0
+        ? `<div style="width:${negW}%;background:var(--BD)"></div><div style="width:${bnW}%;background:var(--PU)"></div>`
+        : `<div style="width:${pfW}%;background:var(--OK)"></div><div style="width:${bnW}%;background:var(--PU)"></div>`;
+      return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+        <div style="width:22px;font-size:11px;font-weight:700;color:${i===0?'#ffd700':'var(--W3)'};text-align:center">${i+1}</div>
+        <div style="width:150px;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${LBL[tid]} ${SIM.names[tid]}</div>
+        <div style="flex:1;height:16px;background:var(--bg4);border-radius:4px;overflow:hidden;display:flex">${bars}</div>
+        <div style="width:72px;text-align:right;font-size:12px;font-weight:700;color:${SIM.scores[tid]>=0?'var(--OK)':'var(--BD)'}">${SIM.scores[tid]>=0?'+':''}${f0(SIM.scores[tid])}</div>
+      </div>`;
+    }).join('');
+}
+
+function renderProfitChart() {
+  const W=460,H=160,pad={l:50,r:10,t:10,b:30};
+  const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
+  const rounds=[0,1,2,3];
+  const teams=[...RETS,...SUPS,'D'];
+  const colors={R1:'#58a6ff',R2:'#bc8cff',R3:'#3fb950',S1:'#d29922',S2:'#f0883e',S3:'#f85149',S4:'#79c0ff',D:'#56d364'};
+  const seriesData=teams.map(tid=>rounds.map(r=>{
+    const ri=RETS.indexOf(tid),si=SUPS.indexOf(tid);
+    if(ri>=0)return SIM.results[r].retProfit[ri];
+    if(si>=0)return SIM.results[r].supProfit[si];
+    return SIM.results[r].dProfit;
+  }));
+  const allVals=seriesData.flat();
+  const mn=Math.min(...allVals,0), mx=Math.max(...allVals,1);
+  const range=mx-mn||1;
+  const toY=v=>pad.t+ih-(v-mn)/range*ih;
+  const toX=i=>pad.l+i/(rounds.length-1)*iw;
+
+  let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:${H}px">`;
+  // Zero line
+  if(mn<0&&mx>0){const zy=toY(0);svg+=`<line x1="${pad.l}" y1="${zy}" x2="${W-pad.r}" y2="${zy}" stroke="#484f58" stroke-width="1" stroke-dasharray="3,2"/>`;}
+  // Grid
+  [0,1,2,3].forEach(i=>{svg+=`<text x="${pad.l-4}" y="${toY(mn+range/3*i)+4}" class="chart-axis" text-anchor="end">${f0(mn+range/3*i)}</text>`;});
+  rounds.forEach(i=>{svg+=`<text x="${toX(i)}" y="${H-5}" class="chart-axis" text-anchor="middle">Т${i+1}</text>`;});
+  // Lines
+  seriesData.forEach((vals,ti)=>{
+    const tid=teams[ti],col=colors[tid];
+    const pts=rounds.map(i=>`${toX(i)},${toY(vals[i])}`).join(' ');
+    svg+=`<polyline points="${pts}" fill="none" stroke="${col}" stroke-width="1.8" opacity=".85"/>`;
+    rounds.forEach(i=>{svg+=`<circle cx="${toX(i)}" cy="${toY(vals[i])}" r="3" fill="${col}"/>`;});
+  });
+  // Legend
+  teams.forEach((tid,i)=>{const x=pad.l+(i%4)*55, y=H-pad.b+18+(Math.floor(i/4)*12);
+    svg+=`<line x1="${x}" y1="${y}" x2="${x+10}" y2="${y}" stroke="${colors[tid]}" stroke-width="2"/>
+      <text x="${x+13}" y="${y+3}" class="chart-axis" style="font-size:8px">${LBL[tid]}</text>`;});
+  svg+='</svg>';
+  document.getElementById('chart-profit').innerHTML=svg;
+}
+
+function renderBullwhipChart() {
+  // K1: show demand, orders, production per round
+  const W=460,H=160,pad={l:40,r:10,t:10,b:30};
+  const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
+  const rounds=[0,1,2,3];
+  const totalDem=rounds.map(r=>P.demand[r][0]);
+  const totalOrd=rounds.map(r=>RETS.reduce((s,_,ri)=>s+SIM.decisions[r].rets[ri][0].ord,0));
+  const totalProd=rounds.map(r=>SIM.results[r].prod[0]);
+  const mx=Math.max(...totalDem,...totalOrd,...totalProd,1);
+  const bw=(iw/rounds.length-8)/3;
+  const toH=v=>v/mx*ih;
+  const toX=(ri,gi)=>pad.l+ri*(iw/rounds.length)+gi*(bw+2)+4;
+
+  const series=[{vals:totalDem,col:'#484f58',lbl:'Спрос'},
+                {vals:totalOrd,col:'#58a6ff',lbl:'Заказы'},
+                {vals:totalProd,col:'#3fb950',lbl:'Произв-во'}];
+  let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:${H}px">`;
+  // Y labels
+  [0,.5,1].forEach(f=>{const v=Math.round(mx*f);const y=pad.t+ih*(1-f);
+    svg+=`<text x="${pad.l-4}" y="${y+4}" class="chart-axis" text-anchor="end">${v}</text>`;});
+  // Bars
+  rounds.forEach((r,ri)=>{
+    svg+=`<text x="${toX(ri,1)}" y="${H-5}" class="chart-axis" text-anchor="middle">Т${r+1}</text>`;
+    series.forEach((s,gi)=>{const h=toH(s.vals[ri]),x=toX(ri,gi),y=pad.t+ih-h;
+      svg+=`<rect x="${x}" y="${y}" width="${bw}" height="${h}" fill="${s.col}" opacity=".9" rx="1"/>`;
+      if(s.vals[ri]>10) svg+=`<text x="${x+bw/2}" y="${y-2}" class="chart-axis" text-anchor="middle" style="font-size:8px">${f0(s.vals[ri])}</text>`;
+    });
+  });
+  // Legend
+  series.forEach((s,i)=>{const x=pad.l+i*80;
+    svg+=`<rect x="${x}" y="${H-pad.b+14}" width="10" height="8" fill="${s.col}" rx="1"/>
+      <text x="${x+13}" y="${H-pad.b+21}" class="chart-axis">${s.lbl}</text>`;});
+  svg+='</svg>';
+  document.getElementById('chart-bullwhip').innerHTML=svg;
+}
+
+function renderWaterfallChart() {
+  // Per round: potential revenue vs losses
+  const W=460,H=160,pad={l:45,r:10,t:10,b:30};
+  const iw=W-pad.l-pad.r,ih=H-pad.t-pad.b;
+  const rounds=[0,1,2,3];
+  const bars=rounds.map(r=>{
+    const res=SIM.results[r],dec=SIM.decisions[r];
+    const potRev=RETS.reduce((s,_,ri)=>s+SUPS.reduce((s2,_,ci)=>{
+      const x=dec.rets[ri][ci]; return s2+res.actDem[ri][ci]*P.rosn[ci]*P.price[x.prc||1].pm;
+    },0),0);
+    const defLoss=res.def.map((row,ri)=>row.map((d,ci)=>{
+      const x=dec.rets[ri][ci]; return d*P.rosn[ci]*P.price[x.prc||1].pm;
+    })).flat().reduce((s,v)=>s+v,0);
+    const ovCost=res.over.flat().reduce((s,v)=>s+v*P.hCost,0);
+    const woffCost=res.woff.map((row,ri)=>row.map((w,ci)=>w*P.cost[ci])).flat().reduce((s,v)=>s+v,0);
+    const transCost=res.totDelivered*dec.tariff;
+    const actual=res.retProfit.reduce((s,v)=>s+v,0)+res.supProfit.reduce((s,v)=>s+v,0)+res.dProfit;
+    return {potRev,defLoss,ovCost,woffCost,transCost,actual};
+  });
+  const mx=Math.max(...bars.map(b=>b.potRev),1);
+  const bw=iw/rounds.length-10;
+  let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:${H}px">`;
+  // Y axis
+  [0,.5,1].forEach(f=>{const v=Math.round(mx*f);const y=pad.t+ih*(1-f);
+    svg+=`<text x="${pad.l-4}" y="${y+4}" class="chart-axis" text-anchor="end">${f0(v)}</text>`;});
+  // Stacked bars
+  const colors=['#3fb950','#f85149','#d29922','#f0883e'];
+  const labels=['Фактич. прибыль','Потери дефицит','Перезапас','Списания'];
+  rounds.forEach((r,ri)=>{
+    const b=bars[ri],x=pad.l+ri*(iw/rounds.length)+5;
+    // potential outline
+    const potH=b.potRev/mx*ih;
+    svg+=`<rect x="${x}" y="${pad.t+ih-potH}" width="${bw}" height="${potH}" fill="none" stroke="#3d4852" stroke-width="1" rx="1"/>`;
+    // actual (filled)
+    const actH=Math.max(0,b.actual)/mx*ih;
+    svg+=`<rect x="${x}" y="${pad.t+ih-actH}" width="${bw}" height="${actH}" fill="${colors[0]}" opacity=".8" rx="1"/>`;
+    // loss stacked
+    let cur=b.actual;
+    [b.defLoss,b.ovCost,b.woffCost].forEach((loss,li)=>{if(loss<1)return;
+      const lh=loss/mx*ih,ly=pad.t+ih-(cur+loss)/mx*ih;
+      svg+=`<rect x="${x+2}" y="${ly}" width="${bw-4}" height="${lh}" fill="${colors[li+1]}" opacity=".75" rx="1"/>`;
+      cur+=loss;
+    });
+    svg+=`<text x="${x+bw/2}" y="${H-5}" class="chart-axis" text-anchor="middle">Т${r+1}</text>`;
+  });
+  // Legend
+  labels.forEach((l,i)=>{const xL=pad.l+i*100; if(xL>W-30)return;
+    svg+=`<rect x="${xL}" y="${H-pad.b+14}" width="8" height="8" fill="${colors[i]}" rx="1"/>
+      <text x="${xL+11}" y="${H-pad.b+21}" class="chart-axis" style="font-size:8px">${l}</text>`;});
+  svg+='</svg>';
+  document.getElementById('chart-waterfall').innerHTML=svg;
+}
+
+function renderEffTable() {
+  const rows=SIM.results.map((res,r)=>{
+    const def=res.def.flat().reduce((s,v)=>s+v,0);
+    const woff=res.woff.flat().reduce((s,v)=>s+v,0);
+    const osa=res.retOSA.reduce((s,v)=>s+v,0)/3;
+    const chainPft=res.retProfit.reduce((s,v)=>s+v,0)+res.supProfit.reduce((s,v)=>s+v,0)+res.dProfit;
+    return `<tr>
+      <td style="font-weight:700;color:var(--P)">Тур ${r+1}</td>
+      <td class="${osa>=.9?'ok':osa>=.75?'wn':'bad'}">${f0(osa*100)}%</td>
+      <td class="${def>40?'bad':def>10?'wn':'ok'}">${f0(def)}</td>
+      <td class="${woff>8?'bad':woff>2?'wn':'ok'}">${f0(woff)}</td>
+      <td class="${res.dCoeff>=.9?'ok':res.dCoeff>=.65?'wn':'bad'}">${f0(res.dCoeff*100)}%</td>
+      <td class="${chainPft>=0?'ok':'bad'}">${chainPft>=0?'+':''}${f0(chainPft)}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('chart-table').innerHTML=`
+    <table class="eff-tbl">
+      <thead><tr><th>Тур</th><th>OSA ср.</th><th>Дефицит</th><th>Списания</th><th>Дист. загр.</th><th>Прибыль цепочки</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function renderInsights() {
+  const insights=[];
+  const sc=SCENARIOS[SIM.scenarioId];
+  // Bullwhip detection
+  const k1Dem=SIM.results.map((_,r)=>P.demand[r][0]);
+  const k1Ord=SIM.results.map((_,r)=>RETS.reduce((s,_,ri)=>s+SIM.decisions[r].rets[ri][0].ord,0));
+  const k1Prod=SIM.results.map((_,r)=>SIM.results[r].prod[0]);
+  const varOf=arr=>{const m=arr.reduce((s,v)=>s+v,0)/arr.length;return arr.reduce((s,v)=>s+(v-m)**2,0)/arr.length;};
+  const bwRatio=varOf(k1Prod)/Math.max(varOf(k1Dem),1);
+  if(bwRatio>3.5) insights.push({lvl:'crit',h:'🌊 Эффект хлыста обнаружен',t:`Дисперсия производства в <b>${f1(bwRatio)}×</b> превысила дисперсию спроса по категории К1. Каждое звено усиливало сигнал — классический bullwhip.`});
+  else if(bwRatio>1.5) insights.push({lvl:'warn',h:'🌊 Умеренный эффект хлыста',t:`Дисперсия производства в <b>${f1(bwRatio)}×</b> превысила спрос. Цепочка частично раскачалась.`});
+  else insights.push({lvl:'good',h:'✅ Эффект хлыста минимален',t:`Производство синхронизировано со спросом. Коэффициент усиления ${f1(bwRatio)}×.`});
+
+  // Total deficit
+  const totDef=SIM.results.reduce((s,r)=>s+r.def.flat().reduce((a,v)=>a+v,0),0);
+  const totWoff=SIM.results.reduce((s,r)=>s+r.woff.flat().reduce((a,v)=>a+v,0),0);
+  if(totDef>120) insights.push({lvl:'crit',h:'🔴 Критический хронический дефицит',t:`За 4 тура дефицит составил <b>${f0(totDef)} ед.</b> Покупатели регулярно не находили товар. Причина: несинхронизированное планирование.`});
+  else if(totDef>40) insights.push({lvl:'warn',h:'🟡 Дефицит в пиковые периоды',t:`Суммарно <b>${f0(totDef)} ед.</b> недоставлено покупателям — преимущественно в турах с шоком или промо.`});
+  if(totWoff>20) insights.push({lvl:'crit',h:'🗑 Высокие потери Fresh',t:`Списано <b>${f0(totWoff)} ед.</b> скоропортящегося товара. Поставщик П2 перепроизводил на фоне нескоординированных заказов.`});
+
+  // Distributor analysis
+  const dTariff=SIM.decisions[0].tariff;
+  const dProfit=SIM.totals['D'];
+  const chainPft=RETS.reduce((s,t)=>s+SIM.totals[t],0)+SUPS.reduce((s,t)=>s+SIM.totals[t],0);
+  const distShare=dProfit/(dProfit+chainPft+1);
+  if(distShare>0.35) insights.push({lvl:'warn',h:'🚛 Дистрибьютор аккумулировал избыточную маржу',t:`Тариф ${f1(dTariff)} у.е./ед. обеспечил дист-ру <b>${f0(distShare*100)}%</b> совокупной прибыли цепочки. Высокий тариф ограничил маржу поставщиков и ритейлеров.`});
+
+  // Scenario-specific
+  if(SIM.scenarioId==='ideal') insights.push({lvl:'good',h:'📐 Эффект координации',t:`В этом сценарии прибыль цепочки на <b>30-50%</b> выше хаотичных сценариев. Это «потенциал координации» — то, что теряется когда каждый оптимизирует себя.`});
+  if(SIM.scenarioId==='stress') insights.push({lvl:'crit',h:'💥 Концентрация риска',t:`Шок ударил неравномерно: ритейлеры с большой долей К4 пострадали несравнимо сильнее. Диверсификация поставщиков — ключевой механизм защиты.`});
+
+  document.getElementById('an-insights').innerHTML=insights.map(ins=>
+    `<div class="insight ${ins.lvl}"><div class="ih">${ins.h}</div><div class="it">${ins.t}</div></div>`
+  ).join('');
+}
+
+function renderDebrief() {
+  const qs=[
+    ...SCENARIOS[SIM.scenarioId].discuss,
+    'Что бы вы согласовали с другими командами до начала игры, зная её исход?',
+    'Как изменился бы результат, если бы П2 и ритейлеры обменялись прогнозами спроса?',
+  ];
+  document.getElementById('debrief-list').innerHTML=
+    qs.map(q=>`<li>${q}</li>`).join('');
+}
+
+// ━━━ NEGOTIATION ENGINE ━━━
+function genNegDialogue(pair, r) {
+  const fCh = CHARS[SIM.chars[pair.from]] || CHARS['Кооперативный'];
+  const tCh = CHARS[SIM.chars[pair.to]]   || CHARS['Кооперативный'];
+  const totalConc = fCh.conc + tCh.conc;
+  const agreed = totalConc > 0.35 || (totalConc > 0.15 && Math.random() > 0.45);
+
+  // Compute agreed values for quantitative subjects
+  let agreedVal = null;
+  if (agreed) {
+    if (pair.type === 'dsc') {
+      const bias = tCh.conc / (totalConc + 0.001);
+      agreedVal = pair.toWant + (pair.fromWant - pair.toWant) * Math.min(0.95, bias + fCh.conc * 0.25);
+      agreedVal = Math.max(0.02, Math.min(0.24, parseFloat(agreedVal.toFixed(2))));
+    } else if (pair.type === 'tar') {
+      const bias = fCh.conc / (totalConc + 0.001);
+      agreedVal = pair.fromWant + (pair.toWant - pair.fromWant) * Math.min(0.95, bias + tCh.conc * 0.25);
+      agreedVal = Math.max(1.0, Math.min(2.5, parseFloat(agreedVal.toFixed(1))));
+    }
+  }
+
+  // Format helpers
+  const fmtV = (v, type) => {
+    if (type === 'dsc') return v!=null ? `скидка ${Math.round(v*100)}%` : 'скидка';
+    if (type === 'tar') return v!=null ? `тариф ${parseFloat(v).toFixed(1)} у.е./ед.` : 'тариф';
+    return '';
+  };
+
+  const askRaw  = pair.type==='dsc' ? pair.fromWant*fCh.dmd :
+                  pair.type==='tar' ? pair.fromWant/fCh.dmd : null;
+  const askClamp= pair.type==='dsc' ? Math.min(0.25,askRaw||0) :
+                  pair.type==='tar' ? Math.max(1.0,askRaw||1.5) : null;
+  const ctrRaw  = pair.type==='dsc' ? pair.toWant*(2-tCh.dmd*0.6) :
+                  pair.type==='tar' ? pair.toWant*tCh.dmd*0.75 : null;
+  const ctrClamp= pair.type==='dsc' ? Math.max(0.01,Math.min(0.13,ctrRaw||0)) :
+                  pair.type==='tar' ? Math.max(1.4,Math.min(2.6,ctrRaw||2.0)) : null;
+
+  const fmtAsk  = (pair.type==='dsc'||pair.type==='tar') ? fmtV(askClamp, pair.type) : pair.fromWant;
+  const fmtCtr  = (pair.type==='dsc'||pair.type==='tar') ? fmtV(ctrClamp, pair.type) : pair.toWant;
+
+  const msgs = [];
+
+  // Message 1: opening ask
+  msgs.push({who:pair.from, side:'left',
+    text: pick(fCh.open).replace('{V}', fmtAsk),
+    offerTag: (pair.type==='dsc'||pair.type==='tar') ? fmtAsk : null,
+  });
+
+  // Message 2: counter
+  msgs.push({who:pair.to, side:'right',
+    text: pick(tCh.ctr).replace('{V}', fmtCtr),
+    offerTag: (pair.type==='dsc'||pair.type==='tar') ? fmtCtr : null,
+  });
+
+  // Message 3: second move (if either side willing to concede)
+  if (fCh.conc > 0.18 || tCh.conc > 0.18) {
+    const midVal = agreed && agreedVal!=null
+      ? (pair.type==='dsc' ? agreedVal*1.04 : agreedVal*0.97) : null;
+    const midFmt = midVal!=null ? fmtV(midVal, pair.type) : fmtAsk;
+    msgs.push({who:pair.from, side:'left',
+      text: pick(fCh.ctr).replace('{V}', midFmt),
+      offerTag: midVal!=null ? midFmt : null,
+    });
+  }
+
+  // Final: resolution
+  if (agreed) {
+    const closer   = tCh.conc >= fCh.conc ? pair.to : pair.from;
+    const closerCh = closer === pair.to ? tCh : fCh;
+    const closerSide = closer === pair.from ? 'left' : 'right';
+    const finalFmt = agreedVal!=null ? fmtV(agreedVal, pair.type) : 'условия приняты';
+    msgs.push({who:closer, side:closerSide, final:true,
+      text: pick(closerCh.ok).replace('{V}', finalFmt),
+    });
+  } else {
+    msgs.push({who:pair.to, side:'right', final:true, failed:true,
+      text: pick(tCh.no),
+    });
+  }
+
+  return {msgs, outcome:{agreed, val:agreedVal, type:pair.type}};
+}
+
+function renderNegScreen(r) {
+  updateDots(r);
+  document.getElementById('neg-r-num').textContent = r+1;
+  document.getElementById('neg-r-num').style.color = SCENARIOS[SIM.scenarioId].color;
+  document.getElementById('neg-r-name').textContent = P.roundNames[r];
+  const sc = SCENARIOS[SIM.scenarioId];
+  const pill = document.getElementById('neg-sc-pill');
+  pill.textContent = sc.name; pill.style.color = sc.color; pill.style.borderColor = sc.color;
+
+  const pairs = NEG_PAIRS[r];
+  const sessions = pairs.map(pair => genNegDialogue(pair, r));
+  SIM.negSessions = sessions;
+  SIM.negPairs = pairs;
+  SIM.negOutcomes[r] = sessions.map((s,i)=>({...pairs[i],...s.outcome}));
+
+  const container = document.getElementById('neg-sessions');
+  container.innerHTML = sessions.map((sess, si) => {
+    const pair = pairs[si];
+    const fCh = CHARS[SIM.chars[pair.from]]||CHARS['Кооперативный'];
+    const tCh = CHARS[SIM.chars[pair.to]]  ||CHARS['Кооперативный'];
+    return `<div class="neg-session" id="neg-s-${si}">
+      <div class="neg-session-hdr">
+        <div class="ns-combatants">
+          <div class="ns-fighter">
+            <div class="ns-avatar" style="background:${hexA(fCh.clr,.15)};color:${fCh.clr};border-color:${hexA(fCh.clr,.5)}">${fCh.ico}</div>
+            <div>
+              <div class="ns-char-name" style="color:${fCh.clr}">${SIM.chars[pair.from]}</div>
+              <div class="ns-team-name">${TEAM_ICO[pair.from]} ${SIM.names[pair.from]}</div>
+            </div>
+          </div>
+          <div class="ns-vs">⚡</div>
+          <div class="ns-fighter ns-fighter-r">
+            <div>
+              <div class="ns-char-name" style="color:${tCh.clr};text-align:right">${SIM.chars[pair.to]}</div>
+              <div class="ns-team-name" style="text-align:right">${TEAM_ICO[pair.to]} ${SIM.names[pair.to]}</div>
+            </div>
+            <div class="ns-avatar" style="background:${hexA(tCh.clr,.15)};color:${tCh.clr};border-color:${hexA(tCh.clr,.5)}">${tCh.ico}</div>
+          </div>
+        </div>
+        <div class="ns-subject-row">
+          <span class="ns-subj-tag">Предмет:</span>
+          <span class="ns-subj-text">${pair.subj}</span>
+          <div id="neg-out-${si}" class="neg-outcome-badge">…</div>
+        </div>
+      </div>
+      <div class="neg-chat" id="neg-chat-${si}"></div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('neg-next-btn').style.display = 'none';
+  animAllSessions(sessions, 0);
+}
+
+function animAllSessions(sessions, si) {
+  if (si >= sessions.length) {
+    document.getElementById('neg-next-btn').style.display = 'inline-flex';
+    return;
+  }
+  animSession(sessions[si], si, () => setTimeout(() => animAllSessions(sessions, si+1), 500));
+}
+
+function animSession(sess, si, done) {
+  const chatEl = document.getElementById(`neg-chat-${si}`);
+  if (!chatEl) { done(); return; }
+  let mi = 0;
+  function showOutcome() {
+    const outEl = document.getElementById(`neg-out-${si}`);
+    if (outEl) {
+      if (sess.outcome.agreed) {
+        outEl.style.background = 'rgba(63,185,80,.18)';
+        outEl.style.color = 'var(--OK)';
+        outEl.style.borderColor = 'rgba(63,185,80,.4)';
+        outEl.style.border = '1px solid';
+        let label = '✅ Договорились';
+        if (sess.outcome.val != null) {
+          if (sess.outcome.type === 'dsc')
+            label = `✅ скидка ${Math.round(sess.outcome.val*100)}%`;
+          else if (sess.outcome.type === 'tar')
+            label = `✅ тариф ${parseFloat(sess.outcome.val).toFixed(1)} у.е.`;
+        }
+        outEl.textContent = label;
+      } else {
+        outEl.style.background = 'rgba(248,81,73,.15)';
+        outEl.style.color = 'var(--BD)';
+        outEl.style.border = '1px solid rgba(248,81,73,.35)';
+        outEl.textContent = '❌ Не договорились';
+      }
+      requestAnimationFrame(() => requestAnimationFrame(() => outEl.classList.add('show')));
+    }
+    setTimeout(done, 600);
+  }
+  function nextMsg() {
+    if (mi >= sess.msgs.length) { showOutcome(); return; }
+    const msg = sess.msgs[mi++];
+    const ch = CHARS[SIM.chars[msg.who]] || CHARS['Кооперативный'];
+    // Show typing indicator (left side only — right comes from other party)
+    const typingEl = document.createElement('div');
+    typingEl.className = `neg-msg ${msg.side} typing-indicator`;
+    typingEl.innerHTML = msg.side === 'left'
+      ? `<div class="msg-ico">${TEAM_ICO[msg.who]}</div><div class="typing-dots"><span></span><span></span><span></span></div>`
+      : `<div class="typing-dots" style="border-bottom-left-radius:14px;border-bottom-right-radius:3px;background:var(--PD)">`
+        + `<span style="background:rgba(255,255,255,.5)"></span><span style="background:rgba(255,255,255,.5)"></span><span style="background:rgba(255,255,255,.5)"></span></div>`
+        + `<div class="msg-ico">${TEAM_ICO[msg.who]}</div>`;
+    chatEl.appendChild(typingEl);
+    chatEl.scrollTop = chatEl.scrollHeight;
+    const delay = 420 + Math.random() * 280;
+    setTimeout(() => {
+      typingEl.remove();
+      const el = document.createElement('div');
+      el.className = `neg-msg ${msg.side}`;
+      const offerHtml = msg.offerTag
+        ? `<div class="msg-offer-tag">${msg.offerTag}</div>` : '';
+      el.innerHTML =
+        `<div class="msg-ico">${TEAM_ICO[msg.who]}</div>
+         <div class="msg-body">
+           <div class="msg-who" style="color:${ch.clr}">${ch.ico} ${SIM.chars[msg.who]} · ${SIM.names[msg.who]}</div>
+           <div class="msg-bubble${msg.failed?' failed':''}">${msg.text}</div>
+           ${offerHtml}
+         </div>`;
+      chatEl.appendChild(el);
+      chatEl.scrollTop = chatEl.scrollHeight;
+      setTimeout(nextMsg, 820);
+    }, delay);
+  }
+  nextMsg();
+}
+
+// ━━━ NAVIGATION ━━━
+function updateDots(r) {
+  document.getElementById('hdr-dots').innerHTML=[0,1,2,3].map(i=>
+    `<div class="rdot ${r>i?'done':r===i?'cur':''}">${i+1}</div>`).join('');
+}
+function showScr(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');window.scrollTo(0,0);}
+function goSetup(){showScr('s-setup');updateDots(-1);}
+
+// ━━━ INIT ━━━
+initSetupUI();
+updateDots(-1);
+</script>
+</body>
+</html>

@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>FMCG-цепочка · Демо</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bg4:#2d333b;
+  --P:#58a6ff;--PD:#1f6feb;
+  --OK:#3fb950;--WN:#d29922;--BD:#f85149;--PU:#bc8cff;--OR:#f0883e;
+  --W:#e6edf3;--W2:#8b949e;--W3:#484f58;
+  --r:10px;
+}
+body{background:var(--bg);color:var(--W);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  min-height:100vh;overflow-x:hidden}
+
+/* ── Header ── */
+.hdr{background:var(--bg2);border-bottom:1px solid var(--bg3);padding:12px 24px;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.hdr-l{display:flex;align-items:center;gap:14px}
+.hdr h1{font-size:16px;font-weight:700;color:var(--P)}
+.rdots{display:flex;gap:5px}
+.rdot{width:26px;height:26px;border-radius:50%;border:2px solid var(--W3);
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--W3)}
+.rdot.cur{border-color:var(--P);color:var(--P);background:rgba(88,166,255,.12)}
+.rdot.done{border-color:var(--OK);background:var(--OK);color:#000}
+.speed-ctrl{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--W2)}
+.speed-btn{padding:4px 12px;border-radius:20px;border:1px solid var(--W3);background:transparent;
+  color:var(--W2);cursor:pointer;font-size:11px;transition:all .15s}
+.speed-btn.on{background:var(--P);border-color:var(--P);color:#000;font-weight:700}
+
+/* ── Screens ── */
+.scr{display:none;padding:24px;max-width:1200px;margin:0 auto;animation:fadeIn .35s ease}
+.scr.on{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Intro ── */
+.intro-hero{text-align:center;padding:32px 0 24px}
+.intro-hero .ico{font-size:60px;margin-bottom:12px}
+.intro-hero h2{font-size:30px;font-weight:700;color:var(--P);margin-bottom:6px}
+.intro-hero p{font-size:15px;color:var(--W2);max-width:500px;margin:0 auto 28px}
+.teams-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:28px}
+.team-intro{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);
+  padding:14px 16px;transition:border-color .2s}
+.team-intro:hover{border-color:var(--W3)}
+.team-intro .ti-ico{font-size:22px;margin-bottom:6px}
+.team-intro .ti-id{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--W3);margin-bottom:2px}
+.team-intro .ti-name{font-size:14px;font-weight:700;color:var(--W)}
+.team-intro .ti-role{font-size:11px;color:var(--W2);margin-top:3px}
+.team-intro.ret{border-left:3px solid var(--P)}
+.team-intro.sup{border-left:3px solid var(--OK)}
+.team-intro.dist{border-left:3px solid var(--PU)}
+
+/* ── Round screen ── */
+.round-hdr{background:var(--bg2);border:1px solid var(--bg3);border-radius:14px;
+  padding:20px 24px;margin-bottom:18px;display:flex;align-items:center;gap:20px}
+.round-hdr .rnum{font-size:48px;font-weight:700;color:var(--P);line-height:1;min-width:56px}
+.round-hdr .rinfo h2{font-size:20px;font-weight:700;color:var(--W);margin-bottom:4px}
+.round-hdr .rinfo p{font-size:13px;color:var(--W2)}
+.round-hdr .rtimer{margin-left:auto;text-align:right}
+.round-hdr .rtimer .tl{font-size:10px;color:var(--W3);text-transform:uppercase;letter-spacing:.4px}
+.round-hdr .rtimer .tv{font-size:13px;font-weight:700;color:var(--W2)}
+
+/* Event card */
+.evt-card{border-radius:var(--r);padding:14px 18px;margin-bottom:16px;display:flex;gap:12px;
+  animation:slideDown .4s ease}
+.evt-card.shock{background:linear-gradient(135deg,#3d0f0f,#5c1a1a);border:1px solid var(--BD)}
+.evt-card.promo{background:linear-gradient(135deg,#1a2d0f,#2d4a1a);border:1px solid var(--OK)}
+.evt-card.info{background:linear-gradient(135deg,#0f1f3d,#1a2d5c);border:1px solid var(--P)}
+.evt-card .eico{font-size:26px}
+.evt-card h3{font-size:14px;font-weight:700;margin-bottom:4px}
+.evt-card.shock h3{color:var(--BD)}.evt-card.promo h3{color:var(--OK)}.evt-card.info h3{color:var(--P)}
+.evt-card p{font-size:12px;color:var(--W2);line-height:1.5}
+@keyframes slideDown{from{transform:translateY(-10px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* Team cards grid */
+.cards-title{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--W3);
+  margin-bottom:10px;margin-top:2px}
+.cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.tcard{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);
+  padding:13px 14px;opacity:0;transform:translateY(10px);transition:opacity .35s ease,transform .35s ease}
+.tcard.visible{opacity:1;transform:translateY(0)}
+.tcard .tc-top{display:flex;align-items:center;gap:8px;margin-bottom:10px;
+  padding-bottom:8px;border-bottom:1px solid var(--bg3)}
+.tcard .tc-ico{font-size:18px}
+.tcard .tc-id{font-size:10px;font-weight:700;color:var(--W3);letter-spacing:.4px}
+.tcard .tc-name{font-size:13px;font-weight:700;color:var(--W)}
+.tcard .tc-lines{font-size:12px;color:var(--W2);line-height:1.6;margin-bottom:8px}
+.tcard .tc-lines span{display:block}
+.tcard .profit-bar{margin-top:6px}
+.tcard .pb-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px}
+.tcard .pb-lbl{color:var(--W3)}
+.tcard .pb-val{font-weight:700}
+.tcard .pb-val.ok{color:var(--OK)}.tcard .pb-val.bad{color:var(--BD)}.tcard .pb-val.wn{color:var(--WN)}
+.tcard .pb-track{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.tcard .pb-fill{height:100%;border-radius:2px;transition:width .8s ease .3s}
+.tcard.ret{border-top:2px solid var(--P)}.tcard.sup{border-top:2px solid var(--OK)}.tcard.dist{border-top:2px solid var(--PU)}
+
+/* Highlight tags */
+.tag{display:inline-block;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;margin-right:3px}
+.tag-ok{background:rgba(63,185,80,.2);color:var(--OK)}
+.tag-bad{background:rgba(248,81,73,.2);color:var(--BD)}
+.tag-wn{background:rgba(210,153,34,.2);color:var(--WN)}
+.tag-p{background:rgba(88,166,255,.15);color:var(--P)}
+
+/* Chain summary */
+.chain-bar{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);
+  padding:14px 18px;margin-bottom:16px}
+.chain-bar h3{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--W3);margin-bottom:10px}
+.chain-kpis{display:flex;gap:12px;flex-wrap:wrap}
+.ck{flex:1;min-width:100px}
+.ck .cl{font-size:10px;text-transform:uppercase;letter-spacing:.3px;color:var(--W3);margin-bottom:2px}
+.ck .cv{font-size:22px;font-weight:700}
+.ck .cv.ok{color:var(--OK)}.ck .cv.bad{color:var(--BD)}.ck .cv.wn{color:var(--WN)}.ck .cv.nt{color:var(--W)}
+
+/* Leaderboard during round */
+.mini-lb{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);
+  padding:12px 16px;margin-bottom:16px}
+.mini-lb h3{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--W3);margin-bottom:8px}
+.lb-row{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--bg3)}
+.lb-row:last-child{border-bottom:none}
+.lb-pos{font-size:12px;font-weight:700;color:var(--W3);min-width:18px;text-align:center}
+.lb-name{flex:1;font-size:12px;font-weight:600;color:var(--W)}
+.lb-profit{font-size:12px;font-weight:700;min-width:70px;text-align:right}
+.lb-bar{flex:2;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.lb-bar-f{height:100%;background:var(--P);border-radius:2px;transition:width .8s ease}
+
+/* Nav buttons */
+.nav-bar{display:flex;align-items:center;justify-content:space-between;
+  padding:14px 0;border-top:1px solid var(--bg3);margin-top:4px}
+.progress-dots{display:flex;gap:6px}
+.pdot{width:8px;height:8px;border-radius:50%;background:var(--bg4);transition:all .3s}
+.pdot.done{background:var(--OK)}.pdot.cur{background:var(--P);transform:scale(1.3)}
+.auto-prog{height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-bottom:8px}
+.auto-prog-f{height:100%;background:var(--P);border-radius:2px;transition:width linear}
+
+/* Final screen */
+.final-hero{text-align:center;padding:28px 0 20px}
+.trophy-ani{font-size:72px;animation:bounce 1.5s ease infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.winners-row{display:flex;gap:16px;justify-content:center;margin:20px 0}
+.winner-card{background:var(--bg2);border:2px solid var(--WN);border-radius:14px;
+  padding:18px 24px;min-width:170px;text-align:center}
+.winner-card .wt{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--W2);margin-bottom:4px}
+.winner-card .wn{font-size:18px;font-weight:700;color:#ffd700}
+.winner-card .ws{font-size:12px;color:var(--W2);margin-top:3px}
+
+.final-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px}
+.final-table th{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--W3);
+  padding:8px 10px;text-align:left;border-bottom:1px solid var(--bg3)}
+.final-table td{padding:9px 10px;border-bottom:1px solid var(--bg4)}
+.final-table tr:last-child td{border-bottom:none}
+.final-table .rank{font-size:15px;font-weight:700;color:var(--W3);text-align:center}
+.final-table .rank.g{color:#ffd700}.final-table .rank.s{color:#c0c0c0}.final-table .rank.b{color:#cd7f32}
+.score-bar{display:flex;align-items:center;gap:8px}
+.sbar{flex:1;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.sbar-f{height:100%;background:var(--P);border-radius:3px;transition:width 1s ease}
+.sbar-v{font-size:12px;font-weight:700;color:var(--P);min-width:32px;text-align:right}
+
+.debrief{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);padding:16px 18px}
+.debrief h3{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--W2);margin-bottom:10px}
+.debrief ol{padding-left:18px;line-height:2.0;font-size:13px;color:var(--W2)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;border-radius:8px;
+  border:none;cursor:pointer;font-size:14px;font-weight:600;transition:all .15s}
+.btn-P{background:var(--P);color:#000}.btn-P:hover{opacity:.85;transform:translateY(-1px)}
+.btn-S{background:var(--bg3);color:var(--W2);border:1px solid var(--W3)}.btn-S:hover{background:var(--bg4)}
+.btn-lg{padding:14px 36px;font-size:16px;border-radius:10px}
+.btn-sm{padding:6px 16px;font-size:12px}
+.btn-back{color:var(--W2);font-size:13px;text-decoration:none;
+  background:transparent;border:none;cursor:pointer;padding:6px 10px}
+
+@media(max-width:900px){.cards-grid{grid-template-columns:repeat(2,1fr)}.teams-grid{grid-template-columns:repeat(2,1fr)}.winners-row{flex-wrap:wrap}}
+@media(max-width:600px){.cards-grid{grid-template-columns:1fr}.chain-kpis{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-l">
+    <a href="/" class="btn-back">← Назад</a>
+    <h1>🏪 FMCG-цепочка · Авторежим</h1>
+    <div class="rdots" id="hdr-dots"></div>
+  </div>
+  <div class="speed-ctrl">
+    <span>Скорость:</span>
+    <button class="speed-btn" onclick="setSpeed(1500)" id="sp-slow">Медленно</button>
+    <button class="speed-btn on" onclick="setSpeed(600)" id="sp-med">Нормально</button>
+    <button class="speed-btn" onclick="setSpeed(0)" id="sp-fast">Быстро</button>
+  </div>
+</header>
+
+<!-- ═══ INTRO ═══ -->
+<div id="s-intro" class="scr on">
+  <div class="intro-hero">
+    <div class="ico">🏪</div>
+    <h2>Демо-симуляция игры</h2>
+    <p>Автоматически сыграем 4 раунда — от распределения ролей до победителя. Все решения генерируются случайно, каждая симуляция уникальна.</p>
+  </div>
+  <div id="intro-teams" class="teams-grid"></div>
+  <div style="text-align:center">
+    <button class="btn btn-P btn-lg" onclick="startDemo()">▶ Запустить симуляцию</button>
+  </div>
+</div>
+
+<!-- ═══ ROUND ═══ -->
+<div id="s-round" class="scr">
+  <div class="round-hdr">
+    <div class="rnum" id="r-num">1</div>
+    <div class="rinfo">
+      <h2 id="r-name">Раунд</h2>
+      <p id="r-sub"></p>
+    </div>
+    <div class="rtimer">
+      <div class="tl">Раунд</div>
+      <div class="tv" id="r-prog"></div>
+    </div>
+  </div>
+  <div id="r-event"></div>
+  <div class="auto-prog"><div class="auto-prog-f" id="auto-prog-f" style="width:0%"></div></div>
+  <div class="cards-title">Ход команд в этом раунде</div>
+  <div class="cards-grid" id="r-cards"></div>
+  <div class="chain-bar">
+    <h3>Состояние цепочки</h3>
+    <div class="chain-kpis" id="r-chain"></div>
+  </div>
+  <div id="r-minilb"></div>
+  <div class="nav-bar">
+    <div class="progress-dots" id="nav-dots"></div>
+    <button class="btn btn-P" id="next-btn" onclick="nextStep()" style="display:none">Следующий раунд →</button>
+  </div>
+</div>
+
+<!-- ═══ FINAL ═══ -->
+<div id="s-final" class="scr">
+  <div class="final-hero">
+    <div class="trophy-ani">🏆</div>
+    <h2 style="font-size:28px;font-weight:700;color:#ffd700;margin-top:8px">Игра завершена!</h2>
+    <p style="color:var(--W2);font-size:14px;margin-top:6px">Итоги четырёх раундов</p>
+  </div>
+  <div class="winners-row" id="f-winners"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px" id="f-tables"></div>
+  <div class="chain-bar" style="margin-bottom:20px" id="f-chain"></div>
+  <div class="debrief">
+    <h3>💬 Вопросы для дебрифа</h3>
+    <ol>
+      <li>Где возник дефицит? Это спрос, заказ, производство или логистика?</li>
+      <li>Как проявился эффект хлыста — кто «раскачал» цепочку?</li>
+      <li>Какие KPI внутри команды конфликтовали?</li>
+      <li>Что сделали бы иначе в раунде 3, зная о шоке заранее?</li>
+      <li>Кто выиграл локально, но навредил всей цепочке?</li>
+    </ol>
+  </div>
+  <div style="text-align:center;margin-top:24px">
+    <button class="btn btn-P btn-lg" onclick="restartDemo()">🔄 Запустить заново</button>
+    &nbsp;&nbsp;
+    <a href="/" class="btn btn-S btn-lg" style="text-decoration:none">← На главную</a>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════
+// CONSTANTS (exact copy from server.js)
+// ═══════════════════════════════════════
+const RETS = ['R1','R2','R3'];
+const SUPS = ['S1','S2','S3','S4'];
+const ALL = [...RETS,...SUPS,'D'];
+const P = {
+  cost:    [6,8,7,14],
+  opt:     [10,13,12,22],
+  rosn:    [14,18,20,32],
+  fresh:   [false,true,false,false],
+  maxProd: [200,140,120,70],
+  fShare:  [[.45,.30,.25],[.20,.40,.40],[.45,.30,.25],[.10,.35,.55]],
+  price:   [{pm:.92,dm:1.2},{pm:1,dm:1},{pm:1.12,dm:.85}],
+  demand:  [[120,90,70,45],[125,95,110,50],[110,130,80,25],[120,115,90,35]],
+  distCap: [320,320,200,320],
+  pBoost:1.5, pThr:.10, tCost:.8, hCost:1.0,
+  catIds:  ['К1','К2','К3','К4'],
+  catNames:['Базовая','Fresh','Промо-хиты','Импорт/премиум'],
+  roundNames:['Стартовый рынок','Промо-инициатива','Внешнее событие','Стабилизация'],
+};
+
+const ROUND_SUBS = [
+  'Команды впервые пробуют силы. Рынок стабилен, учимся планировать.',
+  'Промо-окно открыто — кто успеет договориться?',
+  '🚨 Внешний шок: мощности дистрибьютора рухнули вдвое!',
+  'Рынок восстанавливается. Кто лучше адаптировался?',
+];
+
+const EVENTS = [null,
+  {type:'promo', ico:'📣', title:'Промо-инициатива',
+   text:'Спрос на К3 вырос до 110 ед. Промо-буст ×1.5 — только при скидке поставщика ≥10% и промо=Да.'},
+  {type:'shock', ico:'🚨', title:'ДВОЙНОЙ ШОК',
+   text:'Мощность дист-ра: 320→200 ед. Квота S4: 70→30 ед. Спрос К2→130, К4→25. Срочная приоритизация поставок!'},
+  {type:'info',  ico:'📊', title:'Стабилизация рынка',
+   text:'К2=115, К3=90, К4=35. Восстанавливайте OSA и маржу — финальный раунд!'},
+];
+
+// Demo team names
+const DEMO_NAMES = {
+  R1:['Близко&Дёшево','ЦенаБит','АльфаМаркет','СкидкаПлюс'],
+  R2:['УютМаркет','СвежийГород','ДоброСити','МегаФреш'],
+  R3:['ГиперКолосс','МаксМолл','КупольТорг','ГрандПлюс'],
+  S1:['АгроПром','МассФуд','БазисСнаб','КорнСнаб'],
+  S2:['ФрешЛайн','СвежестьПлюс','ЗеленьПро','ФрешДирект'],
+  S3:['ПромоСила','БустФуд','АктивПром','МаркетФуд'],
+  S4:['ИмпортЭлит','ПремиумФуд','ЕвроТрейд','ГлобалФуд'],
+  D: ['ЛогоМакс','ТрансФуд','ЭффектДист','СкоростьЛог'],
+};
+
+const TEAM_ICO = {R1:'🛒',R2:'🛒',R3:'🛒',S1:'🏭',S2:'🏭',S3:'🏭',S4:'🏭',D:'🚛'};
+const TEAM_TYPE = {R1:'ret',R2:'ret',R3:'ret',S1:'sup',S2:'sup',S3:'sup',S4:'sup',D:'dist'};
+const TEAM_ROLES = {
+  R1:'Дискаунтер — низкие цены, высокий трафик',
+  R2:'Супермаркет — свежесть и сервис',
+  R3:'Гипермаркет — объём и ассортимент',
+  S1:'Поставщик Базовой категории',
+  S2:'Поставщик Fresh (скоропорт)',
+  S3:'Поставщик Промо-хитов',
+  S4:'Поставщик импортного/премиума',
+  D:'Дистрибьютор — логистика всей цепочки',
+};
+
+// ═══════════════════════════════════════
+// CALCULATION ENGINE (exact from server.js)
+// ═══════════════════════════════════════
+function calcRound(r, d) {
+  const {tariff, distCap, sups, rets} = d;
+  const prod  = SUPS.map((_,si)=>Math.min(sups[si]||0, P.maxProd[si]));
+  const oFS   = SUPS.map((_,si)=>RETS.reduce((s,_,ri)=>s+(rets[ri]?.[si]?.ord||0),0));
+  const avail = prod.slice();
+  const sC    = SUPS.map((_,si)=>oFS[si]>0?Math.min(1,avail[si]/oFS[si]):1);
+  const aS    = RETS.map((_,ri)=>SUPS.map((_,ci)=>(rets[ri]?.[ci]?.ord||0)*sC[ci]));
+  const totAS = aS.reduce((s,row)=>s+row.reduce((a,v)=>a+v,0),0);
+  const dC    = totAS>0?Math.min(1,distCap/totAS):1;
+  const del   = aS.map(row=>row.map(v=>v*dC));
+  const aD    = RETS.map((_,ri)=>SUPS.map((_,ci)=>{
+    const x=rets[ri]?.[ci]; if(!x?.asm)return 0;
+    let v=P.demand[r][ci]*P.fShare[ci][ri]*P.price[x.prc||1].dm;
+    if(x.prm&&(x.dsc||0)>=P.pThr) v*=P.pBoost; return v;
+  }));
+  const sold=[],def=[],over=[],woff=[];
+  RETS.forEach((_,ri)=>{sold.push([]);def.push([]);over.push([]);woff.push([]);
+    SUPS.forEach((_,ci)=>{
+      const s=Math.min(del[ri][ci],aD[ri][ci]),ov=Math.max(0,del[ri][ci]-s);
+      sold[ri].push(s); def[ri].push(Math.max(0,aD[ri][ci]-s));
+      over[ri].push(ov); woff[ri].push(P.fresh[ci]?ov:0);
+    });
+  });
+  const retProfit=RETS.map((_,ri)=>{let p=0;
+    SUPS.forEach((_,ci)=>{const x=rets[ri]?.[ci];if(!x?.asm)return;
+      const opt=P.opt[ci]*(1-(x.dsc||0)), rosn=P.rosn[ci]*P.price[x.prc||1].pm;
+      const hold=!P.fresh[ci]?over[ri][ci]*P.hCost:0;
+      p+=(rosn-opt-tariff)*sold[ri][ci]-woff[ri][ci]*P.cost[ci]-hold;});return p;});
+  const tD=SUPS.map((_,si)=>RETS.reduce((s,_,ri)=>s+del[ri][si],0));
+  const supProfit=SUPS.map((_,si)=>{let rev=0;
+    RETS.forEach((_,ri)=>{const opt=P.opt[si]*(1-((rets[ri]?.[si]?.dsc)||0));rev+=opt*del[ri][si];});
+    return rev-prod[si]*P.cost[si];});
+  const totDel=del.reduce((s,row)=>s+row.reduce((a,v)=>a+v,0),0);
+  const retOSA=RETS.map((_,ri)=>{const td=aD[ri].reduce((s,v)=>s+v,0);
+    return td>0?aD[ri].reduce((a,_,ci)=>a+sold[ri][ci],0)/td:1;});
+  return {r,tariff,distCap,dCoeff:dC,totDelivered:totDel,prod,ordFromSup:oFS,supCoeff:sC,
+    del,actDem:aD,sold,def,over,woff,retProfit,supProfit,
+    dProfit:(tariff-P.tCost)*totDel,retOSA,totDel:tD,
+    unsold:SUPS.map((_,si)=>Math.max(0,avail[si]-tD[si]))};
+}
+
+// ═══════════════════════════════════════
+// RANDOM DECISION GENERATOR
+// ═══════════════════════════════════════
+function rnd(a,b){return a+Math.random()*(b-a);}
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
+
+function genDecisions(r) {
+  const dem = P.demand[r];
+  // Supplier personalities — how much of demand they produce
+  const supFactors = [
+    rnd(0.80, 1.10),  // S1 Базовая: stable
+    rnd(0.85, 1.20),  // S2 Fresh: sometimes over-produces
+    rnd(0.75, 1.05),  // S3 Промо: sometimes undersupplies
+    rnd(0.80, 1.05),  // S4 Импорт: limited
+  ];
+  // Total expected demand per category = sum over retailers
+  const totalDem = SUPS.map((_,si)=>RETS.reduce((s,_,ri)=>s+dem[si]*P.fShare[si][ri],0));
+  // S4 quota in R2
+  const s4quota = r===2 ? 30 : P.maxProd[3];
+  const sups = SUPS.map((_,si)=>{
+    const cap = si===3 ? s4quota : P.maxProd[si];
+    return Math.round(Math.min(cap, totalDem[si]*supFactors[si]));
+  });
+
+  const tariff = parseFloat(rnd(1.2, 1.8).toFixed(1));
+  const dc = P.distCap[r];
+
+  // Retailer decisions
+  const rets = RETS.map((rid,ri)=>{
+    // Each retailer has a "style": aggressive (0), standard (1), premium (2)
+    const style = ri===0 ? (Math.random()<.65?0:1)   // R1: mostly aggressive
+                 : ri===1 ? (Math.random()<.30?2:(Math.random()<.60?1:0))  // R2: mixed
+                          : (Math.random()<.40?2:1);  // R3: likes premium
+    const overFactor = ri===2 ? rnd(1.0, 1.20) : rnd(0.85, 1.10); // R3 over-orders
+
+    return SUPS.map((sid,ci)=>{
+      const baseDem = dem[ci]*P.fShare[ci][ri];
+      const dmd = P.price[style].dm;
+      const rawOrd = baseDem / dmd * overFactor;
+      const ord = Math.max(1, Math.round(rawOrd));
+
+      // Promo: R1 likes K1/K3, R2 likes K2, R3 random
+      const promoChance = ri===0&&(ci===0||ci===2)?0.45 : ri===1&&ci===1?0.50 : ri===2&&ci===2?0.35 : 0.20;
+      const prm = Math.random() < promoChance ? 1 : 0;
+      // Discount: only meaningful if promo or negotiated
+      const dsc = prm ? parseFloat(rnd(0.08, 0.18).toFixed(2))
+                      : (Math.random()<0.3 ? parseFloat(rnd(0.02, 0.08).toFixed(2)) : 0);
+
+      return {asm:1, ord, prc:style, prm, dsc};
+    });
+  });
+
+  return {tariff, distCap:dc, sups, rets};
+}
+
+// ═══════════════════════════════════════
+// NARRATIVE GENERATOR
+// ═══════════════════════════════════════
+function genNarrative(tid, dec, res, r) {
+  const lines = [];
+  const prcName = ['агрессивную','стандартную','премиальную'];
+
+  if (RETS.includes(tid)) {
+    const ri = RETS.indexOf(tid);
+    const osa = res.retOSA[ri];
+    const profit = res.retProfit[ri];
+    const totalDef = res.def[ri].reduce((s,v)=>s+v,0);
+    const totalOver = res.over[ri].reduce((s,v)=>s+v,0);
+    const totalWoff = res.woff[ri].reduce((s,v)=>s+v,0);
+    const cats = dec.rets[ri];
+    const mainPrc = cats.reduce((a,c)=>c.prc>a?c.prc:a,0);
+    const promoCats = cats.map((c,ci)=>c.prm?P.catIds[ci]:null).filter(Boolean);
+    const promoWithBoost = cats.some((c,ci)=>c.prm&&c.dsc>=P.pThr);
+
+    lines.push(`Выбрал <b>${prcName[mainPrc]}</b> ценовую стратегию.`);
+
+    if (promoCats.length) {
+      const maxDsc = Math.round(Math.max(...cats.filter(c=>c.prm).map(c=>c.dsc||0))*100);
+      if (promoWithBoost) {
+        lines.push(`🎯 Промо по <b>${promoCats.join(', ')}</b> со скидкой ${maxDsc}% — буст ×1.5 активирован.`);
+      } else {
+        lines.push(`📋 Промо по <b>${promoCats.join(', ')}</b>, но скидка ${maxDsc}% &lt; 10% — буст не сработал.`);
+      }
+    }
+
+    if (totalDef > 25) {
+      const worstCat = P.catIds[res.def[ri].indexOf(Math.max(...res.def[ri]))];
+      lines.push(`🔴 Дефицит <b>${totalDef.toFixed(0)} ед.</b> (особенно ${worstCat}) — покупатели уходили к конкурентам.`);
+    } else if (totalDef > 8) {
+      lines.push(`🟡 Лёгкий дефицит <b>${totalDef.toFixed(0)} ед.</b> — полки пустели в пиковые часы.`);
+    } else {
+      lines.push(`✅ Полки заполнены, дефицит минимальный.`);
+    }
+
+    if (totalWoff > 2) {
+      lines.push(`🗑 Fresh К2: <b>${totalWoff.toFixed(0)} ед.</b> списано — нереализованный остаток.`);
+    } else if (totalOver > 15) {
+      lines.push(`📦 Перезаказ <b>${totalOver.toFixed(0)} ед.</b> — заморозил деньги в запасах.`);
+    }
+
+    return {lines, osa, profit};
+
+  } else if (SUPS.includes(tid)) {
+    const si = SUPS.indexOf(tid);
+    const prod = res.prod[si];
+    const del = res.totDel[si];
+    const ord = res.ordFromSup[si];
+    const unsold = res.unsold[si];
+    const profit = res.supProfit[si];
+    const fillRate = ord>0 ? Math.min(1,del/ord) : 1;
+    const isFresh = P.fresh[si];
+
+    lines.push(`Произвёл <b>${prod.toFixed(0)} ед.</b> из ${P.maxProd[si]} макс.`);
+
+    if (r===2 && si===3) {
+      lines.push(`⚠️ Квота R3 сработала: производство ограничено <b>30 ед.</b> — дефицит импорта у всех ритейлеров.`);
+    }
+
+    if (fillRate >= 0.97) {
+      lines.push(`✅ Fill-rate <b>${(fillRate*100).toFixed(0)}%</b> — все заказы выполнены.`);
+    } else if (fillRate >= 0.80) {
+      lines.push(`🟡 Fill-rate <b>${(fillRate*100).toFixed(0)}%</b> — небольшая нехватка ${(ord-del).toFixed(0)} ед.`);
+    } else {
+      lines.push(`🔴 Fill-rate <b>${(fillRate*100).toFixed(0)}%</b> — дефицит ${(ord-del).toFixed(0)} ед. Мощностей не хватило.`);
+    }
+
+    if (isFresh && unsold > 3) {
+      lines.push(`🗑 <b>${unsold.toFixed(0)} ед. Fresh</b> списано — потери ${(unsold*P.cost[si]).toFixed(0)} у.е.`);
+    } else if (!isFresh && unsold > 10) {
+      lines.push(`📦 Остаток <b>${unsold.toFixed(0)} ед.</b> на складе — холдинг ${(unsold*P.hCost).toFixed(0)} у.е.`);
+    } else if (unsold <= 3) {
+      lines.push(`📊 Планирование точное — остаток ${unsold.toFixed(0)} ед.`);
+    }
+
+    return {lines, osa: fillRate, profit};
+
+  } else {
+    // Distributor
+    const profit = res.dProfit;
+    const dCoeff = res.dCoeff;
+    const delivered = res.totDelivered;
+
+    lines.push(`Тариф <b>${dec.tariff.toFixed(1)} у.е./ед.</b>`);
+
+    if (r===2) {
+      lines.push(`⚠️ Мощность урезана до <b>200 ед.</b> — принудительная приоритизация поставок.`);
+    }
+
+    if (dCoeff >= 0.97) {
+      lines.push(`🔥 Загрузка <b>${(dCoeff*100).toFixed(0)}%</b> — работает на пределе мощностей.`);
+    } else if (dCoeff >= 0.75) {
+      lines.push(`✅ Загрузка <b>${(dCoeff*100).toFixed(0)}%</b> — эффективная работа.`);
+    } else {
+      lines.push(`📉 Загрузка <b>${(dCoeff*100).toFixed(0)}%</b> — мощности недозагружены.`);
+    }
+
+    lines.push(`Перевезено <b>${delivered.toFixed(0)} ед.</b>`);
+    return {lines, osa: dCoeff, profit};
+  }
+}
+
+// ═══════════════════════════════════════
+// DEMO STATE
+// ═══════════════════════════════════════
+let state = {
+  names: {},
+  decisions: [],
+  results: [],
+  narratives: [],
+  totals: {},
+  currentRound: -1,
+  speed: 600,
+  autoTimer: null,
+};
+
+function setSpeed(ms) {
+  state.speed = ms;
+  document.getElementById('sp-slow').classList.toggle('on', ms===1500);
+  document.getElementById('sp-med').classList.toggle('on',  ms===600);
+  document.getElementById('sp-fast').classList.toggle('on', ms===0);
+}
+
+function initDemo() {
+  // Pick random names
+  ALL.forEach(tid => {
+    state.names[tid] = pick(DEMO_NAMES[tid]);
+  });
+  // Pre-generate all 4 rounds
+  state.decisions = [];
+  state.results = [];
+  state.narratives = [];
+  for (let r=0;r<4;r++) {
+    const dec = genDecisions(r);
+    const res = calcRound(r, dec);
+    const narr = {};
+    ALL.forEach(tid => { narr[tid] = genNarrative(tid, dec, res, r); });
+    state.decisions.push(dec);
+    state.results.push(res);
+    state.narratives.push(narr);
+  }
+  // Compute totals
+  state.totals = {};
+  ALL.forEach(tid=>{
+    let profit=0;
+    state.results.forEach((res,r)=>{
+      const ri=RETS.indexOf(tid),si=SUPS.indexOf(tid);
+      if(ri>=0) profit+=res.retProfit[ri];
+      else if(si>=0) profit+=res.supProfit[si];
+      else profit+=res.dProfit;
+    });
+    state.totals[tid] = profit;
+  });
+  state.currentRound = -1;
+}
+
+function renderIntro() {
+  const el = document.getElementById('intro-teams');
+  el.innerHTML = ALL.map(tid => {
+    const type = TEAM_TYPE[tid];
+    return `<div class="team-intro ${type}">
+      <div class="ti-ico">${TEAM_ICO[tid]}</div>
+      <div class="ti-id">${tid}</div>
+      <div class="ti-name">${state.names[tid]}</div>
+      <div class="ti-role">${TEAM_ROLES[tid]}</div>
+    </div>`;
+  }).join('');
+  updateHeaderDots(-1);
+}
+
+function startDemo() {
+  showScr('s-round');
+  state.currentRound = 0;
+  renderRound(0);
+}
+
+function renderRound(r) {
+  updateHeaderDots(r);
+  // Header
+  document.getElementById('r-num').textContent = r+1;
+  document.getElementById('r-name').textContent = P.roundNames[r];
+  document.getElementById('r-sub').textContent = ROUND_SUBS[r];
+  document.getElementById('r-prog').textContent = `${r+1} / 4`;
+
+  // Nav dots
+  const navDots = document.getElementById('nav-dots');
+  navDots.innerHTML = [0,1,2,3].map(i=>
+    `<div class="pdot ${i<r?'done':i===r?'cur':''}"></div>`
+  ).join('');
+
+  // Event
+  const evEl = document.getElementById('r-event');
+  const ev = EVENTS[r];
+  evEl.innerHTML = ev
+    ? `<div class="evt-card ${ev.type}"><div class="eico">${ev.ico}</div>
+        <div><h3>${ev.title}</h3><p>${ev.text}</p></div></div>`
+    : '';
+
+  // Team cards (animate in one by one)
+  const cardsEl = document.getElementById('r-cards');
+  const res = state.results[r];
+  const dec = state.decisions[r];
+
+  cardsEl.innerHTML = ALL.map(tid => {
+    const type = TEAM_TYPE[tid];
+    const narr = state.narratives[r][tid];
+    const profit = narr.profit;
+    const osa = narr.osa;
+    const maxProfit = Math.max(...ALL.map(t=>{
+      const nar=state.narratives[r][t]; return Math.abs(nar.profit);
+    }), 1);
+    const barWidth = Math.min(100, Math.abs(profit)/maxProfit*100);
+    const profClass = profit >= 0 ? 'ok' : 'bad';
+    const fillColor = profit >= 0 ? 'var(--OK)' : 'var(--BD)';
+
+    return `<div class="tcard ${type}" id="tc-${r}-${tid}">
+      <div class="tc-top">
+        <span class="tc-ico">${TEAM_ICO[tid]}</span>
+        <div>
+          <div class="tc-id">${tid}</div>
+          <div class="tc-name">${state.names[tid]}</div>
+        </div>
+      </div>
+      <div class="tc-lines">${narr.lines.map(l=>`<span>${l}</span>`).join('')}</div>
+      <div class="profit-bar">
+        <div class="pb-label">
+          <span class="pb-lbl">OSA / Fill-rate</span>
+          <span class="pb-lbl">${(osa*100).toFixed(0)}%</span>
+        </div>
+        <div class="pb-label" style="margin-top:3px">
+          <span class="pb-lbl">Прибыль</span>
+          <span class="pb-val ${profClass}">${profit>=0?'+':''}${profit.toFixed(0)} у.е.</span>
+        </div>
+        <div class="pb-track">
+          <div class="pb-fill" id="pbf-${r}-${tid}" style="width:0%;background:${fillColor}"></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Chain KPIs
+  const totalDef = res.def.flat().reduce((s,v)=>s+v,0);
+  const totalWoff = res.woff.flat().reduce((s,v)=>s+v,0);
+  const totalSold = res.sold.flat().reduce((s,v)=>s+v,0);
+  const avgOSA = res.retOSA.reduce((s,v)=>s+v,0)/3;
+  document.getElementById('r-chain').innerHTML = `
+    <div class="ck"><div class="cl">Продано ед.</div><div class="cv ok">${totalSold.toFixed(0)}</div></div>
+    <div class="ck"><div class="cl">Дефицит ед.</div><div class="cv ${totalDef>40?'bad':totalDef>15?'wn':'ok'}">${totalDef.toFixed(0)}</div></div>
+    <div class="ck"><div class="cl">Списания Fresh</div><div class="cv ${totalWoff>5?'bad':totalWoff>1?'wn':'ok'}">${totalWoff.toFixed(0)}</div></div>
+    <div class="ck"><div class="cl">OSA ср.</div><div class="cv ${avgOSA>=.9?'ok':avgOSA>=.75?'wn':'bad'}">${(avgOSA*100).toFixed(0)}%</div></div>
+    <div class="ck"><div class="cl">Дист. загрузка</div><div class="cv ${res.dCoeff>=.9?'ok':res.dCoeff>=.65?'wn':'bad'}">${(res.dCoeff*100).toFixed(0)}%</div></div>
+    <div class="ck"><div class="cl">Тариф</div><div class="cv nt">${dec.tariff.toFixed(1)}</div></div>
+  `;
+
+  // Mini leaderboard (running totals)
+  renderMiniLB(r);
+
+  // Animate cards
+  animateCards(r);
+
+  // Show next button (after animation)
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.style.display = 'none';
+  const delay = state.speed===0 ? 100 : ALL.length * state.speed + 800;
+  setTimeout(()=>{
+    nextBtn.style.display = 'flex';
+    nextBtn.textContent = r < 3 ? `Раунд ${r+2} →` : '🏆 Финал →';
+    // Auto-advance
+    if (state.speed > 0) {
+      startAutoProgress(r < 3 ? 8000 : 5000);
+    }
+  }, delay);
+}
+
+function animateCards(r) {
+  const maxProfit = Math.max(...ALL.map(t=>{
+    return Math.abs(state.narratives[r][t].profit);
+  }), 1);
+
+  ALL.forEach((tid,i)=>{
+    const delay = state.speed===0 ? i*30 : i*state.speed;
+    setTimeout(()=>{
+      const el = document.getElementById(`tc-${r}-${tid}`);
+      if (el) {
+        el.classList.add('visible');
+        const profit = state.narratives[r][tid].profit;
+        setTimeout(()=>{
+          const pbf = document.getElementById(`pbf-${r}-${tid}`);
+          if (pbf) pbf.style.width = Math.min(100,Math.abs(profit)/maxProfit*100)+'%';
+        }, 200);
+      }
+    }, delay);
+  });
+}
+
+function renderMiniLB(r) {
+  // Cumulative profit up to round r
+  const cumProfit = {};
+  ALL.forEach(tid=>{
+    let p=0;
+    for(let i=0;i<=r;i++){
+      const ri2=RETS.indexOf(tid),si2=SUPS.indexOf(tid);
+      if(ri2>=0) p+=state.results[i].retProfit[ri2];
+      else if(si2>=0) p+=state.results[i].supProfit[si2];
+      else p+=state.results[i].dProfit;
+    }
+    cumProfit[tid]=p;
+  });
+  const sorted=[...ALL].sort((a,b)=>cumProfit[b]-cumProfit[a]);
+  const maxP=Math.max(...Object.values(cumProfit).map(Math.abs),1);
+
+  document.getElementById('r-minilb').innerHTML = `<div class="mini-lb">
+    <h3>Текущий рейтинг (прибыль за ${r+1} раунд${r>0?'а':''})</h3>
+    ${sorted.map((tid,i)=>{
+      const p=cumProfit[tid];
+      const barW=Math.min(100,Math.abs(p)/maxP*100);
+      const clr=p>=0?'var(--OK)':'var(--BD)';
+      return `<div class="lb-row">
+        <div class="lb-pos">${i+1}</div>
+        <div class="lb-name">${TEAM_ICO[tid]} ${state.names[tid]}</div>
+        <div class="lb-bar"><div class="lb-bar-f" style="width:${barW}%;background:${clr}"></div></div>
+        <div class="lb-profit" style="color:${clr}">${p>=0?'+':''}${p.toFixed(0)}</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+let autoTimer=null, progTimer=null;
+function startAutoProgress(ms) {
+  if(autoTimer) clearTimeout(autoTimer);
+  if(progTimer) clearInterval(progTimer);
+  const pf=document.getElementById('auto-prog-f');
+  pf.style.transition='none'; pf.style.width='0%';
+  setTimeout(()=>{
+    pf.style.transition=`width ${ms}ms linear`;
+    pf.style.width='100%';
+  }, 50);
+  autoTimer=setTimeout(()=>{ nextStep(); }, ms);
+}
+
+function nextStep() {
+  if(autoTimer) clearTimeout(autoTimer);
+  if(progTimer) clearInterval(progTimer);
+  document.getElementById('auto-prog-f').style.transition='none';
+  document.getElementById('auto-prog-f').style.width='0%';
+  state.currentRound++;
+  if(state.currentRound>=4) { renderFinal(); showScr('s-final'); }
+  else renderRound(state.currentRound);
+}
+
+// ═══════════════════════════════════════
+// FINAL SCREEN
+// ═══════════════════════════════════════
+function renderFinal() {
+  updateHeaderDots(4);
+  const tots = state.totals;
+
+  // Winners per category
+  const retWin = RETS.reduce((a,b)=>tots[a]>tots[b]?a:b);
+  const supWin = SUPS.reduce((a,b)=>tots[a]>tots[b]?a:b);
+  const distPft = tots['D'];
+
+  document.getElementById('f-winners').innerHTML = `
+    <div class="winner-card">
+      <div class="wt">🛒 Лучший ритейлер</div>
+      <div class="wn">${state.names[retWin]}</div>
+      <div class="ws">${retWin} · ${tots[retWin].toFixed(0)} у.е.</div>
+    </div>
+    <div class="winner-card">
+      <div class="wt">🏭 Лучший поставщик</div>
+      <div class="wn">${state.names[supWin]}</div>
+      <div class="ws">${supWin} · ${tots[supWin].toFixed(0)} у.е.</div>
+    </div>
+    <div class="winner-card" style="border-color:var(--PU)">
+      <div class="wt">🚛 Дистрибьютор</div>
+      <div class="wn">${state.names['D']}</div>
+      <div class="ws">D · ${distPft.toFixed(0)} у.е.</div>
+    </div>
+  `;
+
+  // Tables
+  function mkTable(ids, title, ico) {
+    const sorted=[...ids].sort((a,b)=>tots[b]-tots[a]);
+    const maxP=Math.max(...ids.map(t=>Math.abs(tots[t])),1);
+    const medals=['🥇','🥈','🥉',''];
+    return `<div style="background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);padding:14px">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--W2);margin-bottom:10px">${ico} ${title}</div>
+      <table class="final-table">
+        <thead><tr><th>#</th><th>Команда</th><th>Прибыль ∑</th><th>Результат</th></tr></thead>
+        <tbody>${sorted.map((tid,i)=>{
+          const p=tots[tid], maxAbs=maxP;
+          const barW=Math.min(100,Math.abs(p)/maxAbs*100);
+          const clr=p>=0?'var(--OK)':'var(--BD)';
+          return `<tr>
+            <td class="rank ${i===0?'g':i===1?'s':i===2?'b':''}">${medals[i]||i+1}</td>
+            <td><b>${state.names[tid]}</b> <span style="font-size:10px;color:var(--W3)">${tid}</span></td>
+            <td style="color:${clr};font-weight:700">${p>=0?'+':''}${p.toFixed(0)}</td>
+            <td><div class="score-bar">
+              <div class="sbar"><div class="sbar-f" style="width:${barW}%;background:${clr}"></div></div>
+            </div></td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>`;
+  }
+
+  document.getElementById('f-tables').innerHTML =
+    mkTable(RETS,'Ритейлеры','🛒') + mkTable(SUPS,'Поставщики','🏭');
+
+  // Chain summary across all rounds
+  let cDef=0,cWoff=0,cSold=0,avgOSAtot=0,cntOSA=0;
+  state.results.forEach(res=>{
+    cDef+=res.def.flat().reduce((s,v)=>s+v,0);
+    cWoff+=res.woff.flat().reduce((s,v)=>s+v,0);
+    cSold+=res.sold.flat().reduce((s,v)=>s+v,0);
+    res.retOSA.forEach(v=>{avgOSAtot+=v;cntOSA++;});
+  });
+  const avgOSA=avgOSAtot/cntOSA;
+
+  document.getElementById('f-chain').innerHTML = `
+    <h3>Итоги цепочки за 4 раунда</h3>
+    <div class="chain-kpis">
+      <div class="ck"><div class="cl">Продано ед. (∑)</div><div class="cv ok">${cSold.toFixed(0)}</div></div>
+      <div class="ck"><div class="cl">Дефицит ед. (∑)</div><div class="cv ${cDef>100?'bad':cDef>40?'wn':'ok'}">${cDef.toFixed(0)}</div></div>
+      <div class="ck"><div class="cl">Списания Fresh (∑)</div><div class="cv ${cWoff>15?'bad':cWoff>5?'wn':'ok'}">${cWoff.toFixed(0)}</div></div>
+      <div class="ck"><div class="cl">OSA средний</div><div class="cv ${avgOSA>=.9?'ok':avgOSA>=.75?'wn':'bad'}">${(avgOSA*100).toFixed(0)}%</div></div>
+    </div>
+  `;
+
+  // Animate bars after slight delay
+  setTimeout(()=>{
+    document.querySelectorAll('.sbar-f').forEach(el=>{
+      const w=el.style.width; el.style.width='0%';
+      requestAnimationFrame(()=>{ el.style.transition='width 1.2s ease'; el.style.width=w; });
+    });
+  }, 100);
+}
+
+// ═══════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════
+function showScr(id) {
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  window.scrollTo(0,0);
+}
+
+function updateHeaderDots(r) {
+  document.getElementById('hdr-dots').innerHTML = [0,1,2,3].map(i=>{
+    const cls = r>i ? 'done' : r===i ? 'cur' : '';
+    return `<div class="rdot ${cls}">${i+1}</div>`;
+  }).join('');
+}
+
+function restartDemo() {
+  initDemo();
+  renderIntro();
+  showScr('s-intro');
+}
+
+// ── INIT ──
+initDemo();
+renderIntro();
+</script>
+</body>
+</html>

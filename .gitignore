@@ -1,0 +1,7 @@
+node_modules/
+game-state.json
+logs/
+*.log
+.DS_Store
+.env
+.claude/

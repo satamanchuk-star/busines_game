@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>IBS · FMCG-цепочка · Проектор</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060d1c;--bg2:#0d1a33;--bg3:#1a3565;
+  --P:#4a87d4;--PD:#2b5ba8;
+  --OK:#3fb950;--WN:#d29922;--BD:#f85149;--PU:#bc8cff;
+  --W:#e6edf3;--W2:#8b9db5;--W3:#2e4d73;
+  --r:10px;--sh:0 4px 24px rgba(0,0,0,.4);
+}
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+body{background:linear-gradient(160deg,#060d1c 0%,#091425 100%);color:var(--W);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  min-height:100vh;display:flex;flex-direction:column;overflow:hidden}
+/* ── Header ── */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 28px;
+  background:linear-gradient(135deg,#1a3565 0%,#2b5ba8 100%);border-bottom:1px solid rgba(74,135,212,.2);box-shadow:0 2px 12px rgba(0,0,0,.4)}
+.hdr h1{font-size:18px;font-weight:700;color:#fff;letter-spacing:.3px}
+.ibs-logo{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;background:#fff;border-radius:5px;flex-shrink:0}
+.ibs-logo span{font-family:'Arial Black',Arial,sans-serif;font-size:14px;font-weight:900;color:#1a3565;letter-spacing:-.5px}
+.hdr-c{display:flex;align-items:center;gap:18px}
+.round-badge{background:var(--PD);color:#fff;border-radius:20px;padding:4px 16px;font-size:13px;font-weight:700}
+.phase-badge{background:var(--bg3);color:var(--W2);border-radius:20px;padding:4px 14px;font-size:13px;border:1px solid var(--W3)}
+.rdots{display:flex;gap:5px}
+.rdot{width:30px;height:30px;border-radius:50%;border:2px solid var(--W3);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--W3)}
+.rdot.cur{border-color:var(--P);color:var(--P);background:rgba(88,166,255,.12)}
+.rdot.done{border-color:var(--OK);background:var(--OK);color:#000}
+/* ── Timer ── */
+.timer-wrap{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--W);
+  background:var(--bg3);border-radius:8px;padding:6px 16px;border:1px solid var(--W3)}
+.timer-wrap.exp{color:var(--BD);animation:blink 1s infinite;border-color:var(--BD)}
+.timer-wrap.low{color:var(--WN);border-color:var(--WN)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+/* ── Main ── */
+.main{flex:1;padding:22px 28px;overflow:hidden;display:flex;flex-direction:column;gap:18px}
+/* ── Announce ── */
+.announce{background:linear-gradient(135deg,#d29922,#b7791f);border-radius:var(--r);
+  padding:13px 20px;display:flex;align-items:center;gap:12px;font-size:15px;font-weight:600;
+  box-shadow:var(--sh);animation:slideIn .4s ease}
+@keyframes slideIn{from{transform:translateY(-12px);opacity:0}to{transform:translateY(0);opacity:1}}
+/* ── Event banner ── */
+.evt{background:linear-gradient(135deg,#450a0a,#7f1d1d);border:1px solid var(--BD);
+  border-radius:var(--r);padding:14px 18px;display:flex;gap:14px;box-shadow:var(--sh)}
+.evt .ico{font-size:28px}
+.evt h3{font-size:15px;font-weight:700;color:var(--BD);margin-bottom:4px}
+.evt p{font-size:13px;color:var(--W2);line-height:1.5}
+/* ── Phase full screen ── */
+.phase-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+.phase-screen .ps-ico{font-size:72px}
+.phase-screen .ps-ph{font-size:38px;font-weight:700;color:var(--P)}
+.phase-screen .ps-rd{font-size:18px;color:var(--W2)}
+/* ── Demand grid ── */
+.dem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.dcard{background:var(--bg2);border-radius:var(--r);padding:16px 18px;border:1px solid var(--bg3);
+  position:relative;overflow:hidden}
+.dcard::before{content:'';position:absolute;inset:0;border-radius:var(--r)}
+.dcard.up{border-color:var(--OK)}.dcard.dn{border-color:var(--BD)}
+.dcard .cn{font-size:12px;color:var(--W2);margin-bottom:4px}
+.dcard .cv{font-size:36px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--W)}
+.dcard .cc{font-size:14px;margin-top:4px;font-weight:600}
+.dcard.up .cc{color:var(--OK)}.dcard.dn .cc{color:var(--BD)}.dcard .cc:empty::before{content:'—';color:var(--W3)}
+/* ── Submit grid ── */
+.sub-section{background:var(--bg2);border-radius:var(--r);border:1px solid var(--bg3);padding:16px 18px}
+.sub-title{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--W2);margin-bottom:12px}
+.sub-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:8px}
+.sub-cell{border-radius:8px;padding:10px 6px;text-align:center;border:1px solid var(--bg3);transition:all .4s}
+.sub-cell .tn{font-size:12px;color:var(--W2);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub-cell .ts{font-size:10px;font-weight:700;border-radius:4px;padding:2px 6px;margin-top:4px;display:inline-block}
+.sub-cell.wait{background:var(--bg3)}.sub-cell.wait .ts{background:var(--W3);color:var(--bg)}
+.sub-cell.conn{background:rgba(63,185,80,.08);border-color:var(--OK)}.sub-cell.conn .ts{background:var(--OK);color:#000}
+.sub-cell.sub{background:rgba(88,166,255,.12);border-color:var(--P)}.sub-cell.sub .ts{background:var(--P);color:#000}
+/* ── Results grid ── */
+.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.res-card{background:var(--bg2);border-radius:var(--r);border:1px solid var(--bg3);
+  padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.res-card h4{font-size:13px;font-weight:700;color:var(--P);border-bottom:1px solid var(--bg3);padding-bottom:8px}
+.kpi-row{display:flex;justify-content:space-between;align-items:center}
+.kpi-lbl{font-size:12px;color:var(--W2)}
+.kpi-val{font-size:15px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.ok{color:var(--OK)}.bad{color:var(--BD)}.wn{color:var(--WN)}.nt{color:var(--W)}
+/* ── Scoreboard ── */
+.score-table{width:100%;border-collapse:collapse}
+.score-table th{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--W2);padding:6px 12px;text-align:left;border-bottom:1px solid var(--bg3)}
+.score-table td{padding:9px 12px;border-bottom:1px solid var(--bg3);font-size:14px}
+.score-table tr:last-child td{border-bottom:none}
+.score-bar{display:flex;align-items:center;gap:8px}
+.sbar{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.sbar-f{height:100%;background:var(--P);border-radius:3px;transition:width .8s ease}
+.sbar-v{font-size:13px;font-weight:700;color:var(--P);min-width:36px;text-align:right;font-family:'JetBrains Mono',monospace}
+/* ── Winner ── */
+.winner-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+.winner-screen .trophy{font-size:80px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.winner-screen h2{font-size:42px;font-weight:700;color:#ffd700}
+.winner-screen .sub{font-size:18px;color:var(--W2)}
+.winner-cards{display:flex;gap:24px}
+.winner-card{background:var(--bg2);border:2px solid var(--WN);border-radius:14px;
+  padding:18px 28px;text-align:center;min-width:180px}
+.winner-card .wtype{font-size:12px;color:var(--W2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.winner-card .wname{font-size:20px;font-weight:700;color:#ffd700}
+/* ── Chain KPI ── */
+.chain-kpi{display:flex;gap:14px}
+.ck{background:var(--bg2);border-radius:var(--r);padding:14px 18px;flex:1;border:1px solid var(--bg3)}
+.ck .cl{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--W2);margin-bottom:4px}
+.ck .cv{font-size:28px;font-weight:700;font-family:'JetBrains Mono',monospace}
+/* ── Conn status ── */
+.conn-bar{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--W2)}
+.conn-dot{width:8px;height:8px;border-radius:50%;background:var(--BD)}
+.conn-dot.ok{background:var(--OK)}
+/* ── Bottom bar ── */
+.bbar{background:var(--bg2);border-top:1px solid var(--bg3);padding:8px 28px;
+  display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--W2)}
+/* ── Roster (распределение ролей) ── */
+.roster-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%}
+.roster{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);padding:12px 14px}
+.roster.ret{border-top:3px solid var(--P)}.roster.sup{border-top:3px solid var(--OK)}.roster.dist{border-top:3px solid var(--PU)}
+.roster-hd{display:flex;align-items:center;gap:8px;margin-bottom:9px;padding-bottom:8px;border-bottom:1px solid var(--bg3)}
+.roster-hd .ri{font-size:20px}.roster-hd .rid{font-size:14px;font-weight:700;color:var(--W)}
+.roster-hd .rnm{font-size:11px;color:var(--W2)}
+.pslot{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px dashed var(--bg3)}
+.pslot:last-child{border-bottom:none}
+.pslot .pri{font-size:15px;width:20px;text-align:center}
+.pslot .prole{font-size:12px;font-weight:700;color:var(--W)}
+.pslot .prole.lead{color:var(--WN)}
+.pslot .pchar{font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;margin-top:2px;display:inline-block}
+/* ── Awards ── */
+.awards-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.award{border-radius:14px;padding:14px 22px;border:2px solid;background:var(--bg2);min-width:200px;text-align:center}
+.award .at{font-size:11px;text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-bottom:4px}
+.award .an{font-size:18px;font-weight:700;color:var(--W)}
+.award .as{font-size:12px;color:var(--W2);margin-top:3px}
+.health-banner{background:linear-gradient(135deg,#0f2d1a,#16432a);border:1px solid var(--OK);
+  border-radius:var(--r);padding:12px 20px;display:flex;align-items:center;gap:16px}
+.health-banner.warn{background:linear-gradient(135deg,#3d2f0a,#4a3a10);border-color:var(--WN)}
+.health-banner.crit{background:linear-gradient(135deg,#3d0f0f,#5c1a1a);border-color:var(--BD)}
+.health-banner .hv{font-size:34px;font-weight:700;font-family:'JetBrains Mono',monospace}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div style="display:flex;align-items:center;gap:14px">
+    <div class="conn-bar"><div id="l-dot" class="conn-dot"></div><span id="l-status">Подключение…</span></div>
+    <div class="ibs-logo"><span>IBS</span></div>
+    <h1>FMCG-цепочка</h1>
+    <span id="l-phase" class="phase-badge">—</span>
+  </div>
+  <div class="hdr-c">
+    <div class="rdots" id="l-dots"></div>
+    <div id="l-rname" style="font-size:14px;font-weight:600;color:var(--W2)"></div>
+  </div>
+  <div id="l-timer" class="timer-wrap">⏱ —:——</div>
+</header>
+
+<main class="main" id="l-main">
+  <div class="phase-screen">
+    <div class="ps-ico">🏪</div>
+    <div class="ps-ph">FMCG-цепочка</div>
+    <div class="ps-rd">Деловая игра · Ожидание начала</div>
+  </div>
+</main>
+
+<footer class="bbar">
+  <span>📺 Проекторный вид · только чтение</span>
+  <span id="l-sub">0/8 подали решения</span>
+  <span style="color:var(--W3);font-size:11px">© IBS 2026</span>
+</footer>
+
+<script>
+const G = {
+  catIds:   ['К1','К2','К3','К4'],
+  catNames: ['Базовая','Fresh','Промо-хиты','Импорт/пр.'],
+  retIds:   ['R1','R2','R3'],
+  supIds:   ['S1','S2','S3','S4'],
+  allTeams: ['R1','R2','R3','S1','S2','S3','S4','D'],
+  demand:   [[120,90,70,45],[125,95,110,50],[110,130,80,25],[120,115,90,35]],
+  distCap:  [320,320,200,320],
+  roundNames:['Стартовый рынок','Промо-инициатива','Внешнее событие','Стабилизация'],
+  events:[
+    null,
+    {t:'📢 Промо-инициатива',d:'Спрос К3 вырос до 110 ед. Промо-буст ×1.5 — только при скидке ≥10% и промо=Да.'},
+    {t:'🚨 ДВОЙНОЙ ШОК',d:'Мощность дист-ра: 320→200. Квота П4: 70→30. Спрос: К2→130, К4→25. Приоритизируйте поставки!'},
+    {t:'📊 Стабилизация',d:'Рынок восстанавливается: К2=115, К3=90, К4=35. Восстановите сервис и маржу.'},
+  ],
+  phaseName:{lobby:'Лобби',roles:'Распределение ролей',briefing:'Брифинг',negotiation:'Переговоры',decisions:'Ввод решений',results:'Итоги',final:'Финал'},
+  phaseIco: {lobby:'🏠',roles:'🎲',briefing:'📋',negotiation:'🤝',decisions:'📝',results:'📊',final:'🏆'},
+  LBL:{R1:'Р1',R2:'Р2',R3:'Р3',S1:'П1',S2:'П2',S3:'П3',S4:'П4',D:'Д'},
+  CHARS:{'Жёсткий':{ico:'🦁',clr:'#f85149'},'Кооперативный':{ico:'🤝',clr:'#3fb950'},'Хитрый':{ico:'🦊',clr:'#d29922'},'Упрямый':{ico:'😤',clr:'#f0883e'},'Аналитик':{ico:'📊',clr:'#58a6ff'}},
+  type:t=>['R1','R2','R3'].includes(t)?'ret':['S1','S2','S3','S4'].includes(t)?'sup':'dist',
+};
+// Метка актора + имя
+function lblName(t){ return `${G.LBL[t]||t} · ${gs?.names?.[t]||t}`; }
+function hexA(hex,a){const h=hex.replace('#','');return `rgba(${parseInt(h.slice(0,2),16)},${parseInt(h.slice(2,4),16)},${parseInt(h.slice(4,6),16)},${a})`;}
+
+let gs = null, ws = null, timerInt = null;
+
+;(function connect(){
+  const proto = location.protocol==='https:'?'wss:':'ws:';
+  ws = new WebSocket(`${proto}//${location.host}`);
+  ws.onopen = ()=>{
+    document.getElementById('l-dot').classList.add('ok');
+    document.getElementById('l-status').textContent='Подключено';
+    ws.send(JSON.stringify({type:'join',role:'player',teamId:'live',name:'Проектор',password:''}));
+  };
+  ws.onmessage = e=>{ try{ onMsg(JSON.parse(e.data)); }catch(ex){console.error(ex);} };
+  ws.onclose = ()=>{
+    document.getElementById('l-dot').classList.remove('ok');
+    document.getElementById('l-status').textContent='Нет связи · переподключение…';
+    setTimeout(connect, 3000);
+  };
+})();
+
+function onMsg(msg){
+  switch(msg.type){
+    case 'joined':
+    case 'upd':
+      if(msg.state) gs=msg.state;
+      else if(gs) Object.keys(msg).forEach(k=>{ if(k!=='type') gs[k]=msg[k]; });
+      render(); break;
+    case 'result': case 'adminResult':
+      if(!gs)break;
+      if(!gs.results)gs.results=[];
+      while(gs.results.length<=msg.round)gs.results.push(null);
+      gs.results[msg.round]=msg.result;
+      gs.phase=msg.phase;
+      if(msg.cumScores) gs.scores=msg.cumScores;
+      render(); break;
+    case 'announcement':
+      if(gs)gs.announce=msg.text; render(); break;
+    case 'teamSub':
+      if(!gs)break;
+      if(!gs.submitted)gs.submitted=[];
+      if(!gs.submitted.includes(msg.teamId))gs.submitted.push(msg.teamId);
+      renderFooter(); renderSubmitGrid(); break;
+    case 'userEvent':
+      if(!gs)break;
+      if(!gs.connected)gs.connected=[];
+      if(msg.user?.teamId&&!gs.connected.includes(msg.user.teamId))gs.connected.push(msg.user.teamId);
+      renderSubmitGrid(); break;
+    case 'reset':
+      gs=null; render(); break;
+  }
+}
+
+function render(){
+  if(!gs){
+    document.getElementById('l-main').innerHTML=`<div class="phase-screen">
+      <div class="ps-ico">🏪</div>
+      <div class="ps-ph">FMCG-цепочка</div>
+      <div class="ps-rd">Ожидание сервера…</div></div>`;
+    return;
+  }
+  const r=gs.round, phase=gs.phase;
+  document.getElementById('l-phase').textContent=G.phaseName[phase]||phase;
+  renderDots(r);
+  document.getElementById('l-rname').textContent=G.roundNames[r]||'';
+  renderTimerDisp(gs.timer);
+  renderFooter();
+
+  const M=document.getElementById('l-main');
+
+  if(phase==='lobby'){
+    M.innerHTML=renderLobby(); return;
+  }
+  if(phase==='roles'){
+    M.innerHTML=renderRoles(); return;
+  }
+  if(phase==='briefing'){
+    M.innerHTML=renderBriefing(r); return;
+  }
+  if(phase==='negotiation'){
+    M.innerHTML=renderNegotiation(r); return;
+  }
+  if(phase==='decisions'){
+    M.innerHTML=renderDecisions(r); return;
+  }
+  if(phase==='results'){
+    M.innerHTML=renderResults(r); return;
+  }
+  if(phase==='final'){
+    M.innerHTML=renderFinal(); return;
+  }
+}
+
+function renderDots(r){
+  document.getElementById('l-dots').innerHTML=[1,2,3,4].map(n=>{
+    const cls=n===r+1?'cur':n<=r?'done':'';
+    return `<div class="rdot ${cls}">${n}</div>`;
+  }).join('');
+}
+
+function renderTimerDisp(timer){
+  const el=document.getElementById('l-timer');
+  if(timerInt){clearInterval(timerInt);timerInt=null;}
+  if(!timer||!timer.on||!timer.end){el.textContent='⏱ ——:——';el.className='timer-wrap';return;}
+  function tick(){
+    const left=timer.end-Date.now();
+    if(left<=0){el.textContent='⏱ 00:00';el.className='timer-wrap exp';clearInterval(timerInt);timerInt=null;return;}
+    const m=Math.floor(left/60000),s=Math.floor((left%60000)/1000);
+    el.textContent=`⏱ ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    el.className='timer-wrap'+(left<60000?' exp':left<180000?' low':'');
+  }
+  tick(); timerInt=setInterval(tick,500);
+}
+
+function renderFooter(){
+  const sub=(gs?.submitted||[]).length;
+  document.getElementById('l-sub').textContent=`${sub}/8 подали решения`;
+}
+
+function renderSubmitGrid(){
+  const sg=document.getElementById('live-subgrid');
+  if(!sg)return;
+  sg.innerHTML=G.allTeams.map(t=>{
+    const conn=(gs.connected||[]).includes(t);
+    const sub=(gs.submitted||[]).includes(t);
+    const cls=sub?'sub':conn?'conn':'wait';
+    const lbl=sub?'✓ Подано':conn?'● Онлайн':'○ Ожидание';
+    return `<div class="sub-cell ${cls}">
+      <div class="tn">${gs.names?.[t]||t}</div>
+      <div class="ts">${lbl}</div></div>`;
+  }).join('');
+}
+
+function renderLobby(){
+  return `<div class="phase-screen">
+    <div class="ps-ico">🏠</div>
+    <div class="ps-ph">Добро пожаловать!</div>
+    <div class="ps-rd">Команды подключаются · ${(gs.connected||[]).length} из 8 онлайн</div>
+    <div class="sub-section" style="width:100%;max-width:800px">
+      <div class="sub-title">Статус команд</div>
+      <div class="sub-grid" id="live-subgrid">${renderSubCells()}</div>
+    </div>
+  </div>`;
+}
+
+function renderRoles(){
+  const rosters=gs.rosters||{};
+  if(!Object.keys(rosters).length) return `<div class="phase-screen">
+    <div class="ps-ico">🎲</div><div class="ps-ph">Распределение ролей</div>
+    <div class="ps-rd">Ведущий раздаёт роли командам…</div></div>`;
+  return `<div style="font-size:20px;font-weight:700;color:var(--P);margin-bottom:4px">🎲 Роли и характеры команд</div>
+    <div style="font-size:13px;color:var(--W2);margin-bottom:14px">🎩 Директор ведёт переговоры — его характер задаёт позицию команды</div>
+    <div class="roster-grid">
+    ${G.allTeams.map(t=>{
+      const slots=rosters[t]||[];
+      const ico=G.type(t)==='ret'?'🛒':G.type(t)==='sup'?'🏭':'🚛';
+      return `<div class="roster ${G.type(t)}">
+        <div class="roster-hd"><span class="ri">${ico}</span>
+          <div><div class="rid">${G.LBL[t]||t}</div><div class="rnm">${gs.names?.[t]||t}</div></div></div>
+        ${slots.map(s=>{const ch=G.CHARS[s.char]||{ico:'',clr:'#888'};
+          return `<div class="pslot"><span class="pri">${s.role.ico}</span>
+            <div><div class="prole ${s.role.lead?'lead':''}">${s.role.title}</div>
+            <span class="pchar" style="background:${hexA(ch.clr,.16)};color:${ch.clr}">${ch.ico} ${s.char}</span></div>
+          </div>`;}).join('')}
+      </div>`;
+    }).join('')}
+    </div>`;
+}
+
+function renderBriefing(r){
+  const ev=G.events[r], dem=G.demand[r], prev=r>0?G.demand[r-1]:null;
+  let h='';
+  if(ev) h+=`<div class="evt"><div class="ico">${r===2?'🚨':'📢'}</div>
+    <div><h3>${ev.t}</h3><p>${ev.d}</p></div></div>`;
+  h+=`<div class="dem-grid">`;
+  G.catIds.forEach((cat,i)=>{
+    const chg=prev?dem[i]-prev[i]:0, cls=chg>0?'up':chg<0?'dn':'';
+    h+=`<div class="dcard ${cls}">
+      <div class="cn">${cat} · ${G.catNames[i]}</div>
+      <div class="cv">${dem[i]}</div>
+      <div class="cc">${!prev?'':chg>0?`▲ +${chg} ед.`:chg<0?`▼ ${chg} ед.`:'= без изм.'}</div>
+    </div>`;
+  });
+  h+=`</div>
+  <div class="sub-section">
+    <div class="sub-title">Статус подключений</div>
+    <div class="sub-grid" id="live-subgrid">${renderSubCells()}</div>
+  </div>`;
+  return h;
+}
+
+function renderNegotiation(r){
+  return `<div class="phase-screen" style="flex:0;margin-bottom:16px">
+    <div class="ps-ico">🤝</div>
+    <div class="ps-ph">Переговоры</div>
+    <div class="ps-rd">${G.roundNames[r]} · Согласуйте условия поставок и тарифы</div>
+  </div>
+  <div class="sub-section">
+    <div class="sub-title">Команды онлайн</div>
+    <div class="sub-grid" id="live-subgrid">${renderSubCells()}</div>
+  </div>
+  <div class="chain-kpi">
+    ${G.catIds.map((cat,i)=>`<div class="ck">
+      <div class="cl">${cat} · Спрос</div>
+      <div class="cv nt">${G.demand[r][i]}</div>
+    </div>`).join('')}
+    <div class="ck"><div class="cl">Мощность дист-ра</div>
+      <div class="cv ${r===2?'bad':'ok'}">${G.distCap[r]}</div>
+    </div>
+  </div>`;
+}
+
+function renderDecisions(r){
+  return `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px">
+    <div style="flex:1">
+      <div style="font-size:22px;font-weight:700;color:var(--P);margin-bottom:6px">📝 Ввод решений</div>
+      <div style="font-size:14px;color:var(--W2)">Команды вводят заказы, объём производства и тарифы</div>
+    </div>
+    <div style="font-size:28px;font-weight:700;color:var(--P);font-family:monospace">
+      ${(gs.submitted||[]).length} / 8
+    </div>
+  </div>
+  <div class="sub-section">
+    <div class="sub-title">Статус подачи решений</div>
+    <div class="sub-grid" id="live-subgrid">${renderSubCells()}</div>
+  </div>
+  <div class="chain-kpi">
+    ${G.catIds.map((cat,i)=>`<div class="ck">
+      <div class="cl">${cat} · Спрос</div>
+      <div class="cv nt">${G.demand[r][i]}</div>
+    </div>`).join('')}
+    <div class="ck"><div class="cl">Дист. мощность</div>
+      <div class="cv ${r===2?'bad':'nt'}">${G.distCap[r]}</div>
+    </div>
+  </div>`;
+}
+
+function renderResults(r){
+  const res=gs.results?.[r];
+  if(!res) return `<div class="phase-screen">
+    <div class="ps-ico">⏳</div>
+    <div class="ps-ph">Расчёт…</div></div>`;
+
+  let cDef=0,cOv=0,cWo=0;
+  for(let ri=0;ri<3;ri++)for(let ci=0;ci<4;ci++){
+    cDef+=res.def?.[ri]?.[ci]||0;
+    cOv+=res.over?.[ri]?.[ci]||0;
+    cWo+=res.woff?.[ri]?.[ci]||0;
+  }
+  const totSold=(res.sold||[]).flat().reduce((s,v)=>s+v,0);
+  const H=res.health?.H??null;
+  const hCls=H==null?'':H>=.75?'':H>=.5?'warn':'crit';
+  const hBanner = H==null ? '' : `<div class="health-banner ${hCls}">
+    <div style="font-size:30px">❤️</div>
+    <div style="flex:1"><div style="font-size:13px;color:var(--W2)">Здоровье цепочки за тур · фонд ${f0(H*250)} у.е. × личный вклад команды</div>
+    <div class="hv ${H>=.75?'ok':H>=.5?'wn':'bad'}">${f0(H*100)}%</div></div>
+    <div style="font-size:12px;color:var(--W2);max-width:280px">OSA ${f0((res.health.OSA||0)*100)}% · дефицит-фактор ${f0((res.health.Deficit||0)*100)}% · анти-хлыст ${f0((res.health.Bullwhip||0)*100)}%</div>
+  </div>`;
+
+  return hBanner + `<div class="chain-kpi">
+    <div class="ck"><div class="cl">Продано ед.</div><div class="cv ok">${f0(totSold)}</div></div>
+    <div class="ck"><div class="cl">Дефицит ед.</div><div class="cv ${cDef>20?'bad':'wn'}">${f0(cDef)}</div></div>
+    <div class="ck"><div class="cl">Перезапас ед.</div><div class="cv wn">${f0(cOv)}</div></div>
+    <div class="ck"><div class="cl">Списания (Fresh)</div><div class="cv ${cWo>5?'bad':'wn'}">${f0(cWo)}</div></div>
+    <div class="ck"><div class="cl">Загрузка дист-ра</div><div class="cv ${res.dCoeff>.9?'ok':res.dCoeff>.6?'wn':'bad'}">${f1(res.dCoeff*100)}%</div></div>
+  </div>
+  <div class="res-grid">
+    ${G.retIds.map((rid,ri)=>{
+      const osa=res.retOSA?.[ri]||0, pft=res.retProfit?.[ri]||0;
+      return `<div class="res-card"><h4>🛒 ${G.LBL[rid]} · ${gs.names?.[rid]||rid}</h4>
+        <div class="kpi-row"><span class="kpi-lbl">OSA</span>
+          <span class="kpi-val ${osa>=.9?'ok':osa>=.75?'wn':'bad'}">${f1(osa*100)}%</span></div>
+        <div class="kpi-row"><span class="kpi-lbl">Прибыль</span>
+          <span class="kpi-val ${pft>=0?'ok':'bad'}">${f1(pft)}</span></div>
+        ${G.catIds.map((_,ci)=>{
+          const d=res.def?.[ri]?.[ci]||0;
+          return `<div class="kpi-row" style="font-size:12px">
+            <span class="kpi-lbl" style="font-size:11px">${G.catIds[ci]} деф.</span>
+            <span class="kpi-val ${d>5?'bad':d>0?'wn':'ok'}" style="font-size:12px">${f1(d)}</span></div>`;
+        }).join('')}
+      </div>`;
+    }).join('')}
+    ${G.supIds.map((sid,si)=>{
+      const pft=res.supProfit?.[si]||0, fr=res.totDel?.[si]&&res.ordFromSup?.[si]?res.totDel[si]/res.ordFromSup[si]:1;
+      return `<div class="res-card"><h4>🏭 ${G.LBL[sid]} · ${gs.names?.[sid]||sid}</h4>
+        <div class="kpi-row"><span class="kpi-lbl">Fill-rate</span>
+          <span class="kpi-val ${fr>=.9?'ok':fr>=.7?'wn':'bad'}">${f1(fr*100)}%</span></div>
+        <div class="kpi-row"><span class="kpi-lbl">Прибыль</span>
+          <span class="kpi-val ${pft>=0?'ok':'bad'}">${f1(pft)}</span></div>
+        <div class="kpi-row"><span class="kpi-lbl">Остаток</span>
+          <span class="kpi-val wn">${f0(res.unsold?.[si]||0)}</span></div>
+      </div>`;
+    }).join('')}
+    <div class="res-card"><h4>🚛 ${G.LBL['D']} · ${gs.names?.['D']||'Дист-р'}</h4>
+      <div class="kpi-row"><span class="kpi-lbl">Тариф</span>
+        <span class="kpi-val nt">${f1(res.tariff||1.5)}</span></div>
+      <div class="kpi-row"><span class="kpi-lbl">Загрузка</span>
+        <span class="kpi-val ${res.dCoeff>.9?'ok':res.dCoeff>.6?'wn':'bad'}">${f1(res.dCoeff*100)}%</span></div>
+      <div class="kpi-row"><span class="kpi-lbl">Прибыль</span>
+        <span class="kpi-val ${res.dProfit>=0?'ok':'bad'}">${f1(res.dProfit)}</span></div>
+    </div>
+  </div>`;
+}
+
+function renderFinal(){
+  const results=(gs.results||[]).filter(r=>r);
+  if(!results.length) return `<div class="phase-screen">
+    <div class="ps-ico">🏁</div><div class="ps-ph">Финал · нет данных</div></div>`;
+
+  // Прибыль, счёт (с сервера), служение и стабильность
+  const profit={}, service={}, cv={};
+  G.allTeams.forEach(t=>{ profit[t]=0; });
+  const RET=G.retIds, SUP=G.supIds;
+  results.forEach(res=>{
+    RET.forEach((_,ri)=>profit[RET[ri]]+=res.retProfit?.[ri]||0);
+    SUP.forEach((_,si)=>profit[SUP[si]]+=res.supProfit?.[si]||0);
+    profit['D']+=res.dProfit||0;
+  });
+  G.allTeams.forEach(t=>{
+    const ri=RET.indexOf(t),si=SUP.indexOf(t); let acc=0;
+    const series=results.map(res=>{
+      if(ri>=0){ acc+=res.retOSA?.[ri]||0; return (res.def?.[ri]||[]).reduce((s,v)=>s+v,0)+(res.sold?.[ri]||[]).reduce((s,v)=>s+v,0); }
+      if(si>=0){ const o=res.ordFromSup?.[si]||0; acc+= o>0?Math.min(1,(res.totDel?.[si]||0)/o):1; return res.totDel?.[si]||0; }
+      acc+= 1-Math.abs((res.dCoeff||0)-0.9); return res.totDelivered||0;
+    });
+    service[t]=acc/results.length;
+    const m=series.reduce((s,v)=>s+v,0)/series.length;
+    const vv=series.reduce((s,x)=>s+(x-m)**2,0)/series.length;
+    cv[t]= m>0?Math.sqrt(vv)/m:0;
+  });
+  const scores = gs.scores && Object.keys(gs.scores).length ? gs.scores
+               : Object.fromEntries(G.allTeams.map(t=>[t,profit[t]]));
+
+  const grand=G.allTeams.reduce((a,b)=>scores[a]>=scores[b]?a:b);
+  const retWin=RET.reduce((a,b)=>profit[a]>profit[b]?a:b);
+  const supWin=SUP.reduce((a,b)=>profit[a]>profit[b]?a:b);
+  const architect=G.allTeams.reduce((a,b)=>service[a]>=service[b]?a:b);
+  const antiwhip=G.allTeams.reduce((a,b)=>cv[a]<=cv[b]?a:b);
+
+  const award=(t,ico,tid,sub,clr)=>`<div class="award" style="border-color:${clr}">
+    <div class="at" style="color:${clr}">${ico} ${t}</div>
+    <div class="an">${G.LBL[tid]} · ${gs.names?.[tid]||tid}</div>
+    <div class="as">${sub}</div></div>`;
+
+  const sorted=[...G.allTeams].sort((a,b)=>scores[b]-scores[a]);
+  const maxAbs=Math.max(...G.allTeams.map(t=>Math.abs(scores[t])),1);
+  const rows=sorted.map((t,i)=>{
+    const sc=scores[t], pct=Math.min(100,Math.abs(sc)/maxAbs*100);
+    return `<tr>
+      <td style="font-weight:700;color:${i===0?'#ffd700':'var(--W3)'};text-align:center">${i+1}</td>
+      <td style="font-weight:700;color:var(--W)">${G.LBL[t]} · ${gs.names?.[t]||t}</td>
+      <td><span class="${profit[t]>=0?'ok':'bad'}">${profit[t].toFixed(0)}</span></td>
+      <td><div class="score-bar"><div class="sbar"><div class="sbar-f" style="width:${pct}%;background:${sc>=0?'var(--P)':'var(--BD)'}"></div></div>
+        <span class="sbar-v">${sc>=0?'+':''}${Math.round(sc)}</span></div></td>
+    </tr>`;
+  }).join('');
+
+  return `<div style="text-align:center;font-size:30px;margin-bottom:10px">🏆 Итоги игры</div>
+  <div class="awards-row">
+    ${award('Гран-при','🏆',grand,`Счёт ${Math.round(scores[grand])} у.е.`,'#ffd700')}
+    ${award('Архитектор цепочки','🤝',architect,`Служение ${f0(service[architect]*100)}%`,'#3fb950')}
+    ${award('Антихлыст','📉',antiwhip,`Стабильность CV ${f1(cv[antiwhip]*100)}%`,'#58a6ff')}
+  </div>
+  <div class="awards-row" style="margin-bottom:14px">
+    <div class="winner-card"><div class="wtype">🛒 Лучший ритейлер</div><div class="wname">${gs.names?.[retWin]||retWin}</div></div>
+    <div class="winner-card"><div class="wtype">🏭 Лучший поставщик</div><div class="wname">${gs.names?.[supWin]||supWin}</div></div>
+  </div>
+  <div style="background:var(--bg2);border-radius:var(--r);padding:14px;border:1px solid var(--bg3)">
+    <div style="font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--W2);margin-bottom:8px">Общий рейтинг · Счёт = прибыль + здоровье цепочки</div>
+    <table class="score-table"><thead><tr><th>#</th><th>Команда</th><th>Прибыль ∑</th><th>Итоговый счёт</th></tr></thead>
+    <tbody>${rows}</tbody></table>
+  </div>`;
+}
+
+function renderSubCells(){
+  if(!gs)return'';
+  return G.allTeams.map(t=>{
+    const conn=(gs.connected||[]).includes(t);
+    const sub=(gs.submitted||[]).includes(t);
+    const cls=sub?'sub':conn?'conn':'wait';
+    const lbl=sub?'✓ Подано':conn?'● Онлайн':'○ Ожидание';
+    return `<div class="sub-cell ${cls}">
+      <div class="tn">${gs.names?.[t]||t}</div>
+      <div class="ts">${lbl}</div></div>`;
+  }).join('');
+}
+
+// ── announce overlay ──
+let annOverlay = null;
+function showAnnounce(text){
+  if(!text){if(annOverlay){annOverlay.remove();annOverlay=null;}return;}
+  if(!annOverlay){
+    annOverlay=document.createElement('div');
+    annOverlay.style.cssText='position:fixed;bottom:50px;left:50%;transform:translateX(-50%);z-index:100;width:80%;max-width:800px';
+    document.body.appendChild(annOverlay);
+  }
+  annOverlay.innerHTML=`<div class="announce">📢 ${text}</div>`;
+}
+
+const origRender=render;
+render=function(){
+  origRender();
+  if(gs?.announce) showAnnounce(gs.announce);
+  else showAnnounce(null);
+};
+
+const f1=v=>parseFloat(v||0).toFixed(1);
+const f0=v=>parseFloat(v||0).toFixed(0);
+
+// Re-render timer from sync
+setInterval(()=>{ if(gs?.timer) renderTimerDisp(gs.timer); },1000);
+</script>
+</body>
+</html>

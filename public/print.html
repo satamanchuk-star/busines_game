@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>IBS · FMCG-цепочка · Печатные материалы</title>
+<style>
+/* ── Reset & base ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1a3565;--blue:#2b5ba8;--bright:#1a6fcf;
+  --OK:#27ae60;--WN:#e67e22;--BD:#c0392b;
+  --g1:#f7f9fc;--g2:#edf1f7;--g3:#d5dce8;--g5:#8896a7;--g7:#4a5568;--g9:#1a202c;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f0f4f8;color:var(--g9);font-size:13px;line-height:1.4}
+
+/* ── Screen preview header ── */
+.screen-hdr{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;padding:16px 32px;
+  display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+.ibs-badge{background:#fff;border-radius:6px;padding:4px 10px;font-family:'Arial Black',Arial,sans-serif;
+  font-size:16px;font-weight:900;color:var(--navy);letter-spacing:-.5px;flex-shrink:0}
+.screen-hdr h1{font-size:17px;font-weight:700}
+.screen-hdr p{font-size:12px;opacity:.75;margin-top:2px}
+.print-btn{margin-left:auto;background:#fff;color:var(--navy);border:none;border-radius:6px;
+  padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.print-btn:hover{background:var(--g2)}
+.section-nav{display:flex;gap:6px;margin-left:24px}
+.snav{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:20px;
+  padding:4px 14px;font-size:12px;color:#fff;text-decoration:none;white-space:nowrap}
+.snav:hover{background:rgba(255,255,255,.25)}
+
+/* ── Page sections ── */
+.section{padding:28px 32px;max-width:1200px;margin:0 auto}
+.section-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--g5);
+  margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid var(--g3);display:flex;align-items:center;gap:8px}
+.section-title::before{content:'';display:block;width:4px;height:18px;background:linear-gradient(135deg,var(--navy),var(--blue));border-radius:2px}
+
+/* ── Print styles ── */
+@media print{
+  .screen-hdr,.print-btn,.section-nav{display:none!important}
+  body{background:#fff;font-size:11px}
+  .section{padding:0;max-width:none}
+  .page-break{page-break-before:always}
+  .no-print{display:none!important}
+}
+
+/* ═══════════ ROLE CARDS ═══════════ */
+.role-cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+@media print{.role-cards-grid{grid-template-columns:repeat(4,1fr);gap:8px}}
+
+.role-card{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1);
+  break-inside:avoid;page-break-inside:avoid}
+.rc-hdr{padding:12px 14px 10px;color:#fff;position:relative;overflow:hidden}
+.rc-hdr::after{content:'';position:absolute;right:-12px;top:-12px;width:60px;height:60px;
+  border-radius:50%;background:rgba(255,255,255,.08)}
+.rc-hdr.ret{background:linear-gradient(135deg,#1a3565,#2b5ba8)}
+.rc-hdr.sup{background:linear-gradient(135deg,#1a5c30,#27ae60)}
+.rc-hdr.dist{background:linear-gradient(135deg,#5b2a8a,#8e44ad)}
+.rc-actor{font-size:22px;font-weight:900;letter-spacing:-.5px;line-height:1}
+.rc-name{font-size:11px;opacity:.85;margin-top:3px;font-weight:500}
+.rc-type{font-size:9px;opacity:.65;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.rc-ico{position:absolute;right:12px;top:10px;font-size:26px;opacity:.7}
+.rc-body{padding:11px 13px}
+.role-row{display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid var(--g2)}
+.role-row:last-child{border-bottom:none}
+.role-ico{font-size:14px;width:18px;flex-shrink:0;margin-top:1px}
+.role-info .rn{font-size:11px;font-weight:700;color:var(--g9)}
+.role-info .rn.lead{color:var(--navy)}
+.role-info .rd{font-size:10px;color:var(--g5);margin-top:1px;line-height:1.35}
+.rc-footer{background:var(--g1);padding:8px 13px;font-size:9px;color:var(--g5);
+  display:flex;align-items:center;gap:6px;border-top:1px solid var(--g2)}
+.rc-footer strong{color:var(--g7)}
+
+/* ═══════════ CHARACTER CARDS ═══════════ */
+.char-cards-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+@media print{.char-cards-grid{grid-template-columns:repeat(5,1fr);gap:8px}}
+
+.char-card{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1);
+  break-inside:avoid}
+.cc-hdr{padding:14px 14px 12px;display:flex;align-items:center;gap:10px}
+.cc-ico{font-size:30px;line-height:1}
+.cc-name{font-size:14px;font-weight:700}
+.cc-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-top:3px;display:inline-block}
+.cc-body{padding:0 14px 14px;font-size:11px;color:var(--g7);line-height:1.55}
+.cc-body .cc-rule{background:var(--g1);border-radius:7px;padding:8px 10px;margin-top:8px;
+  font-size:10px;color:var(--g5);line-height:1.5}
+.cc-body .cc-rule strong{color:var(--g7)}
+.cc-sep{height:3px;width:100%}
+
+/* Character colors */
+.ch-hard .cc-hdr{background:#fff0f0}.ch-hard .cc-name{color:#c0392b}.ch-hard .cc-sep{background:linear-gradient(90deg,#c0392b,#e74c3c)}
+.ch-hard .cc-tag{background:#fde8e8;color:#c0392b}
+.ch-coop .cc-hdr{background:#f0fff5}.ch-coop .cc-name{color:#27ae60}.ch-coop .cc-sep{background:linear-gradient(90deg,#27ae60,#2ecc71)}
+.ch-coop .cc-tag{background:#d5f5e3;color:#27ae60}
+.ch-fox  .cc-hdr{background:#fffbf0}.ch-fox .cc-name{color:#d68910}.ch-fox .cc-sep{background:linear-gradient(90deg,#d68910,#f39c12)}
+.ch-fox  .cc-tag{background:#fef9e7;color:#d68910}
+.ch-stub .cc-hdr{background:#fff5f0}.ch-stub .cc-name{color:#d35400}.ch-stub .cc-sep{background:linear-gradient(90deg,#d35400,#e67e22)}
+.ch-stub .cc-tag{background:#fdeee4;color:#d35400}
+.ch-anal .cc-hdr{background:#f0f6ff}.ch-anal .cc-name{color:#1a6fcf}.ch-anal .cc-sep{background:linear-gradient(90deg,#1a6fcf,#2b82e8)}
+.ch-anal .cc-tag{background:#deeeff;color:#1a6fcf}
+
+/* ═══════════ PLAYER QUICK REF ═══════════ */
+.qr-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media print{.qr-grid{grid-template-columns:1fr 1fr}}
+
+.qr-card{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1)}
+.qr-hdr{padding:12px 16px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;
+  display:flex;align-items:center;gap:10px}
+.qr-hdr .qh-ico{font-size:20px}
+.qr-hdr h3{font-size:14px;font-weight:700}
+.qr-body{padding:14px 16px}
+.phase-list{list-style:none;display:flex;flex-direction:column;gap:6px}
+.phase-item{display:flex;align-items:flex-start;gap:10px}
+.ph-num{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border-radius:50%;
+  width:22px;height:22px;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+.ph-text .pht{font-size:12px;font-weight:700;color:var(--g9)}
+.ph-text .phd{font-size:11px;color:var(--g5);margin-top:1px}
+.tip-list{list-style:none;display:flex;flex-direction:column;gap:5px}
+.tip-item{display:flex;gap:8px;align-items:flex-start;font-size:11px;color:var(--g7);line-height:1.4}
+.tip-ico{flex-shrink:0;font-size:13px}
+.score-formula{background:linear-gradient(135deg,#f0f4ff,#e8f0fb);border:1px solid #c5d5ef;
+  border-radius:8px;padding:12px 14px;text-align:center;margin-top:10px}
+.score-formula .sf-main{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.score-formula .sf-sub{font-size:11px;color:var(--g5)}
+.kpi-mini{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:10px}
+.km{background:var(--g1);border-radius:7px;padding:8px 10px}
+.km .kl{font-size:9px;text-transform:uppercase;letter-spacing:.4px;color:var(--g5);margin-bottom:2px}
+.km .kv{font-size:11px;font-weight:700;color:var(--g7)}
+.awards-mini{display:flex;flex-direction:column;gap:5px;margin-top:6px}
+.am{display:flex;align-items:center;gap:8px;background:var(--g1);border-radius:7px;padding:7px 10px}
+.am .ai{font-size:16px}
+.am .at{font-size:11px}
+.am .an{font-weight:700;color:var(--g9)}
+.am .ad{font-size:10px;color:var(--g5);margin-top:1px}
+
+/* ═══════════ FACILITATOR CARD ═══════════ */
+.fac-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.fac-card{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.1)}
+.fac-hdr{padding:11px 16px;background:linear-gradient(135deg,#1a3565,#2b5ba8);color:#fff;
+  font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+.fac-body{padding:13px 16px}
+.fac-tbl{width:100%;border-collapse:collapse;font-size:11px}
+.fac-tbl th{text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.4px;color:var(--g5);
+  padding:4px 7px;border-bottom:1px solid var(--g2)}
+.fac-tbl td{padding:5px 7px;border-bottom:1px solid var(--g2);vertical-align:top;line-height:1.4}
+.fac-tbl tr:last-child td{border-bottom:none}
+.fac-tbl .t-num{font-weight:700;color:var(--navy);white-space:nowrap}
+.fac-tbl .t-shock{background:#fff5f5}
+.fac-tbl .t-promo{background:#f5fff8}
+.event-badge{font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;display:inline-block;margin-top:2px}
+.ev-shock{background:#fde8e8;color:#c0392b}
+.ev-promo{background:#d5f5e3;color:#27ae60}
+.ev-stab{background:#deeeff;color:#1a6fcf}
+.time-row{display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid var(--g2);font-size:11px}
+.time-row:last-child{border-bottom:none}
+.time-mm{background:var(--g1);border-radius:5px;padding:3px 8px;font-weight:700;color:var(--navy);
+  font-size:11px;min-width:36px;text-align:center;flex-shrink:0}
+.time-ph{font-weight:600;color:var(--g7)}
+.time-tip{color:var(--g5);font-size:10px;margin-top:1px}
+
+/* ═══════════ IBS COVER (first page) ═══════════ */
+.cover{background:linear-gradient(145deg,#1a3565 0%,#2b5ba8 60%,#1a6fcf 100%);
+  color:#fff;border-radius:12px;padding:36px 40px;margin-bottom:28px;
+  display:flex;align-items:center;gap:32px;position:relative;overflow:hidden}
+.cover::before{content:'';position:absolute;right:-40px;top:-40px;width:220px;height:220px;
+  border-radius:50%;background:rgba(255,255,255,.05)}
+.cover::after{content:'';position:absolute;right:40px;bottom:-30px;width:120px;height:120px;
+  border-radius:50%;background:rgba(255,255,255,.07)}
+.cover-logo{background:#fff;border-radius:10px;padding:8px 18px;
+  font-family:'Arial Black',Arial,sans-serif;font-size:32px;font-weight:900;
+  color:#1a3565;letter-spacing:-1px;flex-shrink:0;line-height:1;z-index:1}
+.cover-text{z-index:1}
+.cover-text h1{font-size:28px;font-weight:700;margin-bottom:6px;letter-spacing:-.3px}
+.cover-text p{font-size:14px;opacity:.8;margin-bottom:3px}
+.cover-text .ct-meta{font-size:12px;opacity:.55;margin-top:8px}
+.cover-tags{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.ctag{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:20px;
+  padding:4px 14px;font-size:11px;font-weight:600}
+@media print{
+  .cover{border-radius:0;margin-bottom:20px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Screen navigation header ── -->
+<div class="screen-hdr no-print">
+  <div class="ibs-badge">IBS</div>
+  <div>
+    <h1>FMCG-цепочка · Печатные материалы</h1>
+    <p>Карточки ролей · Характеры · Шпаргалки игрока и ведущего</p>
+  </div>
+  <nav class="section-nav">
+    <a class="snav" href="#roles">Роли</a>
+    <a class="snav" href="#chars">Характеры</a>
+    <a class="snav" href="#player">Игрок</a>
+    <a class="snav" href="#fac">Ведущий</a>
+  </nav>
+  <button class="print-btn" onclick="window.print()">🖨 Печать / PDF</button>
+</div>
+
+<div class="section">
+
+<!-- ── COVER ── -->
+<div class="cover" id="cover">
+  <div class="cover-logo">IBS</div>
+  <div class="cover-text">
+    <h1>FMCG-цепочка</h1>
+    <p>Деловая игра по управлению цепочкой поставок</p>
+    <p style="opacity:.65;font-size:13px">4 тура · 8 команд · до 32 участников · ~90 минут</p>
+    <div class="cover-tags">
+      <span class="ctag">🏪 Ритейл</span>
+      <span class="ctag">🏭 Производство</span>
+      <span class="ctag">🚛 Дистрибуция</span>
+      <span class="ctag">📊 Прогнозирование</span>
+      <span class="ctag">🤝 Переговоры</span>
+    </div>
+    <div class="ct-meta">IBS · Практикум по цепочке поставок · 2026</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     РАЗДЕЛ 1: КАРТОЧКИ РОЛЕЙ
+═══════════════════════════════════════════ -->
+<div class="section-title" id="roles">Карточки ролей команд</div>
+<p style="font-size:12px;color:var(--g5);margin-bottom:16px">
+  Распечатайте и разрежьте. Каждая команда получает одну карточку актора.
+  Роли внутри команды раздаются случайно через интерфейс.
+</p>
+
+<!-- РИТЕЙЛЕРЫ -->
+<div class="role-cards-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:14px">
+
+  <!-- Р1 Дискаунтер -->
+  <div class="role-card">
+    <div class="rc-hdr ret">
+      <div class="rc-actor">Р1</div>
+      <div class="rc-name">Дискаунтер</div>
+      <div class="rc-type">Ритейлер · низкие цены</div>
+      <div class="rc-ico">🛒</div>
+    </div>
+    <div class="rc-body">
+      <div class="role-row">
+        <div class="role-ico">🎩</div>
+        <div class="role-info">
+          <div class="rn lead">Директор сети</div>
+          <div class="rd">Финальное решение. Ведёт переговоры с другими Директорами</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">🏷️</div>
+        <div class="role-info">
+          <div class="rn">Категорийный менеджер</div>
+          <div class="rd">Ценовая политика и промо по категориям К1–К4</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">📦</div>
+        <div class="role-info">
+          <div class="rn">Менеджер закупок</div>
+          <div class="rd">Объём заказов поставщикам. Следит за перезапасом</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">📈</div>
+        <div class="role-info">
+          <div class="rn">Аналитик спроса</div>
+          <div class="rd">Прогноз спроса. Читает вводную команде на брифинге</div>
+        </div>
+      </div>
+    </div>
+    <div class="rc-footer">🎯 Фокус: <strong>объём + промо-буст × 1.5 при скидке ≥ 10%</strong></div>
+  </div>
+
+  <!-- Р2 Супермаркет -->
+  <div class="role-card">
+    <div class="rc-hdr ret">
+      <div class="rc-actor">Р2</div>
+      <div class="rc-name">Супермаркет</div>
+      <div class="rc-type">Ритейлер · баланс цены и сервиса</div>
+      <div class="rc-ico">🛒</div>
+    </div>
+    <div class="rc-body">
+      <div class="role-row">
+        <div class="role-ico">🎩</div>
+        <div class="role-info">
+          <div class="rn lead">Директор сети</div>
+          <div class="rd">Финальное решение. Ведёт переговоры с другими Директорами</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">🏷️</div>
+        <div class="role-info">
+          <div class="rn">Категорийный менеджер</div>
+          <div class="rd">Ценовая политика и промо по категориям К1–К4</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">📦</div>
+        <div class="role-info">
+          <div class="rn">Менеджер закупок</div>
+          <div class="rd">Объём заказов. Баланс OSA и стоимости запасов</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">📈</div>
+        <div class="role-info">
+          <div class="rn">Аналитик спроса</div>
+          <div class="rd">Прогноз спроса. Читает вводную команде на брифинге</div>
+        </div>
+      </div>
+    </div>
+    <div class="rc-footer">🎯 Фокус: <strong>OSA (полнота полки) и маржа</strong></div>
+  </div>
+
+  <!-- Р3 Гипермаркет -->
+  <div class="role-card">
+    <div class="rc-hdr ret">
+      <div class="rc-actor">Р3</div>
+      <div class="rc-name">Гипермаркет</div>
+      <div class="rc-type">Ритейлер · большой объём</div>
+      <div class="rc-ico">🛒</div>
+    </div>
+    <div class="rc-body">
+      <div class="role-row">
+        <div class="role-ico">🎩</div>
+        <div class="role-info">
+          <div class="rn lead">Директор сети</div>
+          <div class="rd">Финальное решение. Ведёт переговоры с другими Директорами</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">🏷️</div>
+        <div class="role-info">
+          <div class="rn">Категорийный менеджер</div>
+          <div class="rd">Широкий ассортимент, управление промо К1–К4</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">📦</div>
+        <div class="role-info">
+          <div class="rn">Менеджер закупок</div>
+          <div class="rd">Крупные объёмы. Минимизирует дефицит по К2 Fresh</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">📈</div>
+        <div class="role-info">
+          <div class="rn">Аналитик спроса</div>
+          <div class="rd">Прогноз спроса. Читает вводную команде на брифинге</div>
+        </div>
+      </div>
+    </div>
+    <div class="rc-footer">🎯 Фокус: <strong>не перезаказать К2 Fresh — списания в убыток</strong></div>
+  </div>
+</div>
+
+<!-- ПОСТАВЩИКИ -->
+<div class="role-cards-grid" style="margin-bottom:14px">
+
+  <!-- П1 Базовый -->
+  <div class="role-card">
+    <div class="rc-hdr sup">
+      <div class="rc-actor">П1</div>
+      <div class="rc-name">Поставщик «Базовый»</div>
+      <div class="rc-type">Производство К1</div>
+      <div class="rc-ico">🏭</div>
+    </div>
+    <div class="rc-body">
+      <div class="role-row">
+        <div class="role-ico">🎩</div>
+        <div class="role-info">
+          <div class="rn lead">Генеральный директор</div>
+          <div class="rd">Стратегия, переговоры по цене и скидкам</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">🏭</div>
+        <div class="role-info">
+          <div class="rn">Директор производства</div>
+          <div class="rd">Объём выпуска (не выше мощности). Оптимизирует загрузку</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">💼</div>
+        <div class="role-info">
+          <div class="rn">Коммерческий директор</div>
+          <div class="rd">Отпускные цены, скидки ритейлерам</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">📊</div>
+        <div class="role-info">
+          <div class="rn">Планировщик S&OP</div>
+          <div class="rd">Баланс мощности и прогноза спроса</div>
+        </div>
+      </div>
+    </div>
+    <div class="rc-footer">🎯 Фокус: <strong>загрузка мощности = прибыль, простой = убыток</strong></div>
+  </div>
+
+  <!-- П2 Fresh -->
+  <div class="role-card">
+    <div class="rc-hdr sup">
+      <div class="rc-actor">П2</div>
+      <div class="rc-name">Поставщик «Fresh»</div>
+      <div class="rc-type">Производство К2 · скоропорт</div>
+      <div class="rc-ico">🥦</div>
+    </div>
+    <div class="rc-body">
+      <div class="role-row">
+        <div class="role-ico">🎩</div>
+        <div class="role-info">
+          <div class="rn lead">Генеральный директор</div>
+          <div class="rd">Стратегия, переговоры. Особый риск — перепроизводство</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">🏭</div>
+        <div class="role-info">
+          <div class="rn">Директор производства</div>
+          <div class="rd">⚠️ Произвёл больше заказа → всё лишнее СПИСЫВАЕТСЯ в убыток</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">💼</div>
+        <div class="role-info">
+          <div class="rn">Коммерческий директор</div>
+          <div class="rd">Отпускная цена. Скидка привлекает заказы → снижает риск списания</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">📊</div>
+        <div class="role-info">
+          <div class="rn">Планировщик S&OP</div>
+          <div class="rd">Точный прогноз критичен: перепрогноз = реальный убыток</div>
+        </div>
+      </div>
+    </div>
+    <div class="rc-footer" style="background:#fff5f5">⚠️ Главный риск: <strong>перепроизводство = списания К2</strong></div>
+  </div>
+
+  <!-- П3 Промо-хиты -->
+  <div class="role-card">
+    <div class="rc-hdr sup">
+      <div class="rc-actor">П3</div>
+      <div class="rc-name">Поставщик «Промо»</div>
+      <div class="rc-type">Производство К3 · промо-хиты</div>
+      <div class="rc-ico">🎁</div>
+    </div>
+    <div class="rc-body">
+      <div class="role-row">
+        <div class="role-ico">🎩</div>
+        <div class="role-info">
+          <div class="rn lead">Генеральный директор</div>
+          <div class="rd">Стратегия. В Туре 2 — ключевые переговоры по промо-буст К3</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">🏭</div>
+        <div class="role-info">
+          <div class="rn">Директор производства</div>
+          <div class="rd">Объём выпуска. В Туре 2 спрос К3 вырастает при промо</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">💼</div>
+        <div class="role-info">
+          <div class="rn">Коммерческий директор</div>
+          <div class="rd">Скидка ≥10% ритейлеру → промо-буст × 1.5 по К3</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">📊</div>
+        <div class="role-info">
+          <div class="rn">Планировщик S&OP</div>
+          <div class="rd">Следит за эффектом хлыста: заказы не должны скакать</div>
+        </div>
+      </div>
+    </div>
+    <div class="rc-footer">🎯 Фокус: <strong>Тур 2 — промо-окно, подготовиться заранее</strong></div>
+  </div>
+
+  <!-- П4 Импорт -->
+  <div class="role-card">
+    <div class="rc-hdr sup">
+      <div class="rc-actor">П4</div>
+      <div class="rc-name">Поставщик «Импорт»</div>
+      <div class="rc-type">Производство К4 · ограниченная квота</div>
+      <div class="rc-ico">🚢</div>
+    </div>
+    <div class="rc-body">
+      <div class="role-row">
+        <div class="role-ico">🎩</div>
+        <div class="role-info">
+          <div class="rn lead">Генеральный директор</div>
+          <div class="rd">Стратегия. В Туре 3 квота падает с 70 до 30 — кризис!</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">🏭</div>
+        <div class="role-info">
+          <div class="rn">Директор производства</div>
+          <div class="rd">Ограниченная мощность. В Туре 3 внешний шок сокращает квоту</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">💼</div>
+        <div class="role-info">
+          <div class="rn">Коммерческий директор</div>
+          <div class="rd">Дефицит → рычаг для цены. Но злоупотреблять — риск для здоровья цепочки</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">📊</div>
+        <div class="role-info">
+          <div class="rn">Планировщик S&OP</div>
+          <div class="rd">Приоритизация: кому отдать дефицитный объём в Туре 3?</div>
+        </div>
+      </div>
+    </div>
+    <div class="rc-footer" style="background:#fff5e8">⚠️ Тур 3: <strong>квота 30 ед. вместо 70 — договоритесь заранее</strong></div>
+  </div>
+</div>
+
+<!-- ДИСТРИБЬЮТОР -->
+<div class="role-cards-grid" style="grid-template-columns:1fr 2fr;margin-bottom:32px">
+  <div class="role-card">
+    <div class="rc-hdr dist">
+      <div class="rc-actor">Д</div>
+      <div class="rc-name">Дистрибьютор</div>
+      <div class="rc-type">Логистика · все потоки</div>
+      <div class="rc-ico">🚛</div>
+    </div>
+    <div class="rc-body">
+      <div class="role-row">
+        <div class="role-ico">🎩</div>
+        <div class="role-info">
+          <div class="rn lead">Управляющий директор</div>
+          <div class="rd">Тариф за перевозку. Переговоры с ритейлерами и поставщиками</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">🚚</div>
+        <div class="role-info">
+          <div class="rn">Директор логистики</div>
+          <div class="rd">Распределение мощностей (в Туре 3 — 200 вместо 320)</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">🤝</div>
+        <div class="role-info">
+          <div class="rn">Менеджер по клиентам</div>
+          <div class="rd">Приоритеты при дефиците мощности. Управление конфликтом интересов</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">🧮</div>
+        <div class="role-info">
+          <div class="rn">Аналитик загрузки</div>
+          <div class="rd">Оптимизация тарифа. Высокий тариф = маржа дист-ра, но убивает здоровье</div>
+        </div>
+      </div>
+    </div>
+    <div class="rc-footer" style="background:#f8f0ff">⚠️ Тур 3: <strong>мощность упадёт до 200 — кто едет первым?</strong></div>
+  </div>
+
+  <!-- Памятка к ролям -->
+  <div class="role-card" style="border:2px dashed var(--g3);box-shadow:none;background:var(--g1)">
+    <div style="padding:18px 20px">
+      <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+        📋 Памятка: зоны ответственности ролей
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:11px">
+        <div>
+          <div style="font-weight:700;color:var(--g7);margin-bottom:6px">🎩 Директор (капитан)</div>
+          <ul style="padding-left:14px;color:var(--g5);line-height:1.7">
+            <li>Финальное слово по всем решениям</li>
+            <li>Выходит на переговоры с другими командами</li>
+            <li>Характер Директора = стиль команды на торгах</li>
+            <li>Может делегировать расчёты аналитику</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-weight:700;color:var(--g7);margin-bottom:6px">📦 / 🏭 Закупщик/Производство</div>
+          <ul style="padding-left:14px;color:var(--g5);line-height:1.7">
+            <li>Предлагает объём решения на Совете</li>
+            <li>Контролирует риск перезапаса/недопоставки</li>
+          </ul>
+          <div style="font-weight:700;color:var(--g7);margin:8px 0 6px">🏷️ / 💼 Ценообразование</div>
+          <ul style="padding-left:14px;color:var(--g5);line-height:1.7">
+            <li>Цена, скидка, промо</li>
+            <li>Считает маржу на Совете</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-weight:700;color:var(--g7);margin-bottom:6px">📈 / 📊 Аналитик</div>
+          <ul style="padding-left:14px;color:var(--g5);line-height:1.7">
+            <li>Читает вводную на Брифинге</li>
+            <li>Даёт прогноз спроса / загрузки</li>
+            <li>Объясняет результаты после расчёта</li>
+          </ul>
+        </div>
+        <div style="background:linear-gradient(135deg,#f0f4ff,#e8f0fb);border-radius:8px;padding:10px 12px">
+          <div style="font-size:10px;font-weight:700;color:var(--navy);margin-bottom:4px">💡 Если в команде < 4 человек</div>
+          <div style="font-size:10px;color:var(--g5);line-height:1.5">
+            Берите роли по списку сверху вниз. <strong>Директор есть всегда</strong> — он капитан.
+            При 2 людях: Директор + Аналитик.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     РАЗДЕЛ 2: КАРТОЧКИ ХАРАКТЕРОВ
+═══════════════════════════════════════════ -->
+<div class="section-title page-break" id="chars">Карточки характеров</div>
+<p style="font-size:12px;color:var(--g5);margin-bottom:16px">
+  Характер выпадает Директору случайно через интерфейс. Раздайте карточку — и игрок отыгрывает её на переговорах.
+</p>
+
+<div class="char-cards-grid">
+
+  <!-- Жёсткий -->
+  <div class="char-card ch-hard">
+    <div class="cc-sep"></div>
+    <div class="cc-hdr">
+      <div class="cc-ico">🦁</div>
+      <div>
+        <div class="cc-name">Жёсткий</div>
+        <div class="cc-tag">Директивный</div>
+      </div>
+    </div>
+    <div class="cc-body">
+      <p>Диктует условия с позиции силы. Почти не уступает — любое отступление воспринимает как слабость.</p>
+      <div class="cc-rule">
+        <strong>На переговорах:</strong> начинай с максимального требования. Соглашайся не раньше третьего предложения партнёра.
+      </div>
+    </div>
+  </div>
+
+  <!-- Кооперативный -->
+  <div class="char-card ch-coop">
+    <div class="cc-sep"></div>
+    <div class="cc-hdr">
+      <div class="cc-ico">🤝</div>
+      <div>
+        <div class="cc-name">Кооперативный</div>
+        <div class="cc-tag">Win-Win</div>
+      </div>
+    </div>
+    <div class="cc-body">
+      <p>Ищет взаимовыгодные решения. Легко идёт навстречу, готов делиться информацией о своём прогнозе.</p>
+      <div class="cc-rule">
+        <strong>На переговорах:</strong> первым предлагай компромисс. Делись прогнозом спроса — это поднимает здоровье цепочки всем.
+      </div>
+    </div>
+  </div>
+
+  <!-- Хитрый -->
+  <div class="char-card ch-fox">
+    <div class="cc-sep"></div>
+    <div class="cc-hdr">
+      <div class="cc-ico">🦊</div>
+      <div>
+        <div class="cc-name">Хитрый</div>
+        <div class="cc-tag">Тактик</div>
+      </div>
+    </div>
+    <div class="cc-body">
+      <p>Завышает запросы, делает «ложные» уступки. Умеет казаться гибким, получая своё.</p>
+      <div class="cc-rule">
+        <strong>На переговорах:</strong> начинай с нереальных условий. Уступай в мелочах, удерживай ключевое требование.
+      </div>
+    </div>
+  </div>
+
+  <!-- Упрямый -->
+  <div class="char-card ch-stub">
+    <div class="cc-sep"></div>
+    <div class="cc-hdr">
+      <div class="cc-ico">😤</div>
+      <div>
+        <div class="cc-name">Упрямый</div>
+        <div class="cc-tag">Негибкий</div>
+      </div>
+    </div>
+    <div class="cc-body">
+      <p>Держит позицию несмотря ни на что. Не реагирует на аргументы — только на факты и цифры.</p>
+      <div class="cc-rule">
+        <strong>На переговорах:</strong> зафиксируй позицию в начале. Меняй её только при изменении ЦИФР, не слов.
+      </div>
+    </div>
+  </div>
+
+  <!-- Аналитик -->
+  <div class="char-card ch-anal">
+    <div class="cc-sep"></div>
+    <div class="cc-hdr">
+      <div class="cc-ico">📊</div>
+      <div>
+        <div class="cc-name">Аналитик</div>
+        <div class="cc-tag">Рациональный</div>
+      </div>
+    </div>
+    <div class="cc-body">
+      <p>Обосновывает каждое решение данными. Принимает взвешенные решения — медленно, но точно.</p>
+      <div class="cc-rule">
+        <strong>На переговорах:</strong> требуй цифровое обоснование от партнёра. Сам показывай расчёты — это обезоруживает жёстких.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════
+     РАЗДЕЛ 3: ШПАРГАЛКА ИГРОКА
+═══════════════════════════════════════════ -->
+<div class="section-title page-break" id="player">Шпаргалка игрока</div>
+<p style="font-size:12px;color:var(--g5);margin-bottom:16px">Распечатайте по одной на каждого участника.</p>
+
+<div class="qr-grid">
+
+  <!-- Ход тура -->
+  <div class="qr-card">
+    <div class="qr-hdr"><div class="qh-ico">🔄</div><h3>Ход одного тура (5 фаз)</h3></div>
+    <div class="qr-body">
+      <ul class="phase-list">
+        <li class="phase-item">
+          <div class="ph-num">1</div>
+          <div class="ph-text">
+            <div class="pht">Брифинг (~2 мин)</div>
+            <div class="phd">Аналитик читает вводную: спрос К1–К4, событие тура, условия рынка</div>
+          </div>
+        </li>
+        <li class="phase-item">
+          <div class="ph-num">2</div>
+          <div class="ph-text">
+            <div class="pht">Совет команды (~3 мин)</div>
+            <div class="phd">Каждый вносит вклад по своей роли. Директор резюмирует позицию</div>
+          </div>
+        </li>
+        <li class="phase-item">
+          <div class="ph-num">3</div>
+          <div class="ph-text">
+            <div class="pht">Переговоры (~3 мин)</div>
+            <div class="phd">Директор договаривается с другими командами. Скидки, тарифы, приоритеты</div>
+          </div>
+        </li>
+        <li class="phase-item">
+          <div class="ph-num">4</div>
+          <div class="ph-text">
+            <div class="pht">Решения (~2 мин)</div>
+            <div class="phd">Вносим финальные цифры и подтверждаем решение в интерфейсе</div>
+          </div>
+        </li>
+        <li class="phase-item">
+          <div class="ph-num">5</div>
+          <div class="ph-text">
+            <div class="pht">Расчёт и разбор (~3 мин)</div>
+            <div class="phd">Движок считает. На экране: прибыль, здоровье цепочки, рейтинг и урок</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Счёт и победа -->
+  <div class="qr-card">
+    <div class="qr-hdr"><div class="qh-ico">🏆</div><h3>Счёт и победа</h3></div>
+    <div class="qr-body">
+      <div class="score-formula">
+        <div class="sf-main">Счёт за тур = Прибыль + Здоровье × 250 × Личный вклад</div>
+        <div class="sf-sub">H — общий для всех (договаривайтесь!). Вклад — твой: Р — OSA, П — выполнение заказов, Д — доля довезённого</div>
+      </div>
+      <div class="kpi-mini">
+        <div class="km"><div class="kl">OSA (полнота полки)</div><div class="kv">35% веса в здоровье</div></div>
+        <div class="km"><div class="kl">Низкий дефицит</div><div class="kv">25% веса</div></div>
+        <div class="km"><div class="kl">Антихлыст (стабильность)</div><div class="kv">25% веса</div></div>
+        <div class="km"><div class="kl">Мало списаний Fresh</div><div class="kv">15% веса</div></div>
+      </div>
+      <div class="awards-mini">
+        <div class="am"><div class="ai">🏆</div><div><div class="an">Гран-при</div><div class="ad">Максимальный суммарный счёт за 4 тура</div></div></div>
+        <div class="am"><div class="ai">🤝</div><div><div class="an">Архитектор цепочки</div><div class="ad">Лучший вклад в здоровье (OSA / сервис)</div></div></div>
+        <div class="am"><div class="ai">📉</div><div><div class="an">Антихлыст</div><div class="ad">Самые стабильные объёмы за все туры</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Советы -->
+  <div class="qr-card">
+    <div class="qr-hdr"><div class="qh-ico">✅</div><h3>Делай так</h3></div>
+    <div class="qr-body">
+      <ul class="tip-list">
+        <li class="tip-item"><span class="tip-ico">📊</span><span>Заказывай близко к реальному спросу — перезаказ раскачивает цепочку (эффект хлыста)</span></li>
+        <li class="tip-item"><span class="tip-ico">🗣️</span><span>Делись прогнозом с соседним звеном на переговорах — это поднимает здоровье и бонус всем</span></li>
+        <li class="tip-item"><span class="tip-ico">⚡</span><span>Готовься к Туру 3: будет шок мощностей и квот. Договорись о приоритетах заранее</span></li>
+        <li class="tip-item"><span class="tip-ico">🎯</span><span>Промо К3 со скидкой ≥10% даёт буст ×1.5. Но кто-то должен произвести больше — обсуди с П3</span></li>
+        <li class="tip-item"><span class="tip-ico">🚛</span><span>Тариф дистрибьютора влияет на всех. Слишком высокий — убивает здоровье цепочки и твой бонус</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Анти-паттерны -->
+  <div class="qr-card">
+    <div class="qr-hdr" style="background:linear-gradient(135deg,#c0392b,#e74c3c)"><div class="qh-ico">🚫</div><h3>Не делай так</h3></div>
+    <div class="qr-body">
+      <ul class="tip-list">
+        <li class="tip-item"><span class="tip-ico">❌</span><span>«Закажу с запасом на всякий случай» — перезапас, списания К2, обвал здоровья цепочки</span></li>
+        <li class="tip-item"><span class="tip-ico">❌</span><span>Гнаться только за прибылью, игнорируя дефицит — теряешь бонус 250 у.е. × 4 тура = 1000 у.е.</span></li>
+        <li class="tip-item"><span class="tip-ico">❌</span><span>П2 (Fresh) — перепроизводить. Всё лишнее списывается напрямую в убыток</span></li>
+        <li class="tip-item"><span class="tip-ico">❌</span><span>Промо со скидкой &lt;10% — буст НЕ даётся, маржа режется впустую</span></li>
+        <li class="tip-item"><span class="tip-ico">❌</span><span>Дистрибьютор с тарифом выше разумного — цепочка задыхается, и твой бонус тоже падает</span></li>
+      </ul>
+    </div>
+  </div>
+
+</div><!-- end qr-grid -->
+
+<!-- ══════════════════════════════════════════
+     РАЗДЕЛ 4: ШПАРГАЛКА ВЕДУЩЕГО
+═══════════════════════════════════════════ -->
+<div class="section-title page-break" id="fac">Шпаргалка ведущего</div>
+<p style="font-size:12px;color:var(--g5);margin-bottom:16px">Оперативный сценарий. Держите перед собой во время игры.</p>
+
+<div class="fac-grid">
+
+  <!-- Тайминги -->
+  <div class="fac-card">
+    <div class="fac-hdr">⏱ Тайминги одного тура (~13 мин)</div>
+    <div class="fac-body">
+      <div class="time-row"><div class="time-mm">2 мин</div><div><div class="time-ph">1. Брифинг</div><div class="time-tip">Озвучьте спрос и событие тура. «Смотрим на экран»</div></div></div>
+      <div class="time-row"><div class="time-mm">3 мин</div><div><div class="time-ph">2. Совет команды</div><div class="time-tip">«Совещайтесь. Директор резюмирует»</div></div></div>
+      <div class="time-row"><div class="time-mm">3 мин</div><div><div class="time-ph">3. Переговоры</div><div class="time-tip">«Директора — на переговоры». Можно ходить между столами</div></div></div>
+      <div class="time-row"><div class="time-mm">2 мин</div><div><div class="time-ph">4. Решения</div><div class="time-tip">«Вносим и подтверждаем». Напомните опаздывающим</div></div></div>
+      <div class="time-row"><div class="time-mm">3 мин</div><div><div class="time-ph">5. Расчёт и разбор</div><div class="time-tip">Запустите расчёт. Задайте один вопрос по экрану</div></div></div>
+    </div>
+  </div>
+
+  <!-- События по турам -->
+  <div class="fac-card">
+    <div class="fac-hdr">📅 События по турам</div>
+    <div class="fac-body">
+      <table class="fac-tbl">
+        <thead>
+          <tr><th>Тур</th><th>Событие</th><th>Вопрос для разбора</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="t-num">Тур 1</td>
+            <td>Стартовый рынок. Спокойно</td>
+            <td>«Кто заказал сильно больше спроса?»</td>
+          </tr>
+          <tr class="t-promo">
+            <td class="t-num">Тур 2</td>
+            <td>
+              <span class="event-badge ev-promo">📢 ПРОМО</span><br>
+              К3 ×1.5 при скидке ≥10%. Спрос К3 = 110
+            </td>
+            <td>«Промо дало буст — но кто заплатил за него?»</td>
+          </tr>
+          <tr class="t-shock">
+            <td class="t-num">Тур 3</td>
+            <td>
+              <span class="event-badge ev-shock">🚨 ШОК</span><br>
+              Дист-р: 320→200. П4 квота: 70→30. К2↑ К4↓
+            </td>
+            <td>«Как дист-р распределил дефицит? Справедливо?»</td>
+          </tr>
+          <tr>
+            <td class="t-num">Тур 4</td>
+            <td>
+              <span class="event-badge ev-stab">📊 СТАБИЛ.</span><br>
+              Восстановление. Последний шанс отыграть маржу
+            </td>
+            <td>«Чья стратегия оказалась устойчивой?»</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Вступление -->
+  <div class="fac-card">
+    <div class="fac-hdr">🎤 Вступительная речь</div>
+    <div class="fac-body" style="font-size:12px;color:var(--g7);line-height:1.65;font-style:italic">
+      <p>«Вы — звенья одной цепочки поставок. Каждый хочет заработать, но связаны вы все. Перезакажете — обвалите склад соседу. Зажмёте тариф — задушите цепочку.</p>
+      <p style="margin-top:8px">Победит не самый жадный, а самый умный: кто зарабатывает <strong>И</strong> держит цепочку здоровой. Поехали.»</p>
+      <div style="margin-top:14px;background:var(--g1);border-radius:8px;padding:10px 12px;font-style:normal;font-size:11px">
+        <strong style="color:var(--navy)">После распределения ролей:</strong><br>
+        «Директор — ваш голос на переговорах. Характер — не шутка, торгуйтесь в его логике.»
+      </div>
+    </div>
+  </div>
+
+  <!-- Дебриф -->
+  <div class="fac-card">
+    <div class="fac-hdr">💬 Вопросы для дебрифа (15 мин)</div>
+    <div class="fac-body">
+      <ul class="tip-list" style="gap:7px">
+        <li class="tip-item"><span class="tip-ico">1️⃣</span><span style="font-size:11px">Насколько сильнее «раскачались» заказы поставщиков по сравнению с реальным спросом?</span></li>
+        <li class="tip-item"><span class="tip-ico">2️⃣</span><span style="font-size:11px">Что вы согласовали бы <em>до игры</em>, зная её исход?</span></li>
+        <li class="tip-item"><span class="tip-ico">3️⃣</span><span style="font-size:11px">Какая минимальная координация дала бы максимальный прирост здоровья?</span></li>
+        <li class="tip-item"><span class="tip-ico">4️⃣</span><span style="font-size:11px">Где ваши KPI конфликтовали с интересом цепочки?</span></li>
+        <li class="tip-item"><span class="tip-ico">5️⃣</span><span style="font-size:11px">Кто в реальной работе «дистрибьютор с ограниченной мощностью»?</span></li>
+      </ul>
+      <div style="margin-top:12px;background:linear-gradient(135deg,#f0f4ff,#e8f0fb);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--navy)">
+        <strong>Ключевая мысль финала:</strong> «Бонус двойной: общий множитель H цепочка зарабатывает вместе, а личный вклад — твоя служба цепочке. Эгоист с плохим сервисом теряет бонус даже при здоровой системе.»
+      </div>
+    </div>
+  </div>
+
+</div><!-- end fac-grid -->
+
+<!-- IBS footer -->
+<div style="margin-top:32px;padding-top:16px;border-top:1px solid var(--g3);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--g5)">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="background:linear-gradient(135deg,var(--navy),var(--blue));border-radius:4px;padding:2px 8px;font-family:'Arial Black',Arial,sans-serif;font-size:12px;font-weight:900;color:#fff">IBS</div>
+    <span>FMCG-цепочка · Деловая игра по цепочке поставок</span>
+  </div>
+  <span>© IBS 2026 · Только для внутреннего использования</span>
+</div>
+
+</div><!-- end .section -->
+</body>
+</html>
