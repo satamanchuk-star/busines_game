@@ -430,7 +430,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 // ═══════════════════════════════════════
 const G = {
   catIds:   ['Бакалея','Молочка','Снеки','Деликатесы'],
-  catNames: ['Базовая','Fresh','Промо-хиты','Импорт/премиум'],
+  catNames: ['долгий срок','скоропорт','промо','импорт'],
   catColor: ['#2e5f8a','#1a7a5e','#7b3fa0','#c0392b'],
   cost:     [6,8,7,14],
   optBase:  [10,13,12,22],
@@ -1303,13 +1303,23 @@ function renderTeamDecisionForm(r) {
 
   let h = `<div class="card-t" style="margin-bottom:12px">📝 Тур ${r+1}: ${G.roundNames[r]} — Ваши решения</div>`;
 
+  // Принятые сделки этой команды (этот тур или без указания тура)
+  const myAgrs = (gs.agreements||[]).filter(a=>(a.from===tid||a.to===tid)&&a.structured&&(a.round==null||a.round===r));
+  const lastDeal = pred => { const m=myAgrs.filter(pred); return m.length?m[m.length-1]:null; };
+  const dealBadge = txt => `<div style="font-size:11px;background:#dcfce7;border-radius:5px;padding:3px 8px;margin-bottom:5px;color:#166534">✅ Договорённость: ${txt}</div>`;
+
   if (isDist) {
     const dc = G.distCap[r];
+    const tarDeal = lastDeal(a=>a.structured.type==='tariff');
+    const tarVal = tarDeal ? tarDeal.structured.value : 1.5;
+    const prioDeals = myAgrs.filter(a=>a.structured.type==='priority');
     h += `<div class="card"><div class="card-t">🚛 ${G.LBL['D']} · ${gs.names['D']}</div>
+      ${tarDeal?dealBadge(dealDesc(tarDeal.structured)):''}
       <div class="frow"><div class="fld"><label>Тариф (у.е./ед.)</label>
-        <input type="number" id="t-tar" value="1.5" min="1" max="3" step="0.1"></div>
+        <input type="number" id="t-tar" value="${tarVal}" min="1" max="3" step="0.1"></div>
       <div class="fld"><label>Мощность (ед.)</label>
         <input type="number" id="t-cap" value="${dc}" min="0" max="500"></div></div>
+      ${prioDeals.length?`<div style="font-size:11px;color:#166534;margin-top:6px">🤝 Приоритеты: ${prioDeals.map(a=>`${G.LBL[a.from===tid?a.to:a.from]} (${a.structured.value} ед.)`).join(', ')}</div>`:''}
       <p style="font-size:12px;color:var(--g5);margin-top:6px">
         Диапазон тарифа: 1.0–3.0 у.е./ед. Себест. перевозки: 0.8 у.е./ед.${r===2?' ⚠️ Мощность ограничена!':''}</p>
     </div>`;
@@ -1323,12 +1333,16 @@ function renderTeamDecisionForm(r) {
         <input type="number" id="t-prod" value="${quota||maxQ}" min="0" max="${maxQ}">
         <span style="font-size:11px;color:var(--g5)">Макс. мощность: ${maxQ} ед.${quota?` | Квота Тур 3: ${quota} ед.!`:''}</span>
       </div>
-      <div class="fld mt3" style="margin-top:10px"><label>Ваша цена/скидки по ритейлерам (заполняется переговорно)</label>
+      <div class="fld mt3" style="margin-top:10px"><label>Ваши скидки по магазинам (заполняется переговорно)</label>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:4px">
-          ${G.retIds.map((rid,ridx)=>`<div class="fld">
+          ${G.retIds.map((rid,ridx)=>{
+            const d=lastDeal(a=>a.structured.type==='discount'&&(a.from===rid||a.to===rid));
+            const dv=d?d.structured.value:0;
+            return `<div class="fld">
             <label>${G.LBL[rid]} · ${gs.names[rid]}</label>
-            <input type="number" id="t-dsc-${ridx}" value="0" min="0" max="50" placeholder="скидка %">
-          </div>`).join('')}
+            <input type="number" id="t-dsc-${ridx}" value="${dv}" min="0" max="50" placeholder="скидка %"
+              ${dv?'style="border-color:#22c55e;background:#f0fdf4"':''}>
+          </div>`;}).join('')}
         </div>
       </div>
     </div>`;
@@ -1337,18 +1351,19 @@ function renderTeamDecisionForm(r) {
   if (isRet) {
     h += `<div class="ret-body" style="padding:0">`;
     G.catIds.forEach((cat,ci)=>{
-      const defOrd=Math.round(G.demand[r][ci]*G.fShare[ci][ri]);
-      // Check if there's an accepted proposal for this category
-      const accepted = (gs.agreements||[]).filter(a=>a.to===tid&&a.structured?.category===cat);
-      const acceptedDsc = accepted.length ? accepted[accepted.length-1].structured.discount : 0;
+      const dscDeal = lastDeal(a=>a.structured.type==='discount'&&a.structured.category===cat);
+      const volDeal = lastDeal(a=>a.structured.type==='volume'&&a.structured.category===cat);
+      const acceptedDsc = dscDeal ? dscDeal.structured.value : 0;
+      const defOrd = volDeal ? volDeal.structured.value : Math.round(G.demand[r][ci]*G.fShare[ci][ri]);
+      const badges = [dscDeal?`скидка ${acceptedDsc}%`:null, volDeal?`объём ${defOrd} ед.`:null].filter(Boolean);
       h+=`<div class="cat-row" id="t-cr-${ci}">
         <div class="cat-rt">
           <span class="cat-nm" style="color:${G.catColor[ci]}">${cat} ${G.catNames[ci]}</span>
           <label class="tgl"><input type="checkbox" id="t-a-${ci}" checked onchange="togTeamRow(${ci})"><span class="tgl-s"></span></label>
         </div>
-        ${accepted.length?`<div style="font-size:11px;background:#dcfce7;border-radius:5px;padding:3px 8px;margin-bottom:5px;color:#166534">✅ Договорённость: скидка ${acceptedDsc}%</div>`:''}
+        ${badges.length?dealBadge(badges.join(' · ')):''}
         <div class="frow">
-          <div class="fld"><label>Заказ ед.</label><input type="number" id="t-o-${ci}" value="${defOrd}" min="0"></div>
+          <div class="fld"><label>Заказ ед.</label><input type="number" id="t-o-${ci}" value="${defOrd}" min="0"${volDeal?' style="border-color:#22c55e;background:#f0fdf4"':''}></div>
           <div class="fld"><label>Цена</label><select id="t-p-${ci}">
             <option value="0">Агрессивная</option><option value="1" selected>Стандарт</option><option value="2">Премиальная</option>
           </select></div>
@@ -1356,7 +1371,7 @@ function renderTeamDecisionForm(r) {
         <div class="frow">
           <div class="fld"><label>Промо</label><select id="t-pm-${ci}"><option value="0">Нет</option><option value="1">Да</option></select></div>
           <div class="fld"><label>Скидка пост. %</label>
-            <input type="number" id="t-ds-${ci}" value="${acceptedDsc}" min="0" max="50"></div>
+            <input type="number" id="t-ds-${ci}" value="${acceptedDsc}" min="0" max="50"${dscDeal?' style="border-color:#22c55e;background:#f0fdf4"':''}></div>
         </div>
       </div>`;
     });
@@ -1424,7 +1439,7 @@ function renderTeamSide() {
       h+=`<div class="prop-card pending">
         <div class="from">${G.LBL[p.from]||p.from} · ${gs.names[p.from]||p.from} → вам</div>
         <div class="text">${escHtml(p.text)}</div>
-        ${p.structured?`<div style="font-size:11px;color:var(--g5);margin-bottom:4px">Кат: ${p.structured.category} · Скидка: ${p.structured.discount}%</div>`:''}
+        ${p.structured?`<div style="font-size:11px;color:var(--A);font-weight:600;margin-bottom:4px">📋 ${dealDesc(p.structured)}</div>`:''}
         <div class="prop-actions">
           <button class="btn btn-ok btn-xs" onclick="replyProp('${p.id}',true)">✓ Принять</button>
           <button class="btn btn-S btn-xs" onclick="replyProp('${p.id}',false)">✗ Отклонить</button>
@@ -1453,15 +1468,17 @@ function renderTeamSide() {
     const others = G.allTeams.filter(t=>t!==tid);
     h += `<div class="prop-form"><h4>📤 Отправить предложение</h4>
       <div class="fld" style="margin-bottom:6px"><label>Кому</label>
-        <select id="prop-to">${others.map(t=>`<option value="${t}">${G.LBL[t]||t} · ${gs.names[t]||t}</option>`).join('')}</select></div>
-      <div class="fld" style="margin-bottom:6px"><label>Текст</label>
-        <textarea id="prop-text" style="width:100%;height:60px;border:1px solid var(--g3);border-radius:6px;padding:6px;font-size:12px;resize:vertical;font-family:inherit" placeholder="Скидка 12% при заказе ≥30 ед.…"></textarea></div>
-      <div class="frow3" style="margin-bottom:6px">
-        <div class="fld"><label>Категория</label>
-          <select id="prop-cat"><option value="">—</option>${G.catIds.map(c=>`<option>${c}</option>`).join('')}</select></div>
-        <div class="fld"><label>Скидка %</label><input type="number" id="prop-dsc" value="0" min="0" max="50"></div>
-        <div class="fld"><label>Мин. объём</label><input type="number" id="prop-vol" value="0" min="0"></div>
+        <select id="prop-to" onchange="updPropTypes()">${others.map(t=>`<option value="${t}">${G.LBL[t]||t} · ${gs.names[t]||t}</option>`).join('')}</select></div>
+      <div class="frow" style="margin-bottom:6px">
+        <div class="fld"><label>Тип сделки</label>
+          <select id="prop-type" onchange="updPropFields()"></select></div>
+        <div class="fld" id="prop-cat-wrap"><label>Категория</label>
+          <select id="prop-cat">${G.catIds.map(c=>`<option>${c}</option>`).join('')}</select></div>
       </div>
+      <div class="fld" style="margin-bottom:6px"><label id="prop-val-lbl">Значение</label>
+        <input type="number" id="prop-val" value="0" min="0" step="0.5"></div>
+      <div class="fld" style="margin-bottom:6px"><label>Комментарий (необязательно)</label>
+        <textarea id="prop-text" style="width:100%;height:44px;border:1px solid var(--g3);border-radius:6px;padding:6px;font-size:12px;resize:vertical;font-family:inherit" placeholder="напр. при заказе ≥30 ед."></textarea></div>
       <button class="btn btn-P btn-sm" style="width:100%;justify-content:center" onclick="sendProposal()">Отправить</button>
     </div>`;
   }
@@ -1482,6 +1499,7 @@ function renderTeamSide() {
   }
 
   el.innerHTML = h;
+  updPropTypes();
 }
 
 function renderTeamActions() {
@@ -1591,15 +1609,56 @@ function submitTeamDecision() {
   renderTeam();
 }
 
+// ── Структурные сделки ──
+const DEAL_TYPES = {
+  discount:{label:'Скидка %',      vlabel:'Скидка, %',         cat:true,  unit:'%'},
+  volume:  {label:'Объём ед.',     vlabel:'Объём, ед.',        cat:true,  unit:' ед.'},
+  tariff:  {label:'Тариф у.е./ед.',vlabel:'Тариф, у.е./ед.',   cat:false, unit:' у.е./ед.'},
+  priority:{label:'Приоритет ед.', vlabel:'Приоритет в доставке, ед.', cat:false, unit:' ед.'},
+};
+// какие типы сделок уместны для пары команд
+function dealTypesFor(a,b){
+  const set=new Set();
+  const pair=[G.type(a),G.type(b)];
+  if(pair.includes('ret')&&pair.includes('sup')){ set.add('discount'); set.add('volume'); }
+  if(pair.includes('dist')){ set.add('tariff'); set.add('priority'); }
+  if(!set.size){ set.add('discount'); set.add('volume'); }
+  return [...set];
+}
+function dealDesc(s){
+  if(!s) return '';
+  if(s.type==='discount') return `Скидка ${s.value}% на «${s.category}»`;
+  if(s.type==='volume')   return `Объём ${s.value} ед. «${s.category}»`;
+  if(s.type==='tariff')   return `Тариф ${s.value} у.е./ед.`;
+  if(s.type==='priority') return `Приоритет в доставке ${s.value} ед.`;
+  return '';
+}
+function updPropTypes(){
+  const to=document.getElementById('prop-to')?.value;
+  const sel=document.getElementById('prop-type'); if(!to||!sel) return;
+  const types=dealTypesFor(me.teamId,to);
+  sel.innerHTML=types.map(t=>`<option value="${t}">${DEAL_TYPES[t].label}</option>`).join('');
+  updPropFields();
+}
+function updPropFields(){
+  const t=document.getElementById('prop-type')?.value;
+  const meta=DEAL_TYPES[t]; if(!meta) return;
+  const catWrap=document.getElementById('prop-cat-wrap');
+  if(catWrap) catWrap.style.display=meta.cat?'':'none';
+  const lbl=document.getElementById('prop-val-lbl'); if(lbl) lbl.textContent=meta.vlabel;
+}
 function sendProposal() {
   const to = document.getElementById('prop-to')?.value;
-  const text = document.getElementById('prop-text')?.value?.trim();
-  const cat = document.getElementById('prop-cat')?.value;
-  const dsc = parseFloat(document.getElementById('prop-dsc')?.value)||0;
-  const vol = parseFloat(document.getElementById('prop-vol')?.value)||0;
-  if (!to||!text) return;
-  ws_send({ type:'proposal', to, text,
-    structured: cat ? {category:cat,discount:dsc,minVol:vol} : null });
+  const type = document.getElementById('prop-type')?.value;
+  const meta = DEAL_TYPES[type];
+  const value = parseFloat(document.getElementById('prop-val')?.value)||0;
+  const cat = meta?.cat ? document.getElementById('prop-cat')?.value : null;
+  const note = document.getElementById('prop-text')?.value?.trim()||'';
+  if (!to||!meta) return;
+  const structured = {type, value, category:cat};
+  const text = dealDesc(structured) + (note?` — ${note}`:'');
+  ws_send({ type:'proposal', to, text, structured });
+  document.getElementById('prop-val').value = 0;
   document.getElementById('prop-text').value = '';
 }
 
