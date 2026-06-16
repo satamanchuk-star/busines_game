@@ -12,13 +12,13 @@
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --P:#1a3565;--PL:#2b5ba8;--A:#1a6fcf;--AL:#2b82e8;
-  --OK:#27ae60;--WN:#f39c12;--BD:#e74c3c;
-  --g1:#f5f7fa;--g2:#edf0f5;--g3:#dde3ed;--g5:#8896a7;--g7:#4a5568;--g9:#1a202c;
-  --W:#fff;--sh:0 2px 12px rgba(0,0,0,.10);--shl:0 8px 30px rgba(0,0,0,.15);--r:10px;
+  --P:#0d1929;--PL:#1c2d4a;--A:#1d3461;--AL:#2c4a7c;
+  --OK:#34c759;--WN:#ff9f0a;--BD:#ff3b30;
+  --g1:#f5f5f7;--g2:#ebebf0;--g3:#d8d8de;--g5:#8e8e93;--g7:#48484a;--g9:#1d1d1f;
+  --W:#fff;--sh:0 2px 16px rgba(0,0,0,.07);--shl:0 8px 32px rgba(0,0,0,.12);--r:12px;
 }
 .ibs-logo{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#fff;border-radius:5px;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.15)}
-.ibs-logo span{font-family:'Arial Black',Arial,sans-serif;font-size:12px;font-weight:900;color:#1a3565;letter-spacing:-.5px}
+.ibs-logo span{font-family:'Arial Black',Arial,sans-serif;font-size:12px;font-weight:900;color:#1c2d4a;letter-spacing:-.5px}
 body{font-family:'Century Gothic',sans-serif;background:var(--g1);color:var(--g9);min-height:100vh;font-size:14px}
 /* ── Header ── */
 .hdr{background:linear-gradient(135deg,var(--P),var(--PL));color:#fff;height:54px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
@@ -47,7 +47,7 @@ body{font-family:'Century Gothic',sans-serif;background:var(--g1);color:var(--g9
 .scr{display:none}.scr.on{display:flex}
 /* ── Login ── */
 #s-login{min-height:100vh;align-items:center;justify-content:center;padding:24px}
-.login-card{background:var(--W);border-radius:16px;padding:40px 44px;max-width:460px;width:100%;box-shadow:var(--shl);text-align:center}
+.login-card{background:var(--W);border-radius:20px;padding:44px 48px;max-width:460px;width:100%;box-shadow:0 4px 48px rgba(0,0,0,.10);border:1px solid var(--g3);text-align:center}
 .login-card .ico{font-size:48px;margin-bottom:10px}
 .login-card h2{font-size:24px;color:var(--P);margin-bottom:4px}
 .login-card .sub{color:var(--g5);margin-bottom:28px;font-size:14px}
@@ -64,11 +64,11 @@ body{font-family:'Century Gothic',sans-serif;background:var(--g1);color:var(--g9
 .tcode.sel{border-color:var(--PL);background:var(--PL);color:#fff}
 .err-msg{background:#fef3f3;border:1px solid #fca5a5;border-radius:8px;padding:10px 14px;color:var(--BD);font-size:13px;margin-bottom:14px;text-align:left;display:none}
 /* ── Buttons ── */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:600;transition:all .15s}
-.btn-P{background:var(--A);color:#fff}.btn-P:hover{background:var(--AL);transform:translateY(-1px)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;border-radius:10px;border:none;cursor:pointer;font-size:14px;font-weight:600;transition:all .15s;letter-spacing:.1px}
+.btn-P{background:var(--P);color:#fff}.btn-P:hover{background:var(--PL);transform:translateY(-1px);box-shadow:0 4px 16px rgba(13,25,41,.25)}
 .btn-S{background:var(--g2);color:var(--g7)}.btn-S:hover{background:var(--g3)}
 .btn-ok{background:var(--OK);color:#fff}.btn-ok:hover{opacity:.9}
-.btn-lg{padding:13px 32px;font-size:15px}
+.btn-lg{padding:14px 36px;font-size:15px;border-radius:12px}
 .btn-sm{padding:6px 14px;font-size:12px}
 .btn-xs{padding:4px 10px;font-size:11px;border-radius:6px}
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
@@ -239,7 +239,7 @@ body{font-family:'Century Gothic',sans-serif;background:var(--g1);color:var(--g9
 <div class="login-card">
   <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px">
     <svg width="52" height="52" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg" style="border-radius:8px">
-      <defs><linearGradient id="ibsG0" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1a3565"/><stop offset="100%" stop-color="#2b5ba8"/></linearGradient></defs>
+      <defs><linearGradient id="ibsG0" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1c2d4a"/><stop offset="100%" stop-color="#1d3461"/></linearGradient></defs>
       <rect width="52" height="52" fill="url(#ibsG0)" rx="8"/>
       <text x="26" y="36" font-family="Arial Black,Arial,sans-serif" font-size="20" font-weight="900" fill="white" text-anchor="middle">IBS</text>
     </svg>

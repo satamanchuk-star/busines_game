@@ -12,23 +12,23 @@
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#060d1c;--bg2:#0d1a33;--bg3:#1a3565;--bg4:#243d6b;
-  --P:#4a87d4;--PD:#2b5ba8;
-  --OK:#3fb950;--WN:#d29922;--BD:#f85149;--PU:#bc8cff;--OR:#f0883e;
-  --W:#e6edf3;--W2:#8b9db5;--W3:#2e4d73;--r:10px;
+  --bg:#08101f;--bg2:#111827;--bg3:#1c2d4a;--bg4:#253a5e;
+  --P:#2c4a7c;--PD:#1d3461;
+  --OK:#34c759;--WN:#ff9f0a;--BD:#f85149;--PU:#bc8cff;--OR:#ff9f0a;
+  --W:rgba(255,255,255,.95);--W2:rgba(255,255,255,.60);--W3:rgba(255,255,255,.34);--r:10px;
 }
-body{background:linear-gradient(160deg,#060d1c 0%,#091425 100%);color:var(--W);font-family:'Century Gothic',sans-serif;min-height:100vh;overflow-x:hidden}
+body{background:linear-gradient(160deg,#08101f 0%,#0c1627 100%);color:var(--W);font-family:'Century Gothic',sans-serif;min-height:100vh;overflow-x:hidden}
 
 /* ── Header ── */
-.hdr{background:linear-gradient(135deg,#1a3565 0%,#2b5ba8 100%);border-bottom:1px solid rgba(74,135,212,.25);padding:11px 22px;
+.hdr{background:linear-gradient(135deg,#1c2d4a 0%,#1d3461 100%);border-bottom:1px solid rgba(44,74,124,.25);padding:11px 22px;
   display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.4)}
 .hdr h1{font-size:15px;font-weight:700;color:#fff}
 .ibs-logo{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;background:#fff;border-radius:5px;flex-shrink:0}
-.ibs-logo span{font-family:'Arial Black',Arial,sans-serif;font-size:13px;font-weight:900;color:#1a3565;letter-spacing:-.5px}
+.ibs-logo span{font-family:'Arial Black',Arial,sans-serif;font-size:13px;font-weight:900;color:#1c2d4a;letter-spacing:-.5px}
 .rdots{display:flex;gap:5px}
 .rdot{width:24px;height:24px;border-radius:50%;border:2px solid var(--W3);
   display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--W3)}
-.rdot.cur{border-color:var(--P);color:var(--P);background:rgba(88,166,255,.12)}
+.rdot.cur{border-color:var(--P);color:var(--P);background:rgba(61,108,181,.12)}
 .rdot.done{border-color:var(--OK);background:var(--OK);color:#000}
 
 /* ── Screens ── */
@@ -128,7 +128,7 @@ body{background:linear-gradient(160deg,#060d1c 0%,#091425 100%);color:var(--W);f
 .teach.crit{background:rgba(248,81,73,.10);border:1px solid rgba(248,81,73,.3)}
 .teach.warn{background:rgba(210,153,34,.10);border:1px solid rgba(210,153,34,.3)}
 .teach.good{background:rgba(63,185,80,.10);border:1px solid rgba(63,185,80,.3)}
-.teach.info{background:rgba(88,166,255,.10);border:1px solid rgba(88,166,255,.3)}
+.teach.info{background:rgba(61,108,181,.10);border:1px solid rgba(61,108,181,.3)}
 .teach .tt{font-size:11px;font-weight:700;margin-bottom:5px;display:flex;align-items:center;gap=5px}
 .teach.crit .tt{color:var(--BD)}.teach.warn .tt{color:var(--WN)}.teach.good .tt{color:var(--OK)}.teach.info .tt{color:var(--P)}
 .teach .td{font-size:11px;color:var(--W2);line-height:1.5}
@@ -259,7 +259,7 @@ body{background:linear-gradient(160deg,#060d1c 0%,#091425 100%);color:var(--W);f
 .neg-hdr h2{font-size:16px;font-weight:700;margin-bottom:2px}
 .neg-hdr .rsub{font-size:11px;color:var(--W2)}
 .neg-sessions{display:flex;flex-direction:column;gap:14px;margin-bottom:14px}
-.neg-intro{background:rgba(74,135,212,.08);border:1px solid rgba(74,135,212,.25);border-left:3px solid var(--P);
+.neg-intro{background:rgba(44,74,124,.08);border:1px solid rgba(44,74,124,.25);border-left:3px solid var(--P);
   border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;line-height:1.6;color:var(--W2)}
 .neg-intro b{color:var(--W);font-weight:700}
 .ns-stake{display:flex;gap:7px;align-items:flex-start;padding-top:7px;font-size:11px;line-height:1.5;color:var(--W2)}
@@ -297,7 +297,7 @@ body{background:linear-gradient(160deg,#060d1c 0%,#091425 100%);color:var(--W);f
 .msg-bubble.failed{opacity:.55;font-style:italic}
 .msg-offer-tag{font-size:11px;font-weight:700;margin-top:4px;padding:4px 11px;border-radius:20px;
   display:inline-block;border:1px solid;letter-spacing:.2px}
-.neg-msg.left  .msg-offer-tag{background:rgba(88,166,255,.12);color:var(--P);border-color:rgba(88,166,255,.3);align-self:flex-start}
+.neg-msg.left  .msg-offer-tag{background:rgba(61,108,181,.12);color:var(--P);border-color:rgba(61,108,181,.3);align-self:flex-start}
 .neg-msg.right .msg-offer-tag{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.25);align-self:flex-end}
 .typing-indicator{opacity:.7}
 .typing-dots{display:inline-flex;gap:4px;padding:10px 14px;background:var(--bg4);border-radius:14px;border-bottom-left-radius:3px}
@@ -563,21 +563,21 @@ const STRATS = {
 // ━━━ SCENARIOS ━━━
 const SCENARIOS = {
   bullwhip:{
-    name:'🌊 Эффект хлыста', color:'#58a6ff',
+    name:'🌊 Эффект хлыста', color:'#3d6cb5',
     desc:'Ритейлеры гонятся за спросом и перезаказывают. Поставщики следуют за заказами. Цепочка раскачивается.',
     strats:{R1:'Агрессивный',R2:'Агрессивный',R3:'Агрессивный',S1:'Максималист',S2:'Максималист',S3:'Максималист',S4:'Максималист',D:'Монополист'},
     params:{noise:15,shock:200,boost:15},
     discuss:['Насколько сильнее «раскачались» заказы поставщиков по сравнению с колебаниями спроса?','Кто проиграл больше всего от перезапаса в Туре 3?','Как бы изменилась ситуация, если бы ритейлеры делились прогнозами с поставщиками?'],
   },
   promo:{
-    name:'🎪 Промо-хаос', color:'#f0883e',
+    name:'🎪 Промо-хаос', color:'#ff9f0a',
     desc:'Все ритейлеры жмут промо одновременно. Буст в Туре 2 — искусственный. После — запасы, дефицит и убытки.',
     strats:{R1:'Промо-фанат',R2:'Промо-фанат',R3:'Промо-фанат',S1:'Реактивный',S2:'Максималист',S3:'Максималист',S4:'Точный',D:'Оптимизатор'},
     params:{noise:10,shock:200,boost:20},
     discuss:['В каком туре промо дало наибольший буст? Почему он оказался временным?','Кто заработал на промо-хаосе, а кто потерял?','Что произошло с запасами Молочки и Фреша когда все одновременно заказали под промо?'],
   },
   ideal:{
-    name:'🤝 Идеальная координация', color:'#3fb950',
+    name:'🤝 Идеальная координация', color:'#34c759',
     desc:'Команды делятся прогнозами и заказывают точно. Это базовый уровень — используйте для сравнения.',
     strats:{R1:'Рыночный',R2:'Рыночный',R3:'Рыночный',S1:'Точный',S2:'Точный',S3:'Точный',S4:'Точный',D:'Партнёр'},
     params:{noise:4,shock:200,boost:15},
@@ -676,7 +676,7 @@ const CHARS = {
     ok:['Принято. {V}. Работаем.','Фиксируем {V}. Договор в силе.','{V}. Согласен. Двигаемся дальше.'],
     no:['Сделки нет. Советую пересмотреть позицию.','Без взаимопонимания — не работаем. Удачи.','Ваши условия неприемлемы. Разговор окончен.']
   },
-  'Кооперативный': {ico:'🤝',clr:'#3fb950',desc:'Ищет взаимную выгоду. Легко уступает.',
+  'Кооперативный': {ico:'🤝',clr:'#34c759',desc:'Ищет взаимную выгоду. Легко уступает.',
     conc:0.60,dmd:1.15,thr:0.50,
     open:[
       'Предлагаю {V} — думаю, это честно для нас обоих.',
@@ -697,7 +697,7 @@ const CHARS = {
     ],
     no:['Жаль, не договорились. Но я открыт — вернёмся к теме позже.','Не сложилось. Надежды не теряю, давайте думать дальше.']
   },
-  'Хитрый': {ico:'🦊',clr:'#d29922',desc:'Завышает запрос. Делает ложные уступки.',
+  'Хитрый': {ico:'🦊',clr:'#ff9f0a',desc:'Завышает запрос. Делает ложные уступки.',
     conc:0.35,dmd:1.80,thr:0.72,
     open:[
       'Знаю, звучит амбициозно, но {V} — это реальная рыночная ставка прямо сейчас.',
@@ -718,7 +718,7 @@ const CHARS = {
     ],
     no:['Пока не готов. Подумайте — мои условия разумные.','Жаль. Но я не тороплюсь — рынок на моей стороне.']
   },
-  'Упрямый': {ico:'😤',clr:'#f0883e',desc:'Держит позицию. Не реагирует на аргументы.',
+  'Упрямый': {ico:'😤',clr:'#ff9f0a',desc:'Держит позицию. Не реагирует на аргументы.',
     conc:0.05,dmd:1.30,thr:0.92,
     open:[
       '{V}. Это моя позиция.',
@@ -734,7 +734,7 @@ const CHARS = {
     ok:['Хорошо. {V}.','Ладно. {V}.','Принято. {V}.'],
     no:['Нет.','Договорённости нет.','Нет смысла продолжать.']
   },
-  'Аналитик': {ico:'📊',clr:'#58a6ff',desc:'Обосновывает цифрами. Принимает взвешенно.',
+  'Аналитик': {ico:'📊',clr:'#3d6cb5',desc:'Обосновывает цифрами. Принимает взвешенно.',
     conc:0.42,dmd:1.22,thr:0.68,
     open:[
       'По нашей модели оптимальная точка — {V}. Минимизирует издержки обеих сторон.',
@@ -1363,8 +1363,8 @@ function renderAwards() {
     <div class="aw-s">${sub}</div></div>`;
   document.getElementById('an-awards').innerHTML=
     card('Гран-при','🏆',grand,`Итоговый счёт ${f0(SIM.scores[grand])} у.е.`,'#ffd700')+
-    card('Архитектор цепочки','🤝',architect,`Служение цепочке ${f0(service[architect]*100)}%`,'#3fb950')+
-    card('Антихлыст','📉',antiwhip,`Самый стабильный объём (CV ${f1(cv[antiwhip]*100)}%)`,'#58a6ff');
+    card('Архитектор цепочки','🤝',architect,`Служение цепочке ${f0(service[architect]*100)}%`,'#34c759')+
+    card('Антихлыст','📉',antiwhip,`Самый стабильный объём (CV ${f1(cv[antiwhip]*100)}%)`,'#3d6cb5');
 }
 
 function renderScoreChart() {
@@ -1395,7 +1395,7 @@ function renderProfitChart() {
   const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
   const rounds=[0,1,2,3];
   const teams=[...RETS,...SUPS,'D'];
-  const colors={R1:'#58a6ff',R2:'#bc8cff',R3:'#3fb950',S1:'#d29922',S2:'#f0883e',S3:'#f85149',S4:'#79c0ff',D:'#56d364'};
+  const colors={R1:'#3d6cb5',R2:'#bc8cff',R3:'#34c759',S1:'#ff9f0a',S2:'#ff9f0a',S3:'#f85149',S4:'#79c0ff',D:'#56d364'};
   const seriesData=teams.map(tid=>rounds.map(r=>{
     const ri=RETS.indexOf(tid),si=SUPS.indexOf(tid);
     if(ri>=0)return SIM.results[r].retProfit[ri];
@@ -1443,8 +1443,8 @@ function renderBullwhipChart() {
   const toX=(ri,gi)=>pad.l+ri*(iw/rounds.length)+gi*(bw+2)+4;
 
   const series=[{vals:totalDem,col:'#484f58',lbl:'Спрос'},
-                {vals:totalOrd,col:'#58a6ff',lbl:'Заказы'},
-                {vals:totalProd,col:'#3fb950',lbl:'Произв-во'}];
+                {vals:totalOrd,col:'#3d6cb5',lbl:'Заказы'},
+                {vals:totalProd,col:'#34c759',lbl:'Произв-во'}];
   let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:${H}px">`;
   // Y labels
   [0,.5,1].forEach(f=>{const v=Math.round(mx*f);const y=pad.t+ih*(1-f);
@@ -1491,7 +1491,7 @@ function renderWaterfallChart() {
   [0,.5,1].forEach(f=>{const v=Math.round(mx*f);const y=pad.t+ih*(1-f);
     svg+=`<text x="${pad.l-4}" y="${y+4}" class="chart-axis" text-anchor="end">${f0(v)}</text>`;});
   // Stacked bars
-  const colors=['#3fb950','#f85149','#d29922','#f0883e'];
+  const colors=['#34c759','#f85149','#ff9f0a','#ff9f0a'];
   const labels=['Фактич. прибыль','Потери дефицит','Перезапас','Списания'];
   rounds.forEach((r,ri)=>{
     const b=bars[ri],x=pad.l+ri*(iw/rounds.length)+5;
