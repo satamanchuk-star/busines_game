@@ -447,14 +447,16 @@ const G = Object.assign({}, GAME_CONFIG, {
   ],
   phaseName:{lobby:'Лобби',roles:'Распределение ролей',briefing:'Брифинг',negotiation:'Переговоры',decisions:'Ввод решений',results:'Итоги тура',final:'Финал'},
   CHARS:{'Жёсткий':{ico:'🦁',clr:'#e74c3c'},'Кооперативный':{ico:'🤝',clr:'#27ae60'},'Хитрый':{ico:'🦊',clr:'#f39c12'},'Упрямый':{ico:'😤',clr:'#e8522a'},'Аналитик':{ico:'📊',clr:'#2e5f8a'}},
-  type:t=>['R1','R2','R3'].includes(t)?'ret':['S1','S2','S3','S4'].includes(t)?'sup':'dist',
+  type:t=>['R1','R2','R3','R4'].includes(t)?'ret':['S1','S2','S3','S4'].includes(t)?'sup':'dist',
   roleData:{
     R1:{name:'Дискаунтер',roles:['Коммерческий директор','Директор по логистике','Финансовый директор'],
-        kpis:['Маржа ≥ стандарт','OSA ≥ 85%','Минимум дефицита'],secrets:['Агрессивная цена бьёт по марже — не увлекайтесь без договорённости','OSA критична: дефицит = потеря лояльности','Следите за R3: лучше недозаказать']},
+        kpis:['Маржа ≥ стандарт','OSA ≥ 85%','Минимум дефицита'],secrets:['Агрессивная цена бьёт по марже — не увлекайтесь без договорённости','OSA критична: дефицит = потеря лояльности','Следите за R4: лучше недозаказать']},
     R2:{name:'Супермаркет',roles:['Коммерческий директор','Директор по логистике','Финансовый директор'],
         kpis:['Маржа ≥ стандарт','OSA ≥ 85%','Выполнение промо'],secrets:['Молочка и Фреш: срок 1 тур — перезаказ = списания','Премиальная цена работает если есть свежий товар','В Туре 3 шок — заранее страхуйтесь']},
     R3:{name:'Гипермаркет',roles:['Коммерческий директор','Директор по логистике','Финансовый директор'],
         kpis:['Объём продаж','OSA ≥ 85%','Деликатесы — точное планирование'],secrets:['Гипермаркет берёт много деликатесов — квота в Туре 3 ударит по вам','Перезапас стоит дорого при больших объёмах','Промо-буст выгоден при вашем масштабе']},
+    R4:{name:'Премиум',roles:['Коммерческий директор','Директор по логистике','Финансовый директор'],
+        kpis:['Маржа/ед. (высокая)','Деликатесы — доля 30%','OSA ≥ 90%'],secrets:['Покупатель Премиум нетребователен к логистике, но чувствителен к отсутствию товара','Деликатесы — ваш главный продукт: квота в Туре 3 ударит сильнее всего','Люкс-цена (+25%) работает только при полных полках — не экономьте на заказах']},
     S1:{name:'Базовый',roles:['Директор по планированию','Директор по производству'],
         kpis:['Маржа/ед.','Минимум остатков','Fill-rate'],secrets:['Бакалея долго хранится: перепроизводство = расходы на хранение','Скидка ниже себестоимости = убыток','Стабильный спрос — ориентируйтесь на Бакалею = 120']},
     S2:{name:'Fresh',roles:['Директор по планированию','Директор по производству'],
@@ -479,6 +481,8 @@ const DOSSIER = {
       goal:'Стабильная маржа без провалов сервиса. Не упустить промо, не словить списания.'},
   R3:{what:'Сеть гипермаркетов. Самые большие объёмы и широкий ассортимент — главный клиент для всех производителей.',
       goal:'Максимум продаж за счёт масштаба. Особое внимание — импортным деликатесам с высокой наценкой.'},
+  R4:{what:'Премиальная сеть: узкий ассортимент, высокий чек. Фокус на деликатесах и качественной бакалее. Покупатель терпим к цене, но требователен к наличию товара.',
+      goal:'Высокая маржа/ед. за счёт люкс-цены (+25%). Деликатесы — основа продаж. Полки должны быть всегда полными.'},
   S1:{what:'Производитель бакалеи (крупы, консервы). Долгий срок годности — можно работать с запасом.',
       goal:'Стабильная маржа и высокий fill-rate. Не перепроизводить — хранение стоит денег.'},
   S2:{what:'Производитель молочки и фреша. Товар быстро портится — что не продано, идёт в убыток.',
@@ -497,7 +501,8 @@ function teamParams(tid){
     const ri=G.retIds.indexOf(tid);
     const shares=G.catIds.map((c,ci)=>`${c} ${Math.round(G.demand[0][ci]*G.fShare[ci][ri])} ед.`);
     p.push(['Ваша доля спроса (Тур 1)', shares.join(' · ')]);
-    p.push(['Рычаги цены','Агрессивная −8% / Стандарт / Премиум +12%']);
+    const priceOpts=['Агрессивная −8%','Стандарт','Премиальная +12%','Люкс +25%'];
+    p.push(['Рычаги цены', priceOpts.slice(0, G.price.length).join(' / ')]);
     p.push(['Цель сервиса','OSA ≥ 85% — держите полки полными']);
   } else if(G.supIds.includes(tid)){
     const si=G.supIds.indexOf(tid);
@@ -851,6 +856,7 @@ function renderAdminBriefing(r) {
   let h = `<div class="pg-h"><div class="pg-title">${G.roundNames[r]} — Брифинг</div>
     <div class="pg-sub">Объявите условия команды, затем дайте 12 минут на переговоры</div></div>`;
   if (ev) h += `<div class="evt"><div class="ico">🚨</div><div><h3>${ev.t}</h3><p>${ev.d}</p></div></div>`;
+  if (r===0) h += renderHistCard();
   h += `<div class="dem-grid">`;
   G.catIds.forEach((cat,i)=>{
     const chg=prev?dem[i]-prev[i]:0;
@@ -1169,6 +1175,46 @@ function renderTeam() {
   renderTeamActions();
 }
 
+// Генерирует 3 исторических периода из базы Тура 1 с учётом тренда и детерминированного шума
+function genHistData() {
+  const periods = G.histPeriods||3, trend = G.histTrend||[.05,.03,.08,.04];
+  const noise = G.histNoise||.10, base = G.demand[0];
+  return Array.from({length:periods},(_,p)=>
+    G.catIds.map((_,ci)=>{
+      const back = periods - p;
+      const n = ((Math.sin((p*7+ci*3)*2.718)+1)/2 - .5)*noise;
+      return Math.round(base[ci]/Math.pow(1+trend[ci],back)*(1+n));
+    })
+  );
+}
+
+function renderHistCard() {
+  const hist = genHistData();
+  const periods = hist.length;
+  const cols = Array.from({length:periods},(_,i)=>`П−${periods-i}`);
+  const clr = ['#1d6fa0','#1a8c5e','#a06d0a','#8c2a1a'];
+  let h = `<div class="card"><div class="card-t">📈 Исторические данные рынка (${periods} периода до игры)</div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <tr><th style="text-align:left;padding:5px 6px;color:var(--g5)">Категория</th>
+      ${cols.map(c=>`<th style="text-align:center;padding:5px 6px;color:var(--g5)">${c}</th>`).join('')}
+      <th style="text-align:center;padding:5px 6px;color:var(--g5)">Тренд</th></tr>`;
+  G.catIds.forEach((cat,ci)=>{
+    const vals = hist.map(row=>row[ci]);
+    const growth = vals[vals.length-1] > vals[0];
+    const pct = Math.round((vals[vals.length-1]/vals[0]-1)*100);
+    const arrow = pct>0?`▲ +${pct}%`:(pct<0?`▼ ${pct}%`:'→ 0%');
+    const arrowClr = pct>0?'var(--OK)':(pct<0?'var(--BD)':'var(--g5)');
+    h+=`<tr style="border-top:1px solid var(--g2)">
+      <td style="padding:6px;font-weight:600;color:${clr[ci]}">${cat}</td>
+      ${vals.map(v=>`<td style="text-align:center;padding:6px">${v}</td>`).join('')}
+      <td style="text-align:center;padding:6px;font-weight:700;color:${arrowClr}">${arrow}</td>
+    </tr>`;
+  });
+  h+=`</table><p style="font-size:11px;color:var(--g5);margin-top:8px">
+    Данные за периоды до начала игры. Используйте как базу для прогноза Тура 1.</p></div>`;
+  return h;
+}
+
 function renderTeamMain() {
   const r = gs.round, phase = gs.phase;
   const isSub = (gs.submitted||[]).includes(me.teamId);
@@ -1193,6 +1239,7 @@ function renderTeamMain() {
     h += `<div class="phase-info"><div class="pn">${G.roundNames[r]}</div>
       <div class="pd">${G.phaseName[phase]}</div></div>`;
     if (ev && phase==='briefing') h+=`<div class="evt"><div class="ico">🚨</div><div><h3>${ev.t}</h3><p>${ev.d}</p></div></div>`;
+    if (r===0 && phase==='briefing') h += renderHistCard();
     h += `<div class="dem-grid">`;
     G.catIds.forEach((cat,i)=>{
       const chg=prev?dem[i]-prev[i]:0;const cls=chg>0?'up':chg<0?'dn':'';
@@ -1342,7 +1389,7 @@ function renderTeamDecisionForm(r) {
         <span style="font-size:11px;color:var(--g5)">Макс. мощность: ${maxQ} ед.${quota?` | Квота Тур 3: ${quota} ед.!`:''}</span>
       </div>
       <div class="fld mt3" style="margin-top:10px"><label>Ваши скидки по магазинам (заполняется переговорно)</label>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:4px">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:4px">
           ${G.retIds.map((rid,ridx)=>{
             const d=lastDeal(a=>a.structured.type==='discount'&&(a.from===rid||a.to===rid));
             const dv=d?d.structured.value:0;
@@ -1373,7 +1420,7 @@ function renderTeamDecisionForm(r) {
         <div class="frow">
           <div class="fld"><label>Заказ ед.</label><input type="number" id="t-o-${ci}" value="${defOrd}" min="0"${volDeal?' style="border-color:#22c55e;background:#f0fdf4"':''}></div>
           <div class="fld"><label>Цена</label><select id="t-p-${ci}">
-            <option value="0">Агрессивная</option><option value="1" selected>Стандарт</option><option value="2">Премиальная</option>
+            <option value="0">Агрессивная</option><option value="1" selected>Стандарт</option><option value="2">Премиальная</option><option value="3">Люкс</option>
           </select></div>
         </div>
         <div class="frow">

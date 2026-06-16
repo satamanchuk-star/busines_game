@@ -210,22 +210,26 @@ const G = Object.assign({}, GAME_CONFIG, {
   phaseName:{lobby:'Лобби',roles:'Распределение ролей',briefing:'Брифинг',negotiation:'Переговоры',decisions:'Ввод решений',results:'Итоги',final:'Финал'},
   phaseIco: {lobby:'🏠',roles:'🎲',briefing:'📋',negotiation:'🤝',decisions:'📝',results:'📊',final:'🏆'},
   CHARS:{'Жёсткий':{ico:'🦁',clr:'#f85149'},'Кооперативный':{ico:'🤝',clr:'#34c759'},'Хитрый':{ico:'🦊',clr:'#ff9f0a'},'Упрямый':{ico:'😤',clr:'#ff9f0a'},'Аналитик':{ico:'📊',clr:'#3d6cb5'}},
-  type:t=>['R1','R2','R3'].includes(t)?'ret':['S1','S2','S3','S4'].includes(t)?'sup':'dist',
+  type:t=>['R1','R2','R3','R4'].includes(t)?'ret':['S1','S2','S3','S4'].includes(t)?'sup':'dist',
 });
 // «Горячие» сделки тура — что подсветить на карте переговоров
 const NEG_HOT = [
   [ {from:'R1',to:'S1',subj:'скидку на бакалею'},
     {from:'R2',to:'D', subj:'тариф за доставку'},
-    {from:'R3',to:'S4',subj:'объём поставки деликатесов'} ],
+    {from:'R3',to:'S4',subj:'объём поставки деликатесов'},
+    {from:'R4',to:'S4',subj:'приоритет на деликатесы (Премиум)'} ],
   [ {from:'R1',to:'S3',subj:'промо-скидку на снеки'},
     {from:'R2',to:'S2',subj:'промо-скидку на молочку'},
-    {from:'R3',to:'D', subj:'надбавку за большой объём'} ],
+    {from:'R3',to:'D', subj:'надбавку за большой объём'},
+    {from:'R4',to:'D', subj:'спецтариф на доставку (Премиум)'} ],
   [ {from:'R1',to:'D', subj:'приоритет в доставке при дефиците'},
     {from:'R2',to:'D', subj:'приоритет в доставке при дефиците'},
-    {from:'R3',to:'S4',subj:'долю в дефицитной квоте деликатесов'} ],
+    {from:'R3',to:'S4',subj:'долю в дефицитной квоте деликатесов'},
+    {from:'R4',to:'S4',subj:'гарантированную квоту деликатесов при дефиците'} ],
   [ {from:'R1',to:'S1',subj:'долгосрочную скидку на бакалею'},
     {from:'R3',to:'S4',subj:'восстановление объёма деликатесов'},
-    {from:'R2',to:'D', subj:'снижение тарифа за доставку'} ],
+    {from:'R2',to:'D', subj:'снижение тарифа за доставку'},
+    {from:'R4',to:'S1',subj:'люкс-бакалею по фиксированной цене'} ],
 ];
 
 // Метка актора + имя
@@ -398,11 +402,46 @@ function renderRoles(){
     </div>`;
 }
 
+function genHistData(){
+  const periods=G.histPeriods||3,trend=G.histTrend||[.05,.03,.08,.04];
+  const noise=G.histNoise||.10,base=G.demand[0];
+  return Array.from({length:periods},(_,p)=>
+    G.catIds.map((_,ci)=>{
+      const back=periods-p,n=((Math.sin((p*7+ci*3)*2.718)+1)/2-.5)*noise;
+      return Math.round(base[ci]/Math.pow(1+trend[ci],back)*(1+n));
+    })
+  );
+}
+function renderHistLive(){
+  const hist=genHistData(),periods=hist.length;
+  const clr=['#5ba4cf','#52c98b','#d4a843','#c05555'];
+  let h=`<div style="background:rgba(255,255,255,.06);border-radius:12px;padding:14px 16px;margin-bottom:14px">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.5);margin-bottom:10px">
+      📈 История рынка · ${periods} периода до игры</div>
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <tr><th style="text-align:left;padding:4px 8px;color:rgba(255,255,255,.5)">Категория</th>
+      ${Array.from({length:periods},(_,i)=>`<th style="text-align:center;padding:4px 8px;color:rgba(255,255,255,.5)">П−${periods-i}</th>`).join('')}
+      <th style="text-align:center;padding:4px 8px;color:rgba(255,255,255,.5)">Тренд</th></tr>`;
+  G.catIds.forEach((cat,ci)=>{
+    const vals=hist.map(row=>row[ci]);
+    const pct=Math.round((vals[vals.length-1]/vals[0]-1)*100);
+    const arrow=pct>0?`▲ +${pct}%`:(pct<0?`▼ ${pct}%`:'→ 0%');
+    const ac=pct>0?'#52c98b':(pct<0?'#e05c5c':'rgba(255,255,255,.5)');
+    h+=`<tr style="border-top:1px solid rgba(255,255,255,.08)">
+      <td style="padding:6px 8px;font-weight:600;color:${clr[ci]}">${cat}</td>
+      ${vals.map(v=>`<td style="text-align:center;padding:6px 8px;color:rgba(255,255,255,.85)">${v}</td>`).join('')}
+      <td style="text-align:center;padding:6px 8px;font-weight:700;color:${ac}">${arrow}</td>
+    </tr>`;
+  });
+  return h+`</table></div>`;
+}
+
 function renderBriefing(r){
   const ev=G.events[r], dem=G.demand[r], prev=r>0?G.demand[r-1]:null;
   let h='';
   if(ev) h+=`<div class="evt"><div class="ico">${r===2?'🚨':'📢'}</div>
     <div><h3>${ev.t}</h3><p>${ev.d}</p></div></div>`;
+  if(r===0) h+=renderHistLive();
   h+=`<div class="dem-grid">`;
   G.catIds.forEach((cat,i)=>{
     const chg=prev?dem[i]-prev[i]:0, cls=chg>0?'up':chg<0?'dn':'';

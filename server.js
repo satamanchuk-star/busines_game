@@ -162,7 +162,7 @@ function mkState() {
   return {
     phase: 'lobby',
     round: 0,
-    names: { R1:'Дискаунтер', R2:'Супермаркет', R3:'Гипермаркет',
+    names: { R1:'Дискаунтер', R2:'Супермаркет', R3:'Гипермаркет', R4:'Премиум',
              S1:'Базовый', S2:'Fresh', S3:'Промо-хиты', S4:'Импорт', D:'Дистрибьютор' },
     timer: { on:false, end:null, mins:0 },
     decisions: {},     // {[round]: {[teamId]: {submitted, data}}}
@@ -264,7 +264,8 @@ function pubResult(res) {
            retOSA:res.retOSA, totDel:res.totDel, ordFromSup:res.ordFromSup,
            totDelivered:res.totDelivered, dCoeff:res.dCoeff, tariff:res.tariff,
            sold:res.sold, def:res.def, over:res.over, woff:res.woff, unsold:res.unsold,
-           health:res.health, scores:res.scores, contrib:res.contrib };
+           health:res.health, scores:res.scores, contrib:res.contrib,
+           penalties:res.penalties };
 }
 function myResult(res, tid) {
   if(!res)return null;
@@ -289,7 +290,7 @@ function sanitizeDec(r, d) {
     rets:    RETS.map((_,ri)=>SUPS.map((_,ci)=>{
       const x = d.rets?.[ri]?.[ci] || {};
       return { asm: x.asm?1:0, ord: cln(x.ord,0,P.maxOrd),
-               prc: [0,1,2].includes(+x.prc)?+x.prc:1,
+               prc: [0,1,2,3].includes(+x.prc)?+x.prc:1,
                prm: x.prm?1:0, dsc: cln(x.dsc,0,P.maxDsc) };
     })),
     caps,
@@ -309,7 +310,7 @@ function calcRound(r, dRaw) {
   const del   = aS.map(row=>row.map(v=>v*dC));
   const aD    = RETS.map((_,ri)=>SUPS.map((_,ci)=>{
     const x=rets[ri]?.[ci]; if(!x?.asm)return 0;
-    let v=P.demand[r][ci]*P.fShare[ci][ri]*P.price[x.prc||1].dm;
+    let v=P.demand[r][ci]*P.fShare[ci][ri]*P.price[x.prc??1].dm;
     if(x.prm&&(x.dsc||0)>=P.pThr)v*=P.pBoost; return v;
   }));
   const sold=[],def=[],over=[],woff=[],osa=[];
@@ -429,6 +430,24 @@ function handle(ws, msg) {
     }
     if (cmd==='calculate') {
       const res = calcRound(G.round, p.dec);
+      // ─ Штрафы за нарушение договорённостей (структурные сделки с qty) ─
+      // Формат agreement.structured: {ret:'R1', sup:'S1', qty:50}
+      // Штраф = excess_units × cost[si] × pStrafCoef; платит нарушитель (поставщик = недопоставил, ритейлер = недовыбрал)
+      const agrs = (G.agreements||[]).filter(a=>a.round===G.round && a.structured?.qty);
+      const retPenalty = RETS.map(()=>0), supPenalty = SUPS.map(()=>0);
+      agrs.forEach(agr=>{
+        const ri=RETS.indexOf(agr.structured.ret), si=SUPS.indexOf(agr.structured.sup);
+        if(ri<0||si<0)return;
+        const agreed = +agr.structured.qty, actual = res.del[ri][si];
+        const dev = Math.abs(actual-agreed)/Math.max(agreed,1);
+        if(dev<=P.pStrafThr)return;
+        const excess = Math.abs(actual-agreed)-agreed*P.pStrafThr;
+        const penalty = excess*P.cost[si]*P.pStrafCoef;
+        if(actual<agreed) supPenalty[si]+=penalty; else retPenalty[ri]+=penalty;
+      });
+      res.retProfit = res.retProfit.map((v,i)=>v-retPenalty[i]);
+      res.supProfit = res.supProfit.map((v,i)=>v-supPenalty[i]);
+      res.penalties = {ret:retPenalty, sup:supPenalty};
       // Здоровье цепочки и счёт команд за тур: бонус = H × фонд × личный вклад
       res.health = chainHealth(res);
       res.contrib = {}; res.scores = {};
