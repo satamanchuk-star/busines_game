@@ -13,7 +13,7 @@
   --W:#e6edf3;--W2:#8b949e;--W3:#484f58;
   --r:10px;
 }
-body{background:var(--bg);color:var(--W);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+body{background:var(--bg);color:var(--W);font-family:'Century Gothic',CenturyGothic,AppleGothic,sans-serif;
   min-height:100vh;overflow-x:hidden}
 
 /* ── Header ── */
@@ -262,30 +262,17 @@ body{background:var(--bg);color:var(--W);font-family:-apple-system,BlinkMacSyste
   </div>
 </div>
 
+<script src="/gameconfig.js"></script>
 <script>
 'use strict';
 
 // ═══════════════════════════════════════
-// CONSTANTS (exact copy from server.js)
+// CONSTANTS (из единого конфига public/gameconfig.js)
 // ═══════════════════════════════════════
-const RETS = ['R1','R2','R3'];
-const SUPS = ['S1','S2','S3','S4'];
-const ALL = [...RETS,...SUPS,'D'];
-const P = {
-  cost:    [6,8,7,14],
-  opt:     [10,13,12,22],
-  rosn:    [14,18,20,32],
-  fresh:   [false,true,false,false],
-  maxProd: [200,140,120,70],
-  fShare:  [[.45,.30,.25],[.20,.40,.40],[.45,.30,.25],[.10,.35,.55]],
-  price:   [{pm:.92,dm:1.2},{pm:1,dm:1},{pm:1.12,dm:.85}],
-  demand:  [[120,90,70,45],[125,95,110,50],[110,130,80,25],[120,115,90,35]],
-  distCap: [320,320,200,320],
-  pBoost:1.5, pThr:.10, tCost:.8, hCost:1.0,
-  catIds:  ['Бакалея','Молочка','Снеки','Деликатесы'],
-  catNames:['долгий срок','скоропорт','промо','импорт'],
-  roundNames:['Стартовый рынок','Промо-инициатива','Внешнее событие','Стабилизация'],
-};
+const RETS = GAME_CONFIG.retIds;
+const SUPS = GAME_CONFIG.supIds;
+const ALL = GAME_CONFIG.allTeams;
+const P = GAME_CONFIG;   // экономика и константы — эталон (зеркало server.js)
 
 const ROUND_SUBS = [
   'Команды впервые пробуют силы. Рынок стабилен, учимся планировать.',

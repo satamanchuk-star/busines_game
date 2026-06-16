@@ -14,7 +14,7 @@
   --r:10px;--sh:0 4px 24px rgba(0,0,0,.4);
 }
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
-body{background:linear-gradient(160deg,#060d1c 0%,#091425 100%);color:var(--W);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+body{background:linear-gradient(160deg,#060d1c 0%,#091425 100%);color:var(--W);font-family:'Century Gothic',CenturyGothic,AppleGothic,sans-serif;
   min-height:100vh;display:flex;flex-direction:column;overflow:hidden}
 /* ── Header ── */
 .hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 28px;
@@ -191,16 +191,11 @@ body{background:linear-gradient(160deg,#060d1c 0%,#091425 100%);color:var(--W);f
   <span style="color:var(--W3);font-size:11px">© IBS 2026</span>
 </footer>
 
+<script src="/gameconfig.js"></script>
 <script>
-const G = {
-  catIds:   ['Бакалея','Молочка','Снеки','Деликатесы'],
-  catNames: ['долгий срок','скоропорт','промо','импорт'],
-  retIds:   ['R1','R2','R3'],
-  supIds:   ['S1','S2','S3','S4'],
-  allTeams: ['R1','R2','R3','S1','S2','S3','S4','D'],
-  demand:   [[120,90,70,45],[125,95,110,50],[110,130,80,25],[120,115,90,35]],
-  distCap:  [320,320,200,320],
-  roundNames:['Стартовый рынок','Промо-инициатива','Внешнее событие','Стабилизация'],
+// Экономика/категории/туры/LBL — из единого конфига (GAME_CONFIG).
+// Здесь только презентационные данные проектора.
+const G = Object.assign({}, GAME_CONFIG, {
   events:[
     null,
     {t:'📢 Промо-инициатива',d:'Спрос на снеки вырос до 110 ед. Промо-буст ×1.5 — только при скидке ≥10% и включённом промо.'},
@@ -209,10 +204,9 @@ const G = {
   ],
   phaseName:{lobby:'Лобби',roles:'Распределение ролей',briefing:'Брифинг',negotiation:'Переговоры',decisions:'Ввод решений',results:'Итоги',final:'Финал'},
   phaseIco: {lobby:'🏠',roles:'🎲',briefing:'📋',negotiation:'🤝',decisions:'📝',results:'📊',final:'🏆'},
-  LBL:{R1:'Дискаунтер',R2:'Супермаркет',R3:'Гипермаркет',S1:'Базовый',S2:'Fresh',S3:'Промо-хиты',S4:'Импорт',D:'Дистрибьютор'},
   CHARS:{'Жёсткий':{ico:'🦁',clr:'#f85149'},'Кооперативный':{ico:'🤝',clr:'#3fb950'},'Хитрый':{ico:'🦊',clr:'#d29922'},'Упрямый':{ico:'😤',clr:'#f0883e'},'Аналитик':{ico:'📊',clr:'#58a6ff'}},
   type:t=>['R1','R2','R3'].includes(t)?'ret':['S1','S2','S3','S4'].includes(t)?'sup':'dist',
-};
+});
 // «Горячие» сделки тура — что подсветить на карте переговоров
 const NEG_HOT = [
   [ {from:'R1',to:'S1',subj:'скидку на бакалею'},

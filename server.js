@@ -6,6 +6,8 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs');
 
+const CONFIG = require('./public/gameconfig.js');   // единый источник данных и экономики
+
 const PORT = process.env.PORT || 3000;
 const ADMIN_PASS = process.env.ADMIN_PASS || 'fmcg2024';
 const STATE_FILE = path.join(__dirname, 'game-state.json');
@@ -15,32 +17,15 @@ const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ━━━ CONSTANTS ━━━
-const RETS = ['R1','R2','R3'];
-const SUPS = ['S1','S2','S3','S4'];
-const ALL_TEAMS = [...RETS, ...SUPS, 'D'];
+// ━━━ CONSTANTS (из единого конфига public/gameconfig.js) ━━━
+const RETS = CONFIG.retIds;
+const SUPS = CONFIG.supIds;
+const ALL_TEAMS = CONFIG.allTeams;
 
-const P = {
-  cost:    [6, 8, 7, 14],
-  opt:     [10,13,12,22],
-  rosn:    [14,18,20,32],
-  fresh:   [false,true,false,false],
-  maxProd: [200,140,120,70],
-  fShare:  [[.45,.30,.25],[.20,.40,.40],[.45,.30,.25],[.10,.35,.55]],
-  price:   [{pm:.92,dm:1.2},{pm:1,dm:1},{pm:1.12,dm:.85}],
-  demand:  [[120,90,70,45],[125,95,110,50],[110,130,80,25],[120,115,90,35]],
-  distCap: [320,320,200,320],
-  pBoost:1.5, pThr:.10, tCost:.8, hCost:1.0,
-  salv:.8,        // непроданный нескоропорт сохраняет 80% закупочной стоимости (запас)
-  s4Shock:30,     // квота П4 в Туре 3 (внешнее событие)
-  maxDsc:.30, maxTariff:5, maxOrd:500,
-  catIds:  ['Бакалея','Молочка','Снеки','Деликатесы'],
-  catNames:['долгий срок','скоропорт','промо','импорт'],
-  roundNames:['Стартовый рынок','Промо-инициатива','Внешнее событие','Стабилизация'],
-};
+const P = CONFIG;   // экономика и константы движка — эталон для всех клиентов
 
 // ━━━ ОБОЗНАЧЕНИЯ (внутренние ключи R/S/D, отображение Р/П/Д) ━━━
-const LBL = {R1:'Дискаунтер',R2:'Супермаркет',R3:'Гипермаркет',S1:'Базовый',S2:'Fresh',S3:'Промо-хиты',S4:'Импорт',D:'Дистрибьютор'};
+const LBL = CONFIG.LBL;
 const LBL2ID = {}; Object.entries(LBL).forEach(([k,v])=>{ LBL2ID[v.toUpperCase()]=k; });
 // Старые короткие коды остаются валидными алиасами при ручном вводе
 Object.entries({R1:'Р1',R2:'Р2',R3:'Р3',S1:'П1',S2:'П2',S3:'П3',S4:'П4',D:'Д'}).forEach(([k,v])=>{ LBL2ID[v.toUpperCase()]=k; });

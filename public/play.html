@@ -14,7 +14,7 @@
 }
 .ibs-logo{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#fff;border-radius:5px;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.15)}
 .ibs-logo span{font-family:'Arial Black',Arial,sans-serif;font-size:12px;font-weight:900;color:#1a3565;letter-spacing:-.5px}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--g1);color:var(--g9);min-height:100vh;font-size:14px}
+body{font-family:'Century Gothic',CenturyGothic,AppleGothic,sans-serif;background:var(--g1);color:var(--g9);min-height:100vh;font-size:14px}
 /* ── Header ── */
 .hdr{background:linear-gradient(135deg,var(--P),var(--PL));color:#fff;height:54px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
 .hdr-l{display:flex;align-items:center;gap:12px}
@@ -424,28 +424,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   </div>
 </div>
 
+<script src="/gameconfig.js"></script>
 <script>
 // ═══════════════════════════════════════
 // CONSTANTS
+// Экономика/категории/туры/LBL — из единого конфига (GAME_CONFIG).
+// Здесь только презентационные данные play.html.
 // ═══════════════════════════════════════
-const G = {
-  catIds:   ['Бакалея','Молочка','Снеки','Деликатесы'],
-  catNames: ['долгий срок','скоропорт','промо','импорт'],
+const G = Object.assign({}, GAME_CONFIG, {
   catColor: ['#2e5f8a','#1a7a5e','#7b3fa0','#c0392b'],
-  cost:     [6,8,7,14],
-  optBase:  [10,13,12,22],
-  recRosn:  [14,18,20,32],
-  fresh:    [false,true,false,false],
-  maxProd:  [200,140,120,70],
-  fShare:   [[.45,.30,.25],[.20,.40,.40],[.45,.30,.25],[.10,.35,.55]],
-  price:    [{pm:.92,dm:1.2},{pm:1,dm:1},{pm:1.12,dm:.85}],
-  demand:   [[120,90,70,45],[125,95,110,50],[110,130,80,25],[120,115,90,35]],
-  distCap:  [320,320,200,320],
-  retIds:   ['R1','R2','R3'],
-  supIds:   ['S1','S2','S3','S4'],
-  allTeams: ['R1','R2','R3','S1','S2','S3','S4','D'],
   retColors:['#2e5f8a','#7b3fa0','#1a7a5e'],
-  roundNames:['Стартовый рынок','Промо-инициатива','Внешнее событие','Стабилизация'],
   events:[
     null,
     {t:'Промо-инициатива',d:'Спрос на снеки вырос до 110. Промо-буст ×1.5 — только при скидке производителя ≥10% и включённом промо.'},
@@ -453,7 +441,6 @@ const G = {
     {t:'Стабилизация',d:'Рынок восстанавливается. Молочка=115, Снеки=90, Деликатесы=35. Восстановите сервис и маржу.'},
   ],
   phaseName:{lobby:'Лобби',roles:'Распределение ролей',briefing:'Брифинг',negotiation:'Переговоры',decisions:'Ввод решений',results:'Итоги тура',final:'Финал'},
-  LBL:{R1:'Дискаунтер',R2:'Супермаркет',R3:'Гипермаркет',S1:'Базовый',S2:'Fresh',S3:'Промо-хиты',S4:'Импорт',D:'Дистрибьютор'},
   CHARS:{'Жёсткий':{ico:'🦁',clr:'#e74c3c'},'Кооперативный':{ico:'🤝',clr:'#27ae60'},'Хитрый':{ico:'🦊',clr:'#f39c12'},'Упрямый':{ico:'😤',clr:'#e8522a'},'Аналитик':{ico:'📊',clr:'#2e5f8a'}},
   type:t=>['R1','R2','R3'].includes(t)?'ret':['S1','S2','S3','S4'].includes(t)?'sup':'dist',
   roleData:{
@@ -474,7 +461,7 @@ const G = {
     D:{name:'Дистрибьютор',roles:['Коммерческий директор по тарифам','Операционный директор','Диспетчер приоритетов'],
        kpis:['Транспортная маржа','Загрузка мощностей','Соблюдение приоритетов'],secrets:['Тариф 1.5 — стандарт. Диапазон 1.0–3.0','В Туре 3 мощность 320→200 — это ваш рычаг влияния','За приоритет можно требовать надбавку']},
   },
-};
+});
 
 // ═══════════════════════════════════════
 // ДОСЬЕ КОМАНД: кто вы, цель, чем занимаетесь
@@ -510,7 +497,7 @@ function teamParams(tid){
   } else if(G.supIds.includes(tid)){
     const si=G.supIds.indexOf(tid);
     p.push(['Мощность','до '+G.maxProd[si]+' ед./тур'+(si===3?' (в Туре 3 квота 30 ед.)':'')]);
-    p.push(['Себестоимость',G.cost[si]+' у.е./ед. · отпускная база '+G.optBase[si]+' у.е.']);
+    p.push(['Себестоимость',G.cost[si]+' у.е./ед. · отпускная база '+G.opt[si]+' у.е.']);
     p.push(['Особенность', G.fresh[si]?'⚠️ Скоропорт — остаток списывается в убыток':'Долгий срок — остаток сохраняет 80% стоимости']);
   } else {
     p.push(['Мощность доставки', G.distCap[0]+' ед./тур (в Туре 3 — '+G.distCap[2]+' ед.)']);

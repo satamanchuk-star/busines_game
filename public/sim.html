@@ -12,7 +12,7 @@
   --OK:#3fb950;--WN:#d29922;--BD:#f85149;--PU:#bc8cff;--OR:#f0883e;
   --W:#e6edf3;--W2:#8b9db5;--W3:#2e4d73;--r:10px;
 }
-body{background:linear-gradient(160deg,#060d1c 0%,#091425 100%);color:var(--W);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;min-height:100vh;overflow-x:hidden}
+body{background:linear-gradient(160deg,#060d1c 0%,#091425 100%);color:var(--W);font-family:'Century Gothic',CenturyGothic,AppleGothic,sans-serif;min-height:100vh;overflow-x:hidden}
 
 /* ── Header ── */
 .hdr{background:linear-gradient(135deg,#1a3565 0%,#2b5ba8 100%);border-bottom:1px solid rgba(74,135,212,.25);padding:11px 22px;
@@ -481,23 +481,13 @@ body{background:linear-gradient(160deg,#060d1c 0%,#091425 100%);color:var(--W);f
 </div>
 
 <!-- ═══════════════════════════════════ SCRIPT ═══════════════════════════════════ -->
+<script src="/gameconfig.js"></script>
 <script>
 'use strict';
 
-// ━━━ CONSTANTS (exact copy from server.js) ━━━
-const RETS = ['R1','R2','R3'], SUPS = ['S1','S2','S3','S4'], ALL = [...RETS,...SUPS,'D'];
-const P = {
-  cost:[6,8,7,14], opt:[10,13,12,22], rosn:[14,18,20,32],
-  fresh:[false,true,false,false], maxProd:[200,140,120,70],
-  fShare:[[.45,.30,.25],[.20,.40,.40],[.45,.30,.25],[.10,.35,.55]],
-  price:[{pm:.92,dm:1.2},{pm:1,dm:1},{pm:1.12,dm:.85}],
-  demand:[[120,90,70,45],[125,95,110,50],[110,130,80,25],[120,115,90,35]],
-  distCap:[320,320,200,320],
-  pBoost:1.5, pThr:.10, tCost:.8, hCost:1.0,
-  salv:.8, // непроданный нескоропорт сохраняет 80% закупочной стоимости
-  catIds:['Бакалея','Молочка','Снеки','Деликатесы'],
-  roundNames:['Стартовый рынок','Промо-инициатива','Внешнее событие','Стабилизация'],
-};
+// ━━━ CONSTANTS (из единого конфига public/gameconfig.js) ━━━
+const RETS = GAME_CONFIG.retIds, SUPS = GAME_CONFIG.supIds, ALL = GAME_CONFIG.allTeams;
+const P = GAME_CONFIG;   // экономика и константы — эталон (зеркало server.js)
 
 // ━━━ CALCULATION ENGINE (exact from server.js) ━━━
 function calcRound(r, d) {
