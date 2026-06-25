@@ -15,8 +15,11 @@ jobs:
           username: root
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
+            set -e
+            git config --global --add safe.directory /var/www/fmcg-game
             cd /var/www/fmcg-game
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main   # деплой-цель всегда == main (устойчиво к дрейфу дерева)
             npm install --production
             pm2 restart fmcg-game
-            echo "✅ Deployed at $(date)"
+            echo "✅ Deployed $(git rev-parse --short HEAD) at $(date)"
