@@ -4,11 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>IBS · FMCG-цепочка · Печатные материалы</title>
+<link rel="stylesheet" href="/fonts/onest.css">
 <style>
-@font-face{font-family:'Century Gothic';src:url('/fonts/CenturyGothic.ttf') format('truetype');font-weight:400;font-style:normal}
-@font-face{font-family:'Century Gothic';src:url('/fonts/CenturyGothic-Bold.ttf') format('truetype');font-weight:700;font-style:normal}
-@font-face{font-family:'Century Gothic';src:url('/fonts/CenturyGothic-Italic.ttf') format('truetype');font-weight:400;font-style:italic}
-@font-face{font-family:'Century Gothic';src:url('/fonts/CenturyGothic-BoldItalic.ttf') format('truetype');font-weight:700;font-style:italic}
 
 /* ── Reset & base ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -17,7 +14,7 @@
   --OK:#27ae60;--WN:#e67e22;--BD:#c0392b;
   --g1:#f7f9fc;--g2:#edf1f7;--g3:#d5dce8;--g5:#8896a7;--g7:#4a5568;--g9:#1a202c;
 }
-body{font-family:'Century Gothic',sans-serif;background:#f0f4f8;color:var(--g9);font-size:13px;line-height:1.4}
+body{font-family:'Onest',sans-serif;background:#f0f4f8;color:var(--g9);font-size:13px;line-height:1.4}
 
 /* ── Screen preview header ── */
 .screen-hdr{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;padding:16px 32px;
@@ -213,7 +210,7 @@ body{font-family:'Century Gothic',sans-serif;background:#f0f4f8;color:var(--g9);
   <div class="cover-text">
     <h1>FMCG-цепочка</h1>
     <p>Деловая игра по управлению цепочкой поставок</p>
-    <p style="opacity:.65;font-size:13px">4 тура · 8 команд · до 32 участников · ~90 минут</p>
+    <p style="opacity:.65;font-size:13px">4 тура · 9 команд · до 36 участников · ~90 минут</p>
     <div class="cover-tags">
       <span class="ctag">🏪 Ритейл</span>
       <span class="ctag">🏭 Производство</span>
@@ -235,7 +232,7 @@ body{font-family:'Century Gothic',sans-serif;background:#f0f4f8;color:var(--g9);
 </p>
 
 <!-- РИТЕЙЛЕРЫ -->
-<div class="role-cards-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:14px">
+<div class="role-cards-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:14px">
 
   <!-- Р1 Дискаунтер -->
   <div class="role-card">
@@ -263,7 +260,7 @@ body{font-family:'Century Gothic',sans-serif;background:#f0f4f8;color:var(--g9);
       <div class="role-row">
         <div class="role-ico">📦</div>
         <div class="role-info">
-          <div class="rn">Менеджер закупок</div>
+          <div class="rn">Директор по закупкам</div>
           <div class="rd">Объём заказов поставщикам. Следит за перезапасом</div>
         </div>
       </div>
@@ -304,7 +301,7 @@ body{font-family:'Century Gothic',sans-serif;background:#f0f4f8;color:var(--g9);
       <div class="role-row">
         <div class="role-ico">📦</div>
         <div class="role-info">
-          <div class="rn">Менеджер закупок</div>
+          <div class="rn">Директор по закупкам</div>
           <div class="rd">Объём заказов. Баланс OSA и стоимости запасов</div>
         </div>
       </div>
@@ -345,7 +342,7 @@ body{font-family:'Century Gothic',sans-serif;background:#f0f4f8;color:var(--g9);
       <div class="role-row">
         <div class="role-ico">📦</div>
         <div class="role-info">
-          <div class="rn">Менеджер закупок</div>
+          <div class="rn">Директор по закупкам</div>
           <div class="rd">Крупные объёмы. Минимизирует дефицит молочки и фреша</div>
         </div>
       </div>
@@ -358,6 +355,47 @@ body{font-family:'Century Gothic',sans-serif;background:#f0f4f8;color:var(--g9);
       </div>
     </div>
     <div class="rc-footer">🎯 Фокус: <strong>не перезаказать молочку и фреш — списания в убыток</strong></div>
+  </div>
+
+  <!-- Р4 Премиум -->
+  <div class="role-card">
+    <div class="rc-hdr ret">
+      <div class="rc-actor">Магазин</div>
+      <div class="rc-name">Премиум</div>
+      <div class="rc-type">Ритейлер · высокий чек</div>
+      <div class="rc-ico">💎</div>
+    </div>
+    <div class="rc-body">
+      <div class="role-row">
+        <div class="role-ico">🎩</div>
+        <div class="role-info">
+          <div class="rn lead">Директор сети</div>
+          <div class="rd">Финальное решение. Ведёт переговоры по дефицитным категориям</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">🏷️</div>
+        <div class="role-info">
+          <div class="rn">Категорийный менеджер</div>
+          <div class="rd">Люкс-цена и промо точечно, без потери образа премиальной сети</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">📦</div>
+        <div class="role-info">
+          <div class="rn">Директор по закупкам</div>
+          <div class="rd">Деликатесы и качественная бакалея. Не допускает пустых полок</div>
+        </div>
+      </div>
+      <div class="role-row">
+        <div class="role-ico">📈</div>
+        <div class="role-info">
+          <div class="rn">Аналитик спроса</div>
+          <div class="rd">Следит за квотой импорта и риском дефицита в Туре 3</div>
+        </div>
+      </div>
+    </div>
+    <div class="rc-footer">🎯 Фокус: <strong>высокая маржа + наличие деликатесов на полке</strong></div>
   </div>
 </div>
 
@@ -588,7 +626,7 @@ body{font-family:'Century Gothic',sans-serif;background:#f0f4f8;color:var(--g9);
           </ul>
         </div>
         <div>
-          <div style="font-weight:700;color:var(--g7);margin-bottom:6px">📦 / 🏭 Закупщик/Производство</div>
+          <div style="font-weight:700;color:var(--g7);margin-bottom:6px">📦 / 🏭 Директор по закупкам / Производство</div>
           <ul style="padding-left:14px;color:var(--g5);line-height:1.7">
             <li>Предлагает объём решения на Совете</li>
             <li>Контролирует риск перезапаса/недопоставки</li>
@@ -766,7 +804,7 @@ body{font-family:'Century Gothic',sans-serif;background:#f0f4f8;color:var(--g9);
           <div class="ph-num">5</div>
           <div class="ph-text">
             <div class="pht">Расчёт и разбор (~3 мин)</div>
-            <div class="phd">Движок считает. На экране: прибыль, здоровье цепочки, рейтинг и урок</div>
+            <div class="phd">Формируется расчёт и подведение результатов тура: прибыль, здоровье цепочки, рейтинг и урок</div>
           </div>
         </li>
       </ul>

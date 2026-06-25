@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Доступ — FMCG-цепочка</title>
+<link rel="stylesheet" href="/fonts/onest.css">
+<style>
+  :root{--bg:#f3f5f9;--panel:#fff;--line:#e6eaf1;--ink:#0d1526;--ink2:#56627a;--ink3:#9aa6b8;
+    --ibs:#2563eb;--ibs-d:#1d4ed8;--ibs-soft:#eef3ff;--ok:#15a34a;--bd:#dc2626}
+  *{box-sizing:border-box}
+  body{font-family:'Onest',sans-serif;background:var(--bg);color:var(--ink);margin:0;min-height:100vh;
+    display:flex;align-items:center;justify-content:center;padding:24px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;max-width:440px;width:100%;
+    padding:34px 30px;box-shadow:0 8px 40px rgba(13,21,38,.10)}
+  .logo{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+  .logo .dot{width:34px;height:34px;border-radius:9px;background:var(--ibs);color:#fff;display:flex;
+    align-items:center;justify-content:center;font-size:18px}
+  .logo b{font-size:17px;font-weight:800}
+
+  /* Вкладки */
+  .tabs{display:flex;gap:4px;background:#f0f2f7;border-radius:12px;padding:4px;margin-bottom:22px}
+  .tab{flex:1;text-align:center;padding:9px 8px;border-radius:9px;font-size:13px;font-weight:600;
+    color:var(--ink2);cursor:pointer;transition:all .15s;border:none;background:none;font-family:inherit}
+  .tab.on{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(13,21,38,.10)}
+
+  h1{font-size:21px;font-weight:800;margin:0 0 6px}
+  .lead{font-size:14px;color:var(--ink2);line-height:1.5;margin:0 0 20px}
+  label{display:block;font-size:13px;font-weight:600;color:var(--ink2);margin:14px 0 5px}
+  input,textarea{width:100%;font-family:inherit;font-size:14px;color:var(--ink);background:#f7f9fc;
+    border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;transition:border-color .15s}
+  input:focus,textarea:focus{outline:none;border-color:var(--ibs);background:#fff;
+    box-shadow:0 0 0 3px rgba(37,99,235,.18)}
+  textarea{resize:vertical;min-height:62px}
+  .btn{width:100%;margin-top:20px;border:none;border-radius:11px;padding:14px;font-family:inherit;
+    font-size:15px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--ibs-d),var(--ibs));
+    cursor:pointer;transition:opacity .15s}
+  .btn:disabled{opacity:.55;cursor:default}
+  /* P1 fix: #9aa6b8 → #5e6a7a (contrast 4.95:1 on white) */
+  .note{font-size:12px;color:#5e6a7a;margin-top:14px;line-height:1.5;text-align:center}
+  .err{font-size:13px;color:var(--bd);margin-top:10px;min-height:16px;text-align:center}
+
+  /* Экраны */
+  .screen{display:none}.screen.on{display:block}
+  .wait-block{text-align:center;padding:10px 0 16px}
+  .spin{width:42px;height:42px;border:4px solid var(--ibs-soft);border-top-color:var(--ibs);
+    border-radius:50%;margin:12px auto 18px;animation:sp 1s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .badge{display:inline-block;padding:5px 14px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:6px}
+  .b-wait{background:#fff8e1;color:#92400e}
+  .b-ok{background:#dcfce7;color:#15803d}
+  .b-no{background:#fee2e2;color:#b91c1c}
+  .b-exp{background:#f1f5f9;color:#64748b}
+  a.link{color:var(--ibs);text-decoration:none;font-weight:600}
+  .divider{display:flex;align-items:center;gap:10px;margin:18px 0;color:#5e6a7a;font-size:12px}
+  .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--line)}
+</style>
+</head>
+<body>
+<main>
+<div class="card">
+  <div class="logo"><span class="dot" aria-hidden="true">🏪</span><b>FMCG-цепочка</b></div>
+
+  <!-- Вкладки (только в режиме форм) -->
+  <div id="tab-bar" class="tabs" role="tablist">
+    <button id="tab-wsh" class="tab" role="tab" aria-selected="false" aria-controls="scr-wsh" onclick="switchTab('wsh')" style="display:none">Код игры</button>
+    <button id="tab-new" class="tab on" role="tab" aria-selected="true"  aria-controls="scr-new" onclick="switchTab('new')">Запрос доступа</button>
+    <button id="tab-ret" class="tab"    role="tab" aria-selected="false" aria-controls="scr-ret" onclick="switchTab('ret')">Уже был доступ</button>
+  </div>
+
+  <!-- ── Вход по коду игры (режим воркшопа) ── -->
+  <div id="scr-wsh" class="screen" role="tabpanel">
+    <h1>Вход в игру</h1>
+    <p class="lead">Введите код игры, который назвал ведущий. Доступ откроется сразу — без ожидания.</p>
+    <label for="wsh-code">Код игры</label>
+    <input id="wsh-code" type="text" autocomplete="off" autocapitalize="characters" placeholder="например, FMCG2026">
+    <button id="btn-wsh" class="btn">Войти в игру →</button>
+    <div id="err-wsh" class="err" role="alert" aria-live="assertive"></div>
+    <div class="note">Код один на всю группу. Нет кода — запросите доступ на соседней вкладке.</div>
+  </div>
+
+  <!-- ── Новый пользователь ── -->
+  <div id="scr-new" class="screen on" role="tabpanel">
+    <h1>Запросить доступ</h1>
+    <p class="lead">Сайт в закрытом режиме. Заполните форму — администратор рассмотрит заявку и доступ откроется в этом окне автоматически.</p>
+    <label for="name">Имя и фамилия *</label>
+    <input id="name" type="text" autocomplete="name" placeholder="Иван Петров" required>
+    <label for="email">Email *</label>
+    <input id="email" type="email" autocomplete="email" placeholder="ivan@company.ru" required>
+    <label for="org">Организация</label>
+    <input id="org" type="text" autocomplete="organization" placeholder="Компания / отдел">
+    <label for="purpose">Цель доступа</label>
+    <textarea id="purpose" placeholder="Например: знакомство с игрой, подготовка к воркшопу"></textarea>
+    <button id="btn-new" class="btn">Отправить заявку</button>
+    <div id="err-new" class="err" role="alert" aria-live="assertive"></div>
+    <div class="note">Письмо уходит только администратору. Ваш email используется для связи.</div>
+  </div>
+
+  <!-- ── Повторный вход ── -->
+  <div id="scr-ret" class="screen" role="tabpanel">
+    <h1>Повторный вход</h1>
+    <p class="lead">Если вам уже выдавали доступ — введите тот же email. Вход мгновенный, без ожидания.</p>
+    <label for="ret-email">Email *</label>
+    <input id="ret-email" type="email" autocomplete="email" placeholder="ivan@company.ru" required>
+    <button id="btn-ret" class="btn">Войти →</button>
+    <div id="err-ret" class="err" role="alert" aria-live="assertive"></div>
+    <div class="note">Если доступ не был выдан — воспользуйтесь вкладкой «Запрос доступа».</div>
+  </div>
+
+  <!-- ── Ожидание одобрения ── -->
+  <div id="scr-wait" class="screen">
+    <h1>Заявка отправлена</h1>
+    <div class="wait-block" role="status" aria-live="polite" aria-atomic="true">
+      <div class="badge b-wait">⏳ Ожидает одобрения</div>
+      <div class="spin" aria-hidden="true"></div>
+      <p class="lead">Уведомили администратора. Как только одобрит — это окно откроется автоматически. Вкладку можно не закрывать.</p>
+    </div>
+    <div class="note">Обычно несколько минут. Если долго — <a class="link" href="mailto:satamanchuk@gmail.com">satamanchuk@gmail.com</a>.</div>
+  </div>
+
+  <!-- ── Отклонено ── -->
+  <div id="scr-deny" class="screen">
+    <h1>Доступ не предоставлен</h1>
+    <div class="wait-block" role="status" aria-live="polite">
+      <div class="badge b-no">⛔ Заявка отклонена</div>
+    </div>
+    <p class="lead">Администратор отклонил заявку. Если это ошибка — <a class="link" href="mailto:satamanchuk@gmail.com">напишите нам</a>.</p>
+    <button class="btn" onclick="reset()">← Попробовать снова</button>
+  </div>
+
+  <!-- ── Истекла ── -->
+  <div id="scr-exp" class="screen">
+    <h1>Заявка истекла</h1>
+    <div class="wait-block" role="status" aria-live="polite">
+      <div class="badge b-exp">⏱ Время вышло (48ч)</div>
+    </div>
+    <p class="lead">Заявка не была рассмотрена в течение 48 часов и автоматически закрыта. Подайте новую.</p>
+    <button class="btn" onclick="reset()">← Подать новую заявку</button>
+  </div>
+</div>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const SCREENS = ['wsh','new','ret','wait','deny','exp'];
+function show(s) {
+  SCREENS.forEach(x => $('scr-'+x).classList.toggle('on', x === s));
+  const hideTabs = ['wait','deny','exp'].includes(s);
+  $('tab-bar').style.display = hideTabs ? 'none' : '';
+}
+
+const TAB_SCREENS = { wsh:'scr-wsh', new:'scr-new', ret:'scr-ret' };
+function switchTab(t) {
+  Object.entries(TAB_SCREENS).forEach(([k, sid]) => $(sid).classList.toggle('on', k === t));
+  document.querySelectorAll('.tab').forEach(el => {
+    const active = el.getAttribute('aria-controls') === TAB_SCREENS[t];
+    el.classList.toggle('on', active);
+    el.setAttribute('aria-selected', active ? 'true' : 'false');
+  });
+  ['err-wsh','err-new','err-ret'].forEach(id => { const e = $(id); if (e) e.textContent = ''; });
+}
+
+function reset() {
+  localStorage.removeItem('fmcg_reqId');
+  show('new');
+  $('tab-bar').style.display = '';
+  switchTab('new');
+}
+
+let poll = null;
+function startPolling(reqId) {
+  localStorage.setItem('fmcg_reqId', reqId);
+  show('wait');
+  clearInterval(poll);
+  const check = () => fetch('/auth/status?reqId=' + encodeURIComponent(reqId))
+    .then(r => r.json()).then(j => {
+      if (j.status === 'approved') {
+        clearInterval(poll);
+        fetch('/auth/claim', { method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ reqId }) }).then(r => r.json()).then(c => {
+            if (c.ok) { localStorage.removeItem('fmcg_reqId'); location.href = c.redirect || '/'; }
+          });
+      } else if (j.status === 'denied')  { clearInterval(poll); localStorage.removeItem('fmcg_reqId'); show('deny'); }
+      else if (j.status === 'expired')   { clearInterval(poll); localStorage.removeItem('fmcg_reqId'); show('exp'); }
+      else if (j.status === 'unknown')   { clearInterval(poll); localStorage.removeItem('fmcg_reqId'); reset(); }
+    }).catch(() => {});
+  check();
+  poll = setInterval(check, 4000);
+}
+
+// ── Кнопка «Отправить заявку» ──
+$('btn-new').onclick = () => {
+  const name  = $('name').value.trim();
+  const email = $('email').value.trim();
+  $('err-new').textContent = '';
+  if (name.length < 2)                              { $('err-new').textContent = 'Укажите имя'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))   { $('err-new').textContent = 'Укажите корректный email'; return; }
+  $('btn-new').disabled = true; $('btn-new').textContent = 'Отправляем…';
+  fetch('/auth/request', { method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ name, email, org: $('org').value.trim(), purpose: $('purpose').value.trim() }) })
+    .then(r => r.json()).then(j => {
+      if (j.status === 'instant') { localStorage.removeItem('fmcg_reqId'); location.href = j.redirect || '/'; return; }
+      if (j.reqId) { startPolling(j.reqId); return; }
+      $('err-new').textContent = j.error || 'Ошибка. Попробуйте ещё раз';
+      $('btn-new').disabled = false; $('btn-new').textContent = 'Отправить заявку';
+    }).catch(() => {
+      $('err-new').textContent = 'Ошибка сети';
+      $('btn-new').disabled = false; $('btn-new').textContent = 'Отправить заявку';
+    });
+};
+
+// ── Кнопка «Войти» (повторный вход) ──
+$('btn-ret').onclick = () => {
+  const email = $('ret-email').value.trim();
+  $('err-ret').textContent = '';
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { $('err-ret').textContent = 'Укажите корректный email'; return; }
+  $('btn-ret').disabled = true; $('btn-ret').textContent = 'Проверяем…';
+  fetch('/auth/reclaim', { method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ email }) })
+    .then(r => r.json()).then(j => {
+      if (j.ok) { location.href = j.redirect || '/'; return; }
+      $('err-ret').textContent = 'Этот email не найден. Воспользуйтесь вкладкой «Запрос доступа».';
+      $('btn-ret').disabled = false; $('btn-ret').textContent = 'Войти →';
+    }).catch(() => {
+      $('err-ret').textContent = 'Ошибка сети';
+      $('btn-ret').disabled = false; $('btn-ret').textContent = 'Войти →';
+    });
+};
+
+// ── Вход по коду игры (режим воркшопа) ──
+function submitWorkshop() {
+  const code = $('wsh-code').value.trim();
+  $('err-wsh').textContent = '';
+  if (!code) { $('err-wsh').textContent = 'Введите код игры'; return; }
+  $('btn-wsh').disabled = true; $('btn-wsh').textContent = 'Входим…';
+  fetch('/auth/workshop', { method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ code }) })
+    .then(r => r.json()).then(j => {
+      if (j.ok) { location.href = j.redirect || '/'; return; }
+      $('err-wsh').textContent = j.error || 'Неверный код игры';
+      $('btn-wsh').disabled = false; $('btn-wsh').textContent = 'Войти в игру →';
+    }).catch(() => {
+      $('err-wsh').textContent = 'Ошибка сети';
+      $('btn-wsh').disabled = false; $('btn-wsh').textContent = 'Войти в игру →';
+    });
+}
+$('btn-wsh').onclick = submitWorkshop;
+$('wsh-code').addEventListener('keydown', e => { if (e.key === 'Enter') submitWorkshop(); });
+
+// Узнать у сервера, включён ли режим воркшопа → показать вкладку «Код игры» и сделать её первой
+fetch('/auth/config').then(r => r.json()).then(cfg => {
+  if (cfg && cfg.workshop) {
+    $('tab-wsh').style.display = '';
+    if (!localStorage.getItem('fmcg_reqId')) switchTab('wsh');
+  }
+}).catch(() => {});
+
+// Восстановить незавершённую заявку после перезагрузки
+const saved = localStorage.getItem('fmcg_reqId');
+if (saved) startPolling(saved);
+</script>
+</body>
+</html>

@@ -4,9 +4,17 @@
   "description": "FMCG-цепочка — деловая игра",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node tests/smoke.test.js && node tests/engine.test.js",
+    "test:smoke": "node tests/smoke.test.js",
+    "test:engine": "node tests/engine.test.js",
+    "test:auth": "node tests/auth.test.js",
+    "test:protocol": "node tests/protocol.test.js",
+    "test:simulation": "node tests/simulation.test.js",
+    "test:all": "node tests/smoke.test.js && node tests/engine.test.js && node tests/protocol.test.js && node tests/auth.test.js && node tests/simulation.test.js"
   },
   "dependencies": {
+    "dotenv": "^16.6.1",
     "express": "^4.18.2",
     "ws": "^8.16.0"
   }

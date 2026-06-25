@@ -1,4 +1,5 @@
 'use strict';
+try { require('dotenv').config(); } catch (e) { /* .env опционален */ }
 const express = require('express');
 const { WebSocketServer } = require('ws');
 const http = require('http');
@@ -15,7 +16,19 @@ const STATE_FILE = path.join(__dirname, 'game-state.json');
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
-app.use(express.static(path.join(__dirname, 'public')));
+
+// ━━━ АВТОРИЗАЦИЯ (заявка + одобрение владельцем; гейт перед статикой) ━━━
+const auth = require('./auth');
+app.use(express.json({ limit: '32kb' }));
+auth.mount(app);                  // /auth/* — заявки, статус, одобрение
+app.use(auth.gate);               // нет валидного доступа → редирект на /login.html
+// no-cache: браузер обязан ревалидировать при каждой загрузке. После деплоя свежая
+// версия отдаётся сразу (без ручного Ctrl+Shift+R); ETag/Last-Modified дают 304,
+// если файл не изменился — лишнего трафика нет.
+app.use(express.static(path.join(__dirname, 'public'), {
+  etag: true, lastModified: true,
+  setHeaders(res) { res.setHeader('Cache-Control', 'no-cache'); },
+}));
 
 // ━━━ CONSTANTS (из единого конфига public/gameconfig.js) ━━━
 const RETS = CONFIG.retIds;
@@ -23,6 +36,10 @@ const SUPS = CONFIG.supIds;
 const ALL_TEAMS = CONFIG.allTeams;
 
 const P = CONFIG;   // экономика и константы движка — эталон для всех клиентов
+
+// ━━━ ДВИЖОК — единственная копия в public/engine.js (его же грузит sim.html, его же тестируют) ━━━
+const ENGINE = require('./public/engine.js');
+const { sanitizeDec, calcRound, chainHealth, contribOf, roundProfit } = ENGINE;
 
 // ━━━ ОБОЗНАЧЕНИЯ (внутренние ключи R/S/D, отображение Р/П/Д) ━━━
 const LBL = CONFIG.LBL;
@@ -42,20 +59,20 @@ function normTeam(t) {
 const ROLE_SETS = {
   ret: [
     {ico:'🎩',title:'Директор сети', duty:'Финальное решение, переговоры', lead:true,
-     desc:'Голос команды на переговорах. Слушает аналитика, закупщика и категорийщика, но финальное слово — за ним.',
+     desc:'Голос команды на переговорах. Слушает аналитика, директора по закупкам и категорийщика, но финальное слово — за ним.',
      decide:'Ведёт переговоры с производителями и перевозчиком, утверждает итоговое решение команды.',
      watch:'Баланс: договориться о скидках, но не обрушить отношения и не остаться без товара.'},
     {ico:'🏷️',title:'Категорийный менеджер', duty:'Цена и промо',
      desc:'Отвечает за то, по какой цене и с каким промо продавать каждую категорию на полке.',
      decide:'Уровень цены (агрессивная/стандарт/премиум) и включение промо по каждой категории.',
      watch:'Промо со скидкой ≥10% даёт всплеск спроса, но режет маржу. Премиум-цена работает только если товар свежий и в наличии.'},
-    {ico:'📦',title:'Менеджер закупок', duty:'Объёмы заказов производителям',
+    {ico:'📦',title:'Директор по закупкам', duty:'Объёмы заказов производителям',
      desc:'Решает, сколько и чего заказать у производителей под прогноз спроса.',
      decide:'Объёмы заказа по каждой категории товара.',
      watch:'Перезаказ скоропорта (молочка/фреш) = списания в убыток. Недозаказ = пустые полки и потеря покупателя.'},
     {ico:'📈',title:'Аналитик спроса', duty:'Прогноз и чтение рынка',
      desc:'Читает вводные рынка и событие тура, переводит их в прогноз для команды.',
-     decide:'Не вводит цифры сам — даёт прогноз закупщику и категорийщику.',
+     decide:'Не вводит цифры сам — даёт прогноз директору по закупкам и категорийщику.',
      watch:'Как изменился спрос к прошлому туру, какое событие объявлено, где будет дефицит или всплеск.'},
   ],
   sup: [
@@ -103,10 +120,9 @@ const CHARS = {
   'Аналитик':      {ico:'📊',clr:'#58a6ff',desc:'Обосновывает цифрами, принимает взвешенно'},
 };
 const CHAR_NAMES = Object.keys(CHARS);
-const BONUS_FUND = 250; // фонд здоровья цепочки за тур
+const BONUS_FUND = CONFIG.bonusFund; // фонд здоровья цепочки за тур (единый источник — gameconfig.js)
 const teamType = tid => RETS.includes(tid)?'ret':SUPS.includes(tid)?'sup':'dist';
 const pick = a => a[Math.floor(Math.random()*a.length)];
-const clamp01 = v => Math.max(0,Math.min(1,v));
 
 function dealRoles(n) {
   n = Math.max(1, Math.min(4, n||4));
@@ -119,42 +135,22 @@ function dealRoles(n) {
   G.rolesDealt = true;
 }
 
-function roundProfit(res, tid) {
-  const ri=RETS.indexOf(tid), si=SUPS.indexOf(tid);
-  if(ri>=0) return res.retProfit[ri];
-  if(si>=0) return res.supProfit[si];
-  return res.dProfit;
+// Оценка ведущего (0..100, «качество переговоров») — множитель бонусной части.
+// 80 = нейтрально (×1.0), 100 → ×1.25, 0 → ×0. Не оценено → нейтрально.
+// Бьёт ТОЛЬКО по бонусу здоровья, прибыль команды не трогает.
+function manualMult(round, tid) {
+  const m = G.manual?.[round]?.[tid];
+  if (m == null) return 1;
+  return Math.max(0, Math.min(1.25, (+m||0)/80));
 }
-
-// Личный вклад команды в здоровье цепочки [0..1] — масштабирует бонус.
-// Р — собственный OSA, П — выполнение заказов (fill rate), Д — доля довезённого.
-function contribOf(res, tid) {
-  const ri=RETS.indexOf(tid), si=SUPS.indexOf(tid);
-  if(ri>=0) return clamp01(res.retOSA[ri]);
-  if(si>=0) return clamp01(res.supC[si]);
-  return clamp01(res.dCoeff);
-}
-
-function chainHealth(res) {
-  const r=res.r;
-  const OSA      = res.retOSA.reduce((s,v)=>s+v,0)/RETS.length;
-  const totalDef = res.def.flat().reduce((s,v)=>s+v,0);
-  const totalWoff= res.woff.flat().reduce((s,v)=>s+v,0);
-  const totalOrd = RETS.reduce((s,_,ri)=>s+SUPS.reduce((a,_,ci)=>a+(res.d.rets[ri]?.[ci]?.ord||0),0),0);
-  // Хлыст сравниваем с ФАКТИЧЕСКИМ спросом (цена/промо меняют его легально)
-  const totalDem = res.actDem.flat().reduce((s,v)=>s+v,0);
-  const amp      = totalOrd/Math.max(totalDem,1);
-  const Deficit  = 1 - clamp01(totalDef/150);
-  const Bullwhip = 1 - clamp01((amp-1)/1.5);
-  const Waste    = 1 - clamp01(totalWoff/30);
-  const H = clamp01(0.35*OSA + 0.25*Deficit + 0.25*Bullwhip + 0.15*Waste);
-  return {H, OSA, Deficit, Bullwhip, Waste, totalDef, totalWoff};
-}
-
 function recomputeScores() {
   G.scores = {}; ALL_TEAMS.forEach(t=>G.scores[t]=0);
-  G.results.forEach(res=>{ if(!res||!res.scores) return;
-    ALL_TEAMS.forEach(t=>{ G.scores[t]+=res.scores[t]||0; }); });
+  G.results.forEach((res, round)=>{ if(!res||!res.scores) return;
+    ALL_TEAMS.forEach(t=>{
+      const bonus = res.bonus?.[t] ?? 0;       // старые результаты с диска бонус не хранят
+      G.scores[t] += (res.scores[t]||0) + bonus*(manualMult(round,t)-1);
+    });
+  });
 }
 
 // ━━━ GAME STATE ━━━
@@ -278,72 +274,11 @@ function myResult(res, tid) {
   return base;
 }
 
-// ━━━ CALCULATION ENGINE ━━━
-const cln = (v,lo,hi) => { v=+v; if(!Number.isFinite(v)) v=0; return Math.max(lo,Math.min(hi,v)); };
-// Клэмп входов: отрицательные/запредельные значения ломают расчёт всего тура
-function sanitizeDec(r, d) {
-  const caps = P.maxProd.map((m,si)=> (r===2 && si===3) ? P.s4Shock : m); // Тур 3: квота П4
-  return {
-    tariff:  cln(d.tariff, 0, P.maxTariff),
-    distCap: cln(d.distCap, 50, 1000),
-    sups:    SUPS.map((_,si)=>cln(d.sups?.[si], 0, caps[si])),
-    rets:    RETS.map((_,ri)=>SUPS.map((_,ci)=>{
-      const x = d.rets?.[ri]?.[ci] || {};
-      return { asm: x.asm?1:0, ord: cln(x.ord,0,P.maxOrd),
-               prc: [0,1,2,3].includes(+x.prc)?+x.prc:1,
-               prm: x.prm?1:0, dsc: cln(x.dsc,0,P.maxDsc) };
-    })),
-    caps,
-  };
-}
-
-function calcRound(r, dRaw) {
-  const d = sanitizeDec(r, dRaw);
-  const { tariff, distCap, sups, rets, caps } = d;
-  const prod  = SUPS.map((_,si)=>Math.min(sups[si]||0, caps[si]));
-  const oFS   = SUPS.map((_,si)=>RETS.reduce((s,_,ri)=>s+(rets[ri]?.[si]?.ord||0),0));
-  const avail = prod.slice();
-  const sC    = SUPS.map((_,si)=>oFS[si]>0?Math.min(1,avail[si]/oFS[si]):1);
-  const aS    = RETS.map((_,ri)=>SUPS.map((_,ci)=>(rets[ri]?.[ci]?.ord||0)*sC[ci]));
-  const totAS = aS.reduce((s,row)=>s+row.reduce((a,v)=>a+v,0),0);
-  const dC    = totAS>0?Math.min(1,distCap/totAS):1;
-  const del   = aS.map(row=>row.map(v=>v*dC));
-  const aD    = RETS.map((_,ri)=>SUPS.map((_,ci)=>{
-    const x=rets[ri]?.[ci]; if(!x?.asm)return 0;
-    let v=P.demand[r][ci]*P.fShare[ci][ri]*P.price[x.prc??1].dm;
-    if(x.prm&&(x.dsc||0)>=P.pThr)v*=P.pBoost; return v;
-  }));
-  const sold=[],def=[],over=[],woff=[],osa=[];
-  RETS.forEach((_,ri)=>{sold.push([]);def.push([]);over.push([]);woff.push([]);osa.push([]);
-    SUPS.forEach((_,ci)=>{
-      const s=Math.min(del[ri][ci],aD[ri][ci]), ov=Math.max(0,del[ri][ci]-s);
-      sold[ri].push(s); def[ri].push(Math.max(0,aD[ri][ci]-s));
-      over[ri].push(ov); woff[ri].push(P.fresh[ci]?ov:0);
-      osa[ri].push(aD[ri][ci]>0?s/aD[ri][ci]:1);
-    });
-  });
-  // Ритейлер платит за всё ПОСТАВЛЕННОЕ (закупка + тариф), выручка — только с проданного.
-  // Fresh-перезапас теряется полностью; прочий перезапас сохраняет salv×закупка минус холдинг.
-  const retProfit=RETS.map((_,ri)=>{let p=0;
-    SUPS.forEach((_,ci)=>{const x=rets[ri][ci];if(!x.asm)return;
-      const opt=P.opt[ci]*(1-x.dsc), rosn=P.rosn[ci]*P.price[x.prc].pm;
-      const salv=P.fresh[ci]?0:P.salv*opt*over[ri][ci];
-      const hold=P.fresh[ci]?0:over[ri][ci]*P.hCost;
-      p+=rosn*sold[ri][ci]-(opt+tariff)*del[ri][ci]+salv-hold;});return p;});
-  const tD=SUPS.map((_,si)=>RETS.reduce((s,_,ri)=>s+del[ri][si],0));
-  const supProfit=SUPS.map((_,si)=>{let rev=0;
-    RETS.forEach((_,ri)=>{const opt=P.opt[si]*(1-((rets[ri]?.[si]?.dsc)||0));rev+=opt*del[ri][si];});
-    return rev-prod[si]*P.cost[si];});
-  const totDel=del.reduce((s,row)=>s+row.reduce((a,v)=>a+v,0),0);
-  const retOSA=RETS.map((_,ri)=>{const td=aD[ri].reduce((s,v)=>s+v,0);
-    return td>0?aD[ri].reduce((a,v,ci)=>a+sold[ri][ci],0)/td:1;});
-  return {r,tariff,distCap,dCoeff:dC,totDelivered:totDel,d,prod,avail,ordFromSup:oFS,supC:sC,
-          del,actDem:aD,sold,def,over,woff,osa,retProfit,supProfit,dProfit:(tariff-P.tCost)*totDel,
-          retOSA,totDel:tD,unsold:SUPS.map((_,si)=>Math.max(0,avail[si]-tD[si]))};
-}
+// ━━━ ДВИЖОК: sanitizeDec / calcRound / chainHealth / contribOf / roundProfit — в public/engine.js (см. require выше) ━━━
 
 // ━━━ WEBSOCKET ━━━
-wss.on('connection', ws => {
+wss.on('connection', (ws, req) => {
+  if (!auth.wsAllowed(req)) { try { ws.close(4001, 'unauthorized'); } catch (e) {} return; }
   const id = ++seq;
   clients.set(ws, { id, role:null, teamId:null, name:null });
 
@@ -414,7 +349,9 @@ function handle(ws, msg) {
     if (cmd==='manual') {
       if (!G.manual[p.round]) G.manual[p.round]={};
       G.manual[p.round][p.teamId]=p.score;
-      tx(ws, {type:'upd',manual:G.manual});
+      recomputeScores();                          // оценка ведущего теперь влияет на бонус
+      tx(ws, {type:'upd',manual:G.manual});       // сами оценки — только ведущему
+      bcastAll({type:'upd',scores:G.scores});     // обновлённый рейтинг — всем
     }
     if (cmd==='setDec') {
       const {round,teamId,data}=p;
@@ -450,10 +387,11 @@ function handle(ws, msg) {
       res.penalties = {ret:retPenalty, sup:supPenalty};
       // Здоровье цепочки и счёт команд за тур: бонус = H × фонд × личный вклад
       res.health = chainHealth(res);
-      res.contrib = {}; res.scores = {};
+      res.contrib = {}; res.bonus = {}; res.scores = {};
       ALL_TEAMS.forEach(t=>{
         res.contrib[t] = contribOf(res,t);
-        res.scores[t]  = roundProfit(res,t) + res.health.H*BONUS_FUND*res.contrib[t];
+        res.bonus[t]   = res.health.H*BONUS_FUND*res.contrib[t];   // бонус здоровья (до оценки ведущего)
+        res.scores[t]  = roundProfit(res,t) + res.bonus[t];         // нейтральный счёт; оценку применяет recomputeScores
       });
       if (G.results.length>G.round) G.results[G.round]=res;
       else { while(G.results.length<G.round) G.results.push(null); G.results.push(res); }
@@ -535,6 +473,9 @@ server.listen(PORT, '0.0.0.0', () => {
   console.log(line);
   console.log(`  Пароль ведущего:  ${ADMIN_PASS}`);
   console.log(`  Коды команд:  ${ALL_TEAMS.map(t=>LBL[t]).join('  ')}  (вводятся как ${ALL_TEAMS.join(' ')})`);
+  const a = auth.status();
+  console.log(`  Авторизация:  ${a.enabled?'ВКЛ':'выкл'}  ·  SMTP: ${a.smtp?'настроен':'НЕ настроен (заявки в лог)'}  ·  владелец: ${a.owner}`);
+  console.log(`  Режим воркшопа:  ${a.workshop?'ВКЛ (вход по общему коду игры)':'выкл (только заявка+одобрение)'}`);
   console.log(line + '\n');
 });
 

@@ -4,27 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>IBS · FMCG-цепочка · Лаборатория</title>
+<link rel="stylesheet" href="/fonts/onest.css">
 <style>
-@font-face{font-family:'Century Gothic';src:url('/fonts/CenturyGothic.ttf') format('truetype');font-weight:400;font-style:normal}
-@font-face{font-family:'Century Gothic';src:url('/fonts/CenturyGothic-Bold.ttf') format('truetype');font-weight:700;font-style:normal}
-@font-face{font-family:'Century Gothic';src:url('/fonts/CenturyGothic-Italic.ttf') format('truetype');font-weight:400;font-style:italic}
-@font-face{font-family:'Century Gothic';src:url('/fonts/CenturyGothic-BoldItalic.ttf') format('truetype');font-weight:700;font-style:italic}
-
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+/* Светлая SaaS-палитра (как сайт и игра). Имена переменных тёмной темы переремаплены
+   в светлые значения, чтобы не переписывать все компоненты: --bg* — фоны/границы, --W* — текст. */
 :root{
-  --bg:#08101f;--bg2:#111827;--bg3:#1c2d4a;--bg4:#253a5e;
-  --P:#2c4a7c;--PD:#1d3461;
-  --OK:#34c759;--WN:#ff9f0a;--BD:#f85149;--PU:#bc8cff;--OR:#ff9f0a;
-  --W:rgba(255,255,255,.95);--W2:rgba(255,255,255,.60);--W3:rgba(255,255,255,.34);--r:10px;
+  --bg:#f3f5f9;--bg2:#ffffff;--bg3:#e6eaf1;--bg4:#eef1f6;
+  --P:#2563eb;--PD:#1d4ed8;
+  --OK:#15a34a;--WN:#d97706;--BD:#dc2626;--PU:#7c3aed;--OR:#d97706;
+  --W:#0d1526;--W2:#56627a;--W3:#9aa6b8;--r:10px;
+  --gold:#a16207;
 }
-body{background:linear-gradient(160deg,#08101f 0%,#0c1627 100%);color:var(--W);font-family:'Century Gothic',sans-serif;min-height:100vh;overflow-x:hidden}
+body{background:var(--bg);color:var(--W);font-family:'Onest',system-ui,-apple-system,sans-serif;min-height:100vh;overflow-x:hidden}
 
 /* ── Header ── */
-.hdr{background:linear-gradient(135deg,#1c2d4a 0%,#1d3461 100%);border-bottom:1px solid rgba(44,74,124,.25);padding:11px 22px;
-  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.4)}
-.hdr h1{font-size:15px;font-weight:700;color:#fff}
-.ibs-logo{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;background:#fff;border-radius:5px;flex-shrink:0}
-.ibs-logo span{font-family:'Arial Black',Arial,sans-serif;font-size:13px;font-weight:900;color:#1c2d4a;letter-spacing:-.5px}
+.hdr{background:var(--bg2);border-bottom:1px solid var(--bg3);padding:11px 22px;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 8px rgba(13,21,38,.06)}
+.hdr h1{font-size:15px;font-weight:700;color:var(--W)}
+.ibs-logo{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;background:var(--P);border-radius:5px;flex-shrink:0}
+.ibs-logo span{font-family:'Arial Black',Arial,sans-serif;font-size:13px;font-weight:900;color:#fff;letter-spacing:-.5px}
 .rdots{display:flex;gap:5px}
 .rdot{width:24px;height:24px;border-radius:50%;border:2px solid var(--W3);
   display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--W3)}
@@ -43,7 +42,7 @@ body{background:linear-gradient(160deg,#08101f 0%,#0c1627 100%);color:var(--W);f
   color:var(--W3);margin-bottom:10px}
 
 /* Scenario cards */
-.scenario-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:22px}
+.scenario-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:22px}
 .sc-card{background:var(--bg2);border:2px solid var(--bg3);border-radius:var(--r);
   padding:14px 13px;cursor:pointer;transition:all .18s;text-align:left}
 .sc-card:hover{border-color:var(--W3);transform:translateY(-2px)}
@@ -83,9 +82,9 @@ body{background:linear-gradient(160deg,#08101f 0%,#0c1627 100%);color:var(--W);f
 
 /* Event */
 .evt{border-radius:var(--r);padding:12px 16px;margin-bottom:14px;display:flex;gap:12px}
-.evt.shock{background:linear-gradient(135deg,#3d0f0f,#5c1a1a);border:1px solid var(--BD)}
-.evt.promo{background:linear-gradient(135deg,#1a2d0f,#2d4a1a);border:1px solid var(--OK)}
-.evt.info{background:linear-gradient(135deg,#0f1f3d,#1a2d5c);border:1px solid var(--P)}
+.evt.shock{background:rgba(220,38,38,.07);border:1px solid rgba(220,38,38,.35)}
+.evt.promo{background:rgba(21,163,74,.07);border:1px solid rgba(21,163,74,.35)}
+.evt.info{background:rgba(37,99,235,.07);border:1px solid rgba(37,99,235,.35)}
 .evt .eico{font-size:24px}.evt h3{font-size:13px;font-weight:700;margin-bottom:3px}
 .evt.shock h3{color:var(--BD)}.evt.promo h3{color:var(--OK)}.evt.info h3{color:var(--P)}
 .evt p{font-size:12px;color:var(--W2);line-height:1.5}
@@ -158,13 +157,13 @@ body{background:linear-gradient(160deg,#08101f 0%,#0c1627 100%);color:var(--W);f
 .an-hero{display:flex;align-items:center;gap:20px;margin-bottom:24px;
   background:var(--bg2);border:1px solid var(--bg3);border-radius:14px;padding:18px 22px}
 .an-trophy{font-size:52px}
-.an-title h2{font-size:22px;font-weight:700;color:#ffd700;margin-bottom:4px}
+.an-title h2{font-size:22px;font-weight:700;color:var(--W);margin-bottom:4px}
 .an-title p{font-size:13px;color:var(--W2)}
 .winners{display:flex;gap:10px;margin-left:auto;flex-wrap:wrap}
 .wcard{background:var(--bg3);border:1.5px solid var(--WN);border-radius:10px;
   padding:10px 16px;text-align:center;min-width:140px}
 .wcard .wt{font-size:9px;text-transform:uppercase;letter-spacing:.4px;color:var(--W2);margin-bottom:3px}
-.wcard .wn{font-size:15px;font-weight:700;color:#ffd700}
+.wcard .wn{font-size:15px;font-weight:700;color:var(--gold)}
 .wcard .ws{font-size:10px;color:var(--W2);margin-top:2px}
 
 /* Awards */
@@ -266,8 +265,8 @@ body{background:linear-gradient(160deg,#08101f 0%,#0c1627 100%);color:var(--W);f
 .ns-stake .ns-stake-ico{flex-shrink:0;opacity:.8}
 .ns-stake b{color:var(--W);font-weight:600}
 .neg-session{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);overflow:hidden;
-  box-shadow:0 2px 12px rgba(0,0,0,.25)}
-.neg-session-hdr{padding:12px 16px;border-bottom:1px solid var(--bg3);background:rgba(255,255,255,.025)}
+  box-shadow:0 2px 12px rgba(13,21,38,.06)}
+.neg-session-hdr{padding:12px 16px;border-bottom:1px solid var(--bg3);background:var(--bg4)}
 .ns-combatants{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .ns-fighter{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
 .ns-fighter-r{justify-content:flex-end}
@@ -276,7 +275,7 @@ body{background:linear-gradient(160deg,#08101f 0%,#0c1627 100%);color:var(--W);f
 .ns-char-name{font-size:12px;font-weight:700;white-space:nowrap}
 .ns-team-name{font-size:10px;color:var(--W3);white-space:nowrap}
 .ns-vs{font-size:12px;color:var(--W3);font-weight:700;flex-shrink:0;padding:0 4px}
-.ns-subject-row{display:flex;align-items:center;gap:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05)}
+.ns-subject-row{display:flex;align-items:center;gap:8px;padding-top:8px;border-top:1px solid var(--bg3)}
 .ns-subj-tag{font-size:10px;color:var(--W3);white-space:nowrap;flex-shrink:0}
 .ns-subj-text{font-size:11px;color:var(--W);font-weight:600;flex:1}
 .neg-outcome-badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;
@@ -298,7 +297,7 @@ body{background:linear-gradient(160deg,#08101f 0%,#0c1627 100%);color:var(--W);f
 .msg-offer-tag{font-size:11px;font-weight:700;margin-top:4px;padding:4px 11px;border-radius:20px;
   display:inline-block;border:1px solid;letter-spacing:.2px}
 .neg-msg.left  .msg-offer-tag{background:rgba(61,108,181,.12);color:var(--P);border-color:rgba(61,108,181,.3);align-self:flex-start}
-.neg-msg.right .msg-offer-tag{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.25);align-self:flex-end}
+.neg-msg.right .msg-offer-tag{background:var(--bg4);color:var(--W2);border-color:var(--bg3);align-self:flex-end}
 .typing-indicator{opacity:.7}
 .typing-dots{display:inline-flex;gap:4px;padding:10px 14px;background:var(--bg4);border-radius:14px;border-bottom-left-radius:3px}
 .typing-dots span{width:6px;height:6px;background:var(--W3);border-radius:50%;animation:typingBounce 1.1s ease-in-out infinite}
@@ -306,6 +305,49 @@ body{background:linear-gradient(160deg,#08101f 0%,#0c1627 100%);color:var(--W);f
 .typing-dots span:nth-child(3){animation-delay:.36s}
 @keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
 
+/* ── What-if editor ── */
+.wif{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);padding:13px 14px}
+.wif-grp{margin-bottom:13px}
+.wif-grp>.wlbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--W3);margin-bottom:7px}
+.wtbl{width:100%;border-collapse:collapse;font-size:11px}
+.wtbl th{font-size:9px;font-weight:700;color:var(--W3);text-transform:uppercase;letter-spacing:.3px;text-align:center;padding:4px 4px;border-bottom:1px solid var(--bg3)}
+.wtbl th:first-child{text-align:left}
+.wtbl td{padding:5px 4px;text-align:center;border-bottom:1px solid rgba(44,74,124,.18)}
+.wtbl td:first-child{text-align:left;color:var(--W);font-weight:700;white-space:nowrap}
+.wtbl input[type=number]{width:54px;background:var(--bg3);border:1px solid var(--W3);border-radius:5px;color:var(--W);font-size:11px;padding:4px 5px;text-align:center;font-family:inherit}
+.wtbl input[type=number]:focus{outline:none;border-color:var(--P)}
+.wtbl select{background:var(--bg3);border:1px solid var(--W3);border-radius:5px;color:var(--W);font-size:11px;padding:4px 5px;font-family:inherit}
+.wtbl input[type=checkbox]{accent-color:var(--P);width:15px;height:15px;cursor:pointer}
+.wif-actions{display:flex;gap:9px;align-items:center;margin-top:6px}
+.wif-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,159,10,.14);color:var(--WN);border:1px solid rgba(255,159,10,.4);border-radius:20px;padding:3px 11px;font-size:10px;font-weight:700;margin-left:7px}
+/* ── A/B panel & compare ── */
+.ab-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ab-slot{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);padding:13px 14px}
+.ab-slot.filled{border-color:var(--P)}
+.ab-k{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--W3);margin-bottom:5px}
+.ab-v{font-size:14px;font-weight:700}
+.ab-m{font-size:11px;color:var(--W2);margin-top:3px}
+.ab-empty{font-size:13px;color:var(--W3);font-style:italic}
+.cmp-hero{display:flex;align-items:center;justify-content:space-between;gap:16px;background:var(--bg2);border:1px solid var(--bg3);border-radius:14px;padding:16px 20px;margin-bottom:14px}
+.cmp-labels{display:flex;align-items:center;gap:11px;font-size:13px}
+.cmp-lab{font-size:15px;font-weight:700}
+.cmp-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.cmp-metric{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--r);padding:14px 16px;text-align:center}
+.cmp-mname{font-size:11px;color:var(--W3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:9px}
+.cmp-vals{display:flex;align-items:center;justify-content:center;gap:9px;font-size:18px;font-weight:700}
+.cmp-va,.cmp-vb{opacity:.55}.cmp-va.win,.cmp-vb.win{opacity:1}
+.cmp-va.win{color:var(--OK)}.cmp-vb.win{color:var(--OK)}
+.cmp-sep{font-size:11px;color:var(--W3);font-weight:400}
+.cmp-trow{display:grid;grid-template-columns:64px 1fr 42px 1fr 42px;align-items:center;gap:8px;margin-bottom:7px}
+.cmp-tn{font-size:12px;font-weight:700;color:var(--W2)}
+.cmp-tbar{height:9px;background:var(--bg4);border-radius:5px;overflow:hidden}
+.cmp-tbar>div{height:100%;border-radius:5px}
+.cmp-tv{font-size:11px;font-weight:700;text-align:right}
+.cmp-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.cmp-tbl th{font-size:10px;font-weight:700;color:var(--W3);text-transform:uppercase;text-align:right;padding:5px 8px;border-bottom:1px solid var(--bg3)}
+.cmp-tbl th:first-child{text-align:left}
+.cmp-tbl td{padding:5px 8px;text-align:right;border-bottom:1px solid rgba(44,74,124,.18)}
+.cmp-tbl td:first-child{text-align:left;color:var(--W);font-weight:700}
 @media(max-width:900px){.round-cols{grid-template-columns:1fr}.scenario-grid{grid-template-columns:repeat(3,1fr)}.an-grid{grid-template-columns:1fr}.cards-grid{grid-template-columns:repeat(2,1fr)}.team-strat-grid{grid-template-columns:repeat(2,1fr)}.params-row{grid-template-columns:1fr}.char-grid{grid-template-columns:repeat(2,1fr)}.team-roster-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
@@ -313,7 +355,7 @@ body{background:linear-gradient(160deg,#08101f 0%,#0c1627 100%);color:var(--W);f
 
 <header class="hdr">
   <div style="display:flex;align-items:center;gap:12px">
-    <a href="/" class="btn-back" style="color:rgba(255,255,255,.7)">← Назад</a>
+    <a href="/" class="btn-back">← Назад</a>
     <div class="ibs-logo"><span>IBS</span></div>
     <h1>FMCG-цепочка <span style="font-size:11px;opacity:.65;font-weight:400">· Лаборатория</span></h1>
   </div>
@@ -328,6 +370,7 @@ body{background:linear-gradient(160deg,#08101f 0%,#0c1627 100%);color:var(--W);f
 
   <div class="section-label">Сценарий</div>
   <div class="scenario-grid" id="sc-grid"></div>
+  <div id="custom-demand" style="display:none;margin-bottom:22px"></div>
 
   <div class="section-label">Стратегии команд <span style="font-weight:400;color:var(--W3)">(сценарий задаёт дефолт, можно изменить)</span></div>
   <div class="team-strat-grid" id="strat-grid"></div>
@@ -360,6 +403,9 @@ body{background:linear-gradient(160deg,#08101f 0%,#0c1627 100%);color:var(--W);f
   </div>
 
   <button class="btn btn-P btn-lg" onclick="runSim()">▶ Запустить симуляцию</button>
+
+  <div class="section-label" style="margin-top:24px">Сравнение A/B <span style="font-weight:400;color:var(--W3)">— прогоните две настройки и сравните итоги бок-о-бок</span></div>
+  <div id="ab-panel"></div>
 </div>
 
 <!-- ═════ ROLE DISTRIBUTION ═════ -->
@@ -413,8 +459,12 @@ body{background:linear-gradient(160deg,#08101f 0%,#0c1627 100%);color:var(--W);f
   <div id="r-evt"></div>
   <div class="round-cols">
     <div>
-      <div class="section-label" style="margin-bottom:7px">Что сделала каждая команда</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
+        <div class="section-label" style="margin-bottom:0">Что сделала каждая команда</div>
+        <button class="btn btn-S btn-sm" id="edit-toggle" onclick="toggleEditor()" style="padding:4px 11px;font-size:11px">✏️ Что если…</button>
+      </div>
       <div class="cards-grid" id="r-cards"></div>
+      <div id="r-editor" style="display:none"></div>
     </div>
     <div class="right-panel">
       <div class="rpanel">
@@ -481,12 +531,34 @@ body{background:linear-gradient(160deg,#08101f 0%,#0c1627 100%);color:var(--W);f
   <div style="text-align:center">
     <button class="btn btn-P btn-lg" onclick="goSetup()">🔄 Новая симуляция</button>
     &nbsp;&nbsp;
+    <button class="btn btn-S btn-lg" onclick="exportCSV()">⬇ Экспорт CSV</button>
+    &nbsp;&nbsp;
     <a href="/" class="btn btn-S btn-lg" style="text-decoration:none">← На главную</a>
+  </div>
+</div>
+
+<!-- ═════ COMPARE A/B ═════ -->
+<div id="s-compare" class="scr">
+  <div class="cmp-hero">
+    <div><h2 style="font-size:20px;font-weight:700">⚖ Сравнение прогонов A ↔ B</h2>
+      <p style="font-size:12px;color:var(--W2)">Два набора настроек бок-о-бок — что даёт более здоровую и прибыльную цепочку</p></div>
+    <div class="cmp-labels">
+      <span class="cmp-lab" id="cmp-a-label">A</span><span style="color:var(--W3)">vs</span><span class="cmp-lab" id="cmp-b-label">B</span>
+    </div>
+  </div>
+  <div class="cmp-cards" id="cmp-metrics"></div>
+  <div class="an-card" style="margin-top:14px"><h3>❤️ Здоровье цепочки по турам · <span id="cmp-h-leg" style="font-weight:400;color:var(--W3)">A слева · B справа</span></h3>
+    <div id="cmp-health" style="margin-top:10px"></div></div>
+  <div class="an-card" style="margin-top:14px"><h3>🏆 Итоговый счёт по командам</h3>
+    <table class="cmp-tbl"><thead><tr><th>Команда</th><th>A</th><th>B</th><th>Δ (A−B)</th></tr></thead><tbody id="cmp-teams"></tbody></table></div>
+  <div style="text-align:center;margin-top:16px">
+    <button class="btn btn-P btn-lg" onclick="goSetup()">← К настройкам</button>
   </div>
 </div>
 
 <!-- ═══════════════════════════════════ SCRIPT ═══════════════════════════════════ -->
 <script src="/gameconfig.js"></script>
+<script src="/engine.js"></script>
 <script>
 'use strict';
 
@@ -494,50 +566,9 @@ body{background:linear-gradient(160deg,#08101f 0%,#0c1627 100%);color:var(--W);f
 const RETS = GAME_CONFIG.retIds, SUPS = GAME_CONFIG.supIds, ALL = GAME_CONFIG.allTeams;
 const P = GAME_CONFIG;   // экономика и константы — эталон (зеркало server.js)
 
-// ━━━ CALCULATION ENGINE (exact from server.js) ━━━
-function calcRound(r, d) {
-  const {tariff, distCap, sups, rets} = d;
-  const prod  = SUPS.map((_,si)=>Math.min(sups[si]||0, P.maxProd[si]));
-  const oFS   = SUPS.map((_,si)=>RETS.reduce((s,_,ri)=>s+(rets[ri]?.[si]?.ord||0),0));
-  const avail = prod.slice();
-  const sC    = SUPS.map((_,si)=>oFS[si]>0?Math.min(1,avail[si]/oFS[si]):1);
-  const aS    = RETS.map((_,ri)=>SUPS.map((_,ci)=>(rets[ri]?.[ci]?.ord||0)*sC[ci]));
-  const totAS = aS.reduce((s,row)=>s+row.reduce((a,v)=>a+v,0),0);
-  const dC    = totAS>0?Math.min(1,distCap/totAS):1;
-  const del   = aS.map(row=>row.map(v=>v*dC));
-  const aD    = RETS.map((_,ri)=>SUPS.map((_,ci)=>{
-    const x=rets[ri]?.[ci]; if(!x?.asm)return 0;
-    let v=P.demand[r][ci]*P.fShare[ci][ri]*P.price[x.prc||1].dm;
-    if(x.prm&&(x.dsc||0)>=P.pThr) v*=P.pBoost; return v;
-  }));
-  const sold=[],def=[],over=[],woff=[];
-  RETS.forEach((_,ri)=>{sold.push([]);def.push([]);over.push([]);woff.push([]);
-    SUPS.forEach((_,ci)=>{
-      const s=Math.min(del[ri][ci],aD[ri][ci]),ov=Math.max(0,del[ri][ci]-s);
-      sold[ri].push(s); def[ri].push(Math.max(0,aD[ri][ci]-s));
-      over[ri].push(ov); woff[ri].push(P.fresh[ci]?ov:0);
-    });
-  });
-  // Ритейлер платит за всё поставленное; Fresh-перезапас — полная потеря,
-  // прочий перезапас сохраняет salv×закупка минус холдинг
-  const retProfit=RETS.map((_,ri)=>{let p=0;
-    SUPS.forEach((_,ci)=>{const x=rets[ri]?.[ci];if(!x?.asm)return;
-      const opt=P.opt[ci]*(1-(x.dsc||0)),rosn=P.rosn[ci]*P.price[x.prc||1].pm;
-      const salv=P.fresh[ci]?0:P.salv*opt*over[ri][ci];
-      const hold=P.fresh[ci]?0:over[ri][ci]*P.hCost;
-      p+=rosn*sold[ri][ci]-(opt+tariff)*del[ri][ci]+salv-hold;});return p;});
-  const tD=SUPS.map((_,si)=>RETS.reduce((s,_,ri)=>s+del[ri][si],0));
-  const supProfit=SUPS.map((_,si)=>{let rev=0;
-    RETS.forEach((_,ri)=>{const opt=P.opt[si]*(1-((rets[ri]?.[si]?.dsc)||0));rev+=opt*del[ri][si];});
-    return rev-prod[si]*P.cost[si];});
-  const totDel=del.reduce((s,row)=>s+row.reduce((a,v)=>a+v,0),0);
-  const retOSA=RETS.map((_,ri)=>{const td=aD[ri].reduce((s,v)=>s+v,0);
-    return td>0?aD[ri].reduce((a,_,ci)=>a+sold[ri][ci],0)/td:1;});
-  return {r,tariff,distCap,dCoeff:dC,totDelivered:totDel,prod,ordFromSup:oFS,supCoeff:sC,
-    del,actDem:aD,sold,def,over,woff,retProfit,supProfit,
-    dProfit:(tariff-P.tCost)*totDel,retOSA,totDel:tD,
-    unsold:SUPS.map((_,si)=>Math.max(0,avail[si]-tD[si]))};
-}
+// ━━━ ДВИЖОК: единый public/engine.js. Лаборатория — режим «песочницы» (sanitize:false):
+// без игровых капов (свой шок/спрос), но математика та же, что на сервере. Возвращает supC (не supCoeff).
+const calcRound = (r, d) => GAME_ENGINE.calcRound(r, d, { sanitize: false });
 
 // ━━━ STRATEGIES ━━━
 const STRATS = {
@@ -565,53 +596,61 @@ const SCENARIOS = {
   bullwhip:{
     name:'🌊 Эффект хлыста', color:'#3d6cb5',
     desc:'Ритейлеры гонятся за спросом и перезаказывают. Поставщики следуют за заказами. Цепочка раскачивается.',
-    strats:{R1:'Агрессивный',R2:'Агрессивный',R3:'Агрессивный',S1:'Максималист',S2:'Максималист',S3:'Максималист',S4:'Максималист',D:'Монополист'},
+    strats:{R1:'Агрессивный',R2:'Агрессивный',R3:'Агрессивный',R4:'Агрессивный',S1:'Максималист',S2:'Максималист',S3:'Максималист',S4:'Максималист',D:'Монополист'},
     params:{noise:15,shock:200,boost:15},
     discuss:['Насколько сильнее «раскачались» заказы поставщиков по сравнению с колебаниями спроса?','Кто проиграл больше всего от перезапаса в Туре 3?','Как бы изменилась ситуация, если бы ритейлеры делились прогнозами с поставщиками?'],
   },
   promo:{
     name:'🎪 Промо-хаос', color:'#ff9f0a',
     desc:'Все ритейлеры жмут промо одновременно. Буст в Туре 2 — искусственный. После — запасы, дефицит и убытки.',
-    strats:{R1:'Промо-фанат',R2:'Промо-фанат',R3:'Промо-фанат',S1:'Реактивный',S2:'Максималист',S3:'Максималист',S4:'Точный',D:'Оптимизатор'},
+    strats:{R1:'Промо-фанат',R2:'Промо-фанат',R3:'Промо-фанат',R4:'Рыночный',S1:'Реактивный',S2:'Максималист',S3:'Максималист',S4:'Точный',D:'Оптимизатор'},
     params:{noise:10,shock:200,boost:20},
     discuss:['В каком туре промо дало наибольший буст? Почему он оказался временным?','Кто заработал на промо-хаосе, а кто потерял?','Что произошло с запасами Молочки и Фреша когда все одновременно заказали под промо?'],
   },
   ideal:{
     name:'🤝 Идеальная координация', color:'#34c759',
     desc:'Команды делятся прогнозами и заказывают точно. Это базовый уровень — используйте для сравнения.',
-    strats:{R1:'Рыночный',R2:'Рыночный',R3:'Рыночный',S1:'Точный',S2:'Точный',S3:'Точный',S4:'Точный',D:'Партнёр'},
+    strats:{R1:'Рыночный',R2:'Рыночный',R3:'Рыночный',R4:'Рыночный',S1:'Точный',S2:'Точный',S3:'Точный',S4:'Точный',D:'Партнёр'},
     params:{noise:4,shock:200,boost:15},
     discuss:['Насколько выше прибыль цепочки по сравнению со сценарием «Хаос»?','Какая минимальная координация нужна для такого результата?','Что мешает реализовать этот сценарий на практике?'],
   },
   stress:{
     name:'💥 Стресс-тест', color:'#f85149',
     desc:'Максимальный шок в Туре 3: мощность перевозчика 120 ед., квота Импорта — 20 ед. Кто выживает? Кто теряет всё?',
-    strats:{R1:'Агрессивный',R2:'Рыночный',R3:'Рыночный',S1:'Осторожный',S2:'Осторожный',S3:'Реактивный',S4:'Точный',D:'Монополист'},
+    strats:{R1:'Агрессивный',R2:'Рыночный',R3:'Рыночный',R4:'Консервативный',S1:'Осторожный',S2:'Осторожный',S3:'Реактивный',S4:'Точный',D:'Монополист'},
     params:{noise:20,shock:120,boost:15},
     discuss:['Как дистрибьютор должен был распределить ограниченные 120 ед.? Было ли это справедливо?','Кто принял правильное решение заранее, а кто пострадал от шока?','Какие буферные запасы помогли бы пережить этот шок?'],
   },
   free:{
     name:'🎲 Свободный рынок', color:'#bc8cff',
     desc:'Смешанные стратегии — каждый за себя, переговоры не сложились. Реалистичный сценарий без координации.',
-    strats:{R1:'Агрессивный',R2:'Рыночный',R3:'Промо-фанат',S1:'Реактивный',S2:'Максималист',S3:'Точный',S4:'Осторожный',D:'Оптимизатор'},
+    strats:{R1:'Агрессивный',R2:'Рыночный',R3:'Промо-фанат',R4:'Консервативный',S1:'Реактивный',S2:'Максималист',S3:'Точный',S4:'Осторожный',D:'Оптимизатор'},
     params:{noise:12,shock:200,boost:15},
     discuss:['Чья стратегия оказалась наиболее выигрышной? Почему?','Где стратегии команд конфликтовали друг с другом?','Что нужно согласовать минимально, чтобы улучшить общий результат?'],
   },
+  custom:{
+    name:'🛠 Свой сценарий', color:'#22d3ee',
+    desc:'Задайте собственный спрос по турам, шок перевозчика и промо-буст. Полный контроль над рынком.',
+    strats:{R1:'Рыночный',R2:'Рыночный',R3:'Промо-фанат',R4:'Консервативный',S1:'Точный',S2:'Реактивный',S3:'Максималист',S4:'Осторожный',D:'Оптимизатор'},
+    params:{noise:10,shock:200,boost:15},
+    discuss:['Как заданный вами спрос повлиял на дефицит и эффект хлыста?','Какой уровень шока перевозчика ломает цепочку?','Какая комбинация спроса и стратегий даёт самое здоровое равновесие?'],
+  },
 };
 
-const TEAM_ICO  = {R1:'🛒',R2:'🛒',R3:'🛒',S1:'🏭',S2:'🏭',S3:'🏭',S4:'🏭',D:'🚛'};
-const TEAM_TYPE = {R1:'ret',R2:'ret',R3:'ret',S1:'sup',S2:'sup',S3:'sup',S4:'sup',D:'dist'};
-const TEAM_ROLE = {R1:'Дискаунтер',R2:'Супермаркет',R3:'Гипермаркет',
+const TEAM_ICO  = {R1:'🛒',R2:'🛒',R3:'🛒',R4:'🛒',S1:'🏭',S2:'🏭',S3:'🏭',S4:'🏭',D:'🚛'};
+const TEAM_TYPE = {R1:'ret',R2:'ret',R3:'ret',R4:'ret',S1:'sup',S2:'sup',S3:'sup',S4:'sup',D:'dist'};
+const TEAM_ROLE = {R1:'Дискаунтер',R2:'Супермаркет',R3:'Гипермаркет',R4:'Премиум',
                    S1:'Базовый',S2:'Fresh',S3:'Промо-хиты',S4:'Импорт',D:'Дистрибьютор'};
 // Тип бизнеса команды (понятный префикс вместо кодов Р/П/Д)
-const TYPE = {R1:'Магазин',R2:'Магазин',R3:'Магазин',
+const TYPE = {R1:'Магазин',R2:'Магазин',R3:'Магазин',R4:'Магазин',
               S1:'Производитель',S2:'Производитель',S3:'Производитель',S4:'Производитель',D:'Перевозчик'};
 // LBL = различимое короткое имя для подписей/графиков (без кодов)
 const LBL = {...TEAM_ROLE};
 const turLabel = i => `Тур ${i+1}`;
 const DEMO_NAMES={
   R1:['Близко&Дёшево','ЦенаБит','АльфаМаркет'],R2:['УютМаркет','СвежийГород','МегаФреш'],
-  R3:['ГиперКолосс','МаксМолл','КупольТорг'],S1:['АгроПром','МассФуд','БазисСнаб'],
+  R3:['ГиперКолосс','МаксМолл','КупольТорг'],R4:['ПремиумСити','ЭлитМаркет','ЛюксФуд'],
+  S1:['АгроПром','МассФуд','БазисСнаб'],
   S2:['ФрешЛайн','СвежестьПлюс','ЗеленьПро'],S3:['ПромоСила','БустФуд','АктивПром'],
   S4:['ИмпортЭлит','ПремиумФуд','ЕвроТрейд'],D:['ЛогоМакс','ТрансФуд','ЭффектДист'],
 };
@@ -619,46 +658,14 @@ const pick = arr => arr[Math.floor(Math.random()*arr.length)];
 const rnd  = (a,b) => a+Math.random()*(b-a);
 const f0   = v => Math.round(v||0);
 const f1   = v => parseFloat(v||0).toFixed(1);
-const clamp01 = v => Math.max(0,Math.min(1,v));
-
-// ━━━ СИСТЕМА СЧЁТА ━━━
-const BONUS_FUND = 250; // фонд здоровья цепочки за тур (у.е.)
-
-// Прибыль конкретной команды за тур
-function roundProfit(res, tid) {
-  const ri=RETS.indexOf(tid), si=SUPS.indexOf(tid);
-  if(ri>=0) return res.retProfit[ri];
-  if(si>=0) return res.supProfit[si];
-  return res.dProfit;
-}
-
-// Личный вклад в здоровье [0..1]: Р — OSA, П — fill rate, Д — доля довезённого
-function contribOf(res, tid) {
-  const ri=RETS.indexOf(tid), si=SUPS.indexOf(tid);
-  if(ri>=0) return clamp01(res.retOSA[ri]);
-  if(si>=0) return clamp01(res.supCoeff[si]);
-  return clamp01(res.dCoeff);
-}
-
-// Индекс здоровья цепочки за тур H ∈ [0,1] + компоненты
-function chainHealth(res, r) {
-  const OSA      = res.retOSA.reduce((s,v)=>s+v,0)/RETS.length;
-  const totalDef = res.def.flat().reduce((s,v)=>s+v,0);
-  const totalWoff= res.woff.flat().reduce((s,v)=>s+v,0);
-  // Эффект хлыста: заказы vs ФАКТИЧЕСКИЙ спрос (цена/промо меняют его легально)
-  const totalOrd = RETS.reduce((s,_,ri)=>s+SUPS.reduce((a,_,ci)=>a+(SIM.decisions[r].rets[ri][ci].ord||0),0),0);
-  const totalDem = res.actDem.flat().reduce((s,v)=>s+v,0);
-  const amp      = totalOrd/Math.max(totalDem,1);
-  const Deficit  = 1 - clamp01(totalDef/150);
-  const Bullwhip = 1 - clamp01((amp-1)/1.5);
-  const Waste    = 1 - clamp01(totalWoff/30);
-  const H = 0.35*OSA + 0.25*Deficit + 0.25*Bullwhip + 0.15*Waste;
-  return {H:clamp01(H), OSA, Deficit, Bullwhip, Waste, amp, totalDef, totalWoff};
-}
+// ━━━ СИСТЕМА СЧЁТА (движок — общий public/engine.js, как на сервере) ━━━
+const { clamp01, roundProfit, contribOf } = GAME_ENGINE;
+const chainHealth = res => GAME_ENGINE.chainHealth(res);   // r-арг не нужен: engine читает res.d
+const BONUS_FUND = P.bonusFund; // фонд бонуса здоровья (единый источник — gameconfig.js)
 
 // ━━━ CHARACTERS ━━━
 const CHARS = {
-  'Жёсткий': {ico:'🦁',clr:'#f85149',desc:'Диктует условия. Не идёт на уступки.',
+  'Жёсткий': {ico:'🦁',clr:'#dc2626',desc:'Диктует условия. Не идёт на уступки.',
     conc:0.08,dmd:1.55,thr:0.88,
     open:[
       '{V} — моё условие. Это не старт переговоров, это финал.',
@@ -676,7 +683,7 @@ const CHARS = {
     ok:['Принято. {V}. Работаем.','Фиксируем {V}. Договор в силе.','{V}. Согласен. Двигаемся дальше.'],
     no:['Сделки нет. Советую пересмотреть позицию.','Без взаимопонимания — не работаем. Удачи.','Ваши условия неприемлемы. Разговор окончен.']
   },
-  'Кооперативный': {ico:'🤝',clr:'#34c759',desc:'Ищет взаимную выгоду. Легко уступает.',
+  'Кооперативный': {ico:'🤝',clr:'#15a34a',desc:'Ищет взаимную выгоду. Легко уступает.',
     conc:0.60,dmd:1.15,thr:0.50,
     open:[
       'Предлагаю {V} — думаю, это честно для нас обоих.',
@@ -697,7 +704,7 @@ const CHARS = {
     ],
     no:['Жаль, не договорились. Но я открыт — вернёмся к теме позже.','Не сложилось. Надежды не теряю, давайте думать дальше.']
   },
-  'Хитрый': {ico:'🦊',clr:'#ff9f0a',desc:'Завышает запрос. Делает ложные уступки.',
+  'Хитрый': {ico:'🦊',clr:'#b45309',desc:'Завышает запрос. Делает ложные уступки.',
     conc:0.35,dmd:1.80,thr:0.72,
     open:[
       'Знаю, звучит амбициозно, но {V} — это реальная рыночная ставка прямо сейчас.',
@@ -718,7 +725,7 @@ const CHARS = {
     ],
     no:['Пока не готов. Подумайте — мои условия разумные.','Жаль. Но я не тороплюсь — рынок на моей стороне.']
   },
-  'Упрямый': {ico:'😤',clr:'#ff9f0a',desc:'Держит позицию. Не реагирует на аргументы.',
+  'Упрямый': {ico:'😤',clr:'#ea580c',desc:'Держит позицию. Не реагирует на аргументы.',
     conc:0.05,dmd:1.30,thr:0.92,
     open:[
       '{V}. Это моя позиция.',
@@ -734,7 +741,7 @@ const CHARS = {
     ok:['Хорошо. {V}.','Ладно. {V}.','Принято. {V}.'],
     no:['Нет.','Договорённости нет.','Нет смысла продолжать.']
   },
-  'Аналитик': {ico:'📊',clr:'#3d6cb5',desc:'Обосновывает цифрами. Принимает взвешенно.',
+  'Аналитик': {ico:'📊',clr:'#2563eb',desc:'Обосновывает цифрами. Принимает взвешенно.',
     conc:0.42,dmd:1.22,thr:0.68,
     open:[
       'По нашей модели оптимальная точка — {V}. Минимизирует издержки обеих сторон.',
@@ -762,7 +769,7 @@ const ROLE_SETS = {
   ret: [
     {ico:'🎩',title:'Директор сети',       duty:'Финальное решение, переговоры', lead:true},
     {ico:'🏷️',title:'Категорийный менеджер',duty:'Цена и промо'},
-    {ico:'📦',title:'Менеджер закупок',     duty:'Объёмы заказов поставщикам'},
+    {ico:'📦',title:'Директор по закупкам',  duty:'Объёмы заказов поставщикам'},
     {ico:'📈',title:'Аналитик спроса',      duty:'Прогноз и чтение рынка'},
   ],
   sup: [
@@ -782,11 +789,12 @@ const hexA = (hex,a) => {const h=hex.replace('#','');return `rgba(${parseInt(h.s
 
 // Default characters per scenario
 const SCENARIO_CHARS = {
-  bullwhip:{R1:'Жёсткий',R2:'Жёсткий',R3:'Жёсткий',S1:'Упрямый',S2:'Упрямый',S3:'Упрямый',S4:'Жёсткий',D:'Жёсткий'},
-  promo:   {R1:'Хитрый',R2:'Хитрый',R3:'Хитрый',S1:'Аналитик',S2:'Кооперативный',S3:'Кооперативный',S4:'Аналитик',D:'Упрямый'},
-  ideal:   {R1:'Кооперативный',R2:'Кооперативный',R3:'Кооперативный',S1:'Кооперативный',S2:'Кооперативный',S3:'Кооперативный',S4:'Кооперативный',D:'Кооперативный'},
-  stress:  {R1:'Жёсткий',R2:'Аналитик',R3:'Аналитик',S1:'Упрямый',S2:'Упрямый',S3:'Аналитик',S4:'Кооперативный',D:'Жёсткий'},
-  free:    {R1:'Жёсткий',R2:'Хитрый',R3:'Кооперативный',S1:'Аналитик',S2:'Упрямый',S3:'Кооперативный',S4:'Аналитик',D:'Хитрый'},
+  bullwhip:{R1:'Жёсткий',R2:'Жёсткий',R3:'Жёсткий',R4:'Упрямый',S1:'Упрямый',S2:'Упрямый',S3:'Упрямый',S4:'Жёсткий',D:'Жёсткий'},
+  promo:   {R1:'Хитрый',R2:'Хитрый',R3:'Хитрый',R4:'Аналитик',S1:'Аналитик',S2:'Кооперативный',S3:'Кооперативный',S4:'Аналитик',D:'Упрямый'},
+  ideal:   {R1:'Кооперативный',R2:'Кооперативный',R3:'Кооперативный',R4:'Кооперативный',S1:'Кооперативный',S2:'Кооперативный',S3:'Кооперативный',S4:'Кооперативный',D:'Кооперативный'},
+  stress:  {R1:'Жёсткий',R2:'Аналитик',R3:'Аналитик',R4:'Кооперативный',S1:'Упрямый',S2:'Упрямый',S3:'Аналитик',S4:'Кооперативный',D:'Жёсткий'},
+  free:    {R1:'Жёсткий',R2:'Хитрый',R3:'Кооперативный',R4:'Аналитик',S1:'Аналитик',S2:'Упрямый',S3:'Кооперативный',S4:'Аналитик',D:'Хитрый'},
+  custom:  {R1:'Аналитик',R2:'Аналитик',R3:'Хитрый',R4:'Кооперативный',S1:'Аналитик',S2:'Кооперативный',S3:'Хитрый',S4:'Аналитик',D:'Хитрый'},
 };
 
 // Negotiation pairs per round
@@ -841,9 +849,11 @@ const NEG_INTRO = [
 // ━━━ SIM STATE ━━━
 let SIM = {scenarioId:'bullwhip', strats:{...SCENARIOS.bullwhip.strats},
            chars:{...SCENARIO_CHARS.bullwhip}, teamSize:4, rosters:{},
-           params:{noise:15,shock:200,boost:15}, names:{},
+           params:{noise:15,shock:200,boost:15}, names:{}, demand:null,
            decisions:[], results:[], narratives:[], totals:{}, scores:{}, round:-1,
-           negSessions:[], negPairs:[], negOutcomes:{}};
+           negSessions:[], negPairs:[], negOutcomes:{}, ab:{A:null,B:null}};
+// Эталонный спрос — чтобы переключать P.demand между обычными сценариями и «Своим»
+const BASE_DEMAND = JSON.parse(JSON.stringify(P.demand));
 
 // ━━━ SETUP UI ━━━
 function initSetupUI() {
@@ -860,7 +870,28 @@ function initSetupUI() {
   ).join('');
   renderStratGrid();
   renderCharGrid();
+  renderCustomDemand();
+  renderABPanel();
 }
+
+// ── Редактор спроса для сценария «Свой» ──
+function renderCustomDemand() {
+  const box = document.getElementById('custom-demand');
+  if (!box) return;
+  if (SIM.scenarioId !== 'custom') { box.style.display = 'none'; return; }
+  if (!SIM.demand) SIM.demand = JSON.parse(JSON.stringify(P.demand));   // старт от эталонного спроса
+  const cats = P.catIds;
+  const rows = SIM.demand.map((row,r)=>`<tr><td>${turLabel(r)}</td>${
+    row.map((v,ci)=>`<td><input type="number" id="cd-${r}-${ci}" value="${v}" oninput="updCustomDemand(${r},${ci},this.value)"></td>`).join('')
+  }</tr>`).join('');
+  box.style.display = 'block';
+  box.innerHTML = `<div class="wif"><div class="wlbl" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--W3);margin-bottom:8px">🛠 Спрос по турам и категориям (ед.) — задайте свой рынок</div>
+    <table class="wtbl"><thead><tr><th>Тур</th>${cats.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>
+    <div style="font-size:11px;color:var(--W3);margin-top:8px">Шок перевозчика и промо-буст настраиваются ниже в «Параметрах рынка». Сброс — кнопкой ниже.</div>
+    <div class="wif-actions"><button class="btn btn-S btn-sm" onclick="resetCustomDemand()">⟲ Сбросить спрос к эталону</button></div></div>`;
+}
+function updCustomDemand(r,ci,val){ SIM.demand[r][ci] = Math.max(0, parseInt(val)||0); }
+function resetCustomDemand(){ SIM.demand = JSON.parse(JSON.stringify(P.demand)); renderCustomDemand(); }
 
 function renderCharGrid() {
   const cg = document.getElementById('char-grid');
@@ -910,6 +941,7 @@ function selScenario(id) {
   });
   renderStratGrid();
   renderCharGrid();
+  renderCustomDemand();
 }
 
 function renderStratGrid() {
@@ -1060,7 +1092,7 @@ const DISCUSS = [
 
 function genTeachMoment(r, res) {
   const totalDef = res.def.flat().reduce((s,v)=>s+v,0);
-  const avgOSA = res.retOSA.reduce((s,v)=>s+v,0)/3;
+  const avgOSA = res.retOSA.reduce((s,v)=>s+v,0)/RETS.length;
   const dCoeff = res.dCoeff;
   const totalOver = res.over.flat().reduce((s,v)=>s+v,0);
   const totalWoff = res.woff.flat().reduce((s,v)=>s+v,0);
@@ -1082,24 +1114,11 @@ function genTeachMoment(r, res) {
   return moments.slice(0,2);
 }
 
-// ━━━ RUN SIMULATION ━━━
-function runSim() {
-  ALL.forEach(tid=>{ SIM.names[tid]=pick(DEMO_NAMES[tid]); });
-  SIM.decisions=[]; SIM.results=[]; SIM.narratives=[];
-  for(let r=0;r<4;r++){
-    const dec=genDecisions(r);
-    // Re-apply boost patch before calc
-    const origBoost=P.pBoost; P.pBoost=SIM.params.boost/10;
-    const res=calcRound(r,dec);
-    P.pBoost=origBoost;
-    const narr={}; ALL.forEach(tid=>{narr[tid]=genNarrative(tid,dec,res);});
-    SIM.decisions.push(dec); SIM.results.push(res); SIM.narratives.push(narr);
-  }
+// Пересчёт агрегатов (итоги, здоровье, счёт, бонусы) из текущих SIM.results.
+// Вынесено отдельно, чтобы переиспользовать при ручном пересчёте тура («что если»).
+function recomputeAggregates() {
   SIM.totals={};
-  ALL.forEach(tid=>{
-    let p=0; SIM.results.forEach((res)=>{p+=roundProfit(res,tid);}); SIM.totals[tid]=p;
-  });
-  // Здоровье цепочки и накопленный счёт по турам (бонус = H × фонд × личный вклад)
+  ALL.forEach(tid=>{ let p=0; SIM.results.forEach(res=>{p+=roundProfit(res,tid);}); SIM.totals[tid]=p; });
   SIM.health=[]; SIM.scoreCum=[]; SIM.scores={}; SIM.bonuses={};
   const running={}, runBonus={}; ALL.forEach(t=>{running[t]=0; runBonus[t]=0;});
   SIM.results.forEach((res,r)=>{
@@ -1113,6 +1132,96 @@ function runSim() {
     SIM.scoreCum.push(snap);
   });
   ALL.forEach(t=>{SIM.scores[t]=running[t]; SIM.bonuses[t]=runBonus[t];});
+}
+
+// Пересчёт одного тура после ручного редактирования решений
+function recalcRound(r) {
+  const dec=SIM.decisions[r];
+  const origBoost=P.pBoost; P.pBoost=SIM.params.boost/10;
+  SIM.results[r]=calcRound(r,dec);
+  P.pBoost=origBoost;
+  if(!SIM.narratives[r]) SIM.narratives[r]={};
+  ALL.forEach(tid=>{ SIM.narratives[r][tid]=genNarrative(tid,dec,SIM.results[r]); });
+  recomputeAggregates();
+}
+
+// ━━━ РУЧНОЕ ПЕРЕОПРЕДЕЛЕНИЕ РЕШЕНИЙ («что если») ━━━
+let editorOpen=false;
+function toggleEditor(){ editorOpen=!editorOpen; syncEditor(SIM.round); }
+function syncEditor(r){
+  const ed=document.getElementById('r-editor'), cards=document.getElementById('r-cards'), btn=document.getElementById('edit-toggle');
+  if(!ed) return;
+  cards.style.display=editorOpen?'none':'';
+  ed.style.display=editorOpen?'block':'none';
+  if(btn) btn.textContent=editorOpen?'✕ Закрыть редактор':'✏️ Что если…';
+  if(editorOpen) renderEditor(r);
+}
+function wNum(id,v){ return `<input type="number" id="${id}" value="${v}">`; }
+function renderEditor(r){
+  const dec=SIM.decisions[r], cats=P.catIds;
+  const prcNames=['Агрессивная','Стандарт','Высокая','Премиум'];
+  const retRows=RETS.map((tid,ri)=>{
+    const cells=cats.map((_,ci)=>`<td>${wNum('ord-'+ri+'-'+ci, f0(dec.rets[ri][ci].ord))}</td>`).join('');
+    const prc=dec.rets[ri][0].prc, prm=dec.rets[ri].some(c=>c.prm)?'checked':'';
+    const prcSel=`<select id="prc-${ri}">${prcNames.map((n,k)=>`<option value="${k}" ${k===prc?'selected':''}>${n}</option>`).join('')}</select>`;
+    return `<tr><td>${TEAM_ICO[tid]} ${SIM.names[tid]}</td>${cells}<td>${prcSel}</td><td><input type="checkbox" id="prm-${ri}" ${prm}></td></tr>`;
+  }).join('');
+  const supRows=SUPS.map((tid,si)=>`<tr><td>${TEAM_ICO[tid]} ${SIM.names[tid]}</td><td colspan="3" style="text-align:left">выпуск ${wNum('sup-'+si, f0(dec.sups[si]))} ед.</td><td style="color:var(--W3)">макс ${P.maxProd[si]}</td></tr>`).join('');
+  const edited=SIM.edited&&SIM.edited[r];
+  document.getElementById('r-editor').innerHTML=`<div class="wif">
+    <div class="wif-grp"><div class="wlbl">🛒 Магазины — заказ по категориям · цена · промо</div>
+      <table class="wtbl"><thead><tr><th>Команда</th>${cats.map(c=>`<th>${c}</th>`).join('')}<th>Цена</th><th>Промо</th></tr></thead><tbody>${retRows}</tbody></table></div>
+    <div class="wif-grp"><div class="wlbl">🏭 Производители — выпуск</div>
+      <table class="wtbl"><tbody>${supRows}</tbody></table></div>
+    <div class="wif-grp"><div class="wlbl">🚛 Перевозчик — тариф и мощность</div>
+      <table class="wtbl"><tbody><tr><td>${TEAM_ICO.D} ${SIM.names.D}</td><td colspan="2" style="text-align:left">тариф ${wNum('w-tariff',f1(dec.tariff))}</td><td colspan="2" style="text-align:left">мощность ${wNum('w-cap',f0(dec.distCap))}</td></tr></tbody></table></div>
+    <div class="wif-actions">
+      <button class="btn btn-P btn-sm" onclick="applyEdits(${r})">↻ Пересчитать тур</button>
+      <button class="btn btn-S btn-sm" onclick="resetRoundAuto(${r})">⟲ Вернуть авто</button>
+      ${edited?'<span class="wif-badge">✏️ изменено вручную</span>':''}
+    </div></div>`;
+}
+function applyEdits(r){
+  const dec=SIM.decisions[r], gv=id=>{const e=document.getElementById(id);return e?parseFloat(e.value)||0:0;};
+  RETS.forEach((_,ri)=>{
+    const prc=parseInt(document.getElementById('prc-'+ri).value)||1;
+    const prm=document.getElementById('prm-'+ri).checked?1:0;
+    P.catIds.forEach((_,ci)=>{ const c=dec.rets[ri][ci]; c.ord=Math.max(0,gv('ord-'+ri+'-'+ci)); c.prc=prc; c.prm=prm; c.asm=1; });
+  });
+  SUPS.forEach((_,si)=>{ dec.sups[si]=Math.max(0,gv('sup-'+si)); });
+  dec.tariff=Math.max(0,gv('w-tariff')); dec.distCap=Math.max(0,gv('w-cap'));
+  if(!SIM.edited) SIM.edited={}; SIM.edited[r]=true;
+  recalcRound(r); renderRound(r);
+}
+function resetRoundAuto(r){
+  // Восстанавливаем ТОЧНЫЙ исходный авто-прогон (снимок), а не новый случайный
+  if(SIM.autoDecisions&&SIM.autoDecisions[r]) SIM.decisions[r]=JSON.parse(JSON.stringify(SIM.autoDecisions[r]));
+  else SIM.decisions[r]=genDecisions(r);
+  if(SIM.edited) SIM.edited[r]=false;
+  recalcRound(r); renderRound(r);
+}
+
+// ━━━ RUN SIMULATION ━━━
+// Полный расчёт 4 туров из текущей настройки (без смены экрана) — используется и в A/B.
+function computeRun() {
+  // Спрос: «Свой» сценарий использует заданный пользователем, остальные — эталонный
+  P.demand = (SIM.scenarioId==='custom' && SIM.demand) ? SIM.demand : BASE_DEMAND;
+  ALL.forEach(tid=>{ SIM.names[tid]=pick(DEMO_NAMES[tid]); });
+  SIM.decisions=[]; SIM.results=[]; SIM.narratives=[];
+  for(let r=0;r<4;r++){
+    const dec=genDecisions(r);
+    const origBoost=P.pBoost; P.pBoost=SIM.params.boost/10;
+    const res=calcRound(r,dec);
+    P.pBoost=origBoost;
+    const narr={}; ALL.forEach(tid=>{narr[tid]=genNarrative(tid,dec,res);});
+    SIM.decisions.push(dec); SIM.results.push(res); SIM.narratives.push(narr);
+  }
+  SIM.autoDecisions=JSON.parse(JSON.stringify(SIM.decisions));   // снимок авто-решений для «Вернуть авто»
+  SIM.edited={};
+  recomputeAggregates();
+}
+function runSim() {
+  computeRun();
   SIM.round=0;
   SIM.negOutcomes={};
   dealRoles();
@@ -1120,6 +1229,76 @@ function runSim() {
   document.getElementById('hdr-sc').textContent=sc.name;
   showScr('s-roles');
   renderRosters();
+}
+
+// ━━━ A/B СРАВНЕНИЕ ━━━
+function snapAB(slot) {
+  computeRun();
+  const sc=SCENARIOS[SIM.scenarioId];
+  const avgH=SIM.health.reduce((s,h)=>s+h.H,0)/SIM.health.length;
+  SIM.ab[slot]={
+    label:sc.name, color:sc.color,
+    scores:{...SIM.scores}, totals:{...SIM.totals}, bonuses:{...SIM.bonuses},
+    health:SIM.health.map(h=>h.H), avgH,
+    chainProfit:ALL.reduce((s,t)=>s+SIM.totals[t],0),
+    chainScore:ALL.reduce((s,t)=>s+SIM.scores[t],0),
+  };
+  renderABPanel();
+}
+function renderABPanel() {
+  const box=document.getElementById('ab-panel'); if(!box) return;
+  const slot=(k)=>{ const s=SIM.ab[k];
+    return `<div class="ab-slot ${s?'filled':''}">
+      <div class="ab-k">Слот ${k}</div>
+      ${s?`<div class="ab-v" style="color:${s.color}">${s.label}</div>
+           <div class="ab-m">Счёт цепочки ${f0(s.chainScore)} · Здоровье ${f0(s.avgH*100)}%</div>`
+         :`<div class="ab-empty">пусто</div>`}
+      <button class="btn btn-S btn-sm" onclick="snapAB('${k}')" style="margin-top:7px;width:100%">▶ Прогнать текущую настройку в ${k}</button>
+    </div>`; };
+  const both=SIM.ab.A&&SIM.ab.B;
+  box.innerHTML=`<div class="ab-grid">${slot('A')}${slot('B')}</div>
+    <button class="btn btn-P" id="ab-compare-btn" onclick="showCompare()" ${both?'':'disabled'} style="margin-top:10px;${both?'':'opacity:.5;cursor:default'}">⚖ Сравнить A ↔ B</button>`;
+}
+function showCompare() {
+  if(!(SIM.ab.A&&SIM.ab.B)) return;
+  renderCompare();
+  showScr('s-compare');
+}
+function renderCompare() {
+  const A=SIM.ab.A, B=SIM.ab.B;
+  document.getElementById('cmp-a-label').textContent=A.label;
+  document.getElementById('cmp-a-label').style.color=A.color;
+  document.getElementById('cmp-b-label').textContent=B.label;
+  document.getElementById('cmp-b-label').style.color=B.color;
+  // Сводные метрики
+  const metric=(name,a,b,unit,better)=>{
+    const da=better==='hi'?(a>=b):(a<=b);
+    return `<div class="cmp-metric">
+      <div class="cmp-mname">${name}</div>
+      <div class="cmp-vals">
+        <span class="cmp-va ${da?'win':''}">${a}${unit}</span>
+        <span class="cmp-sep">vs</span>
+        <span class="cmp-vb ${!da?'win':''}">${b}${unit}</span>
+      </div></div>`;
+  };
+  document.getElementById('cmp-metrics').innerHTML=
+    metric('Счёт цепочки (сумма)', f0(A.chainScore), f0(B.chainScore), '', 'hi')+
+    metric('Средн. здоровье', f0(A.avgH*100), f0(B.avgH*100), '%', 'hi')+
+    metric('Прибыль цепочки', f0(A.chainProfit), f0(B.chainProfit), '', 'hi');
+  // Здоровье по турам
+  document.getElementById('cmp-health').innerHTML=A.health.map((ha,r)=>{
+    const hb=B.health[r];
+    return `<div class="cmp-trow"><span class="cmp-tn">${turLabel(r)}</span>
+      <div class="cmp-tbar"><div class="cmp-ta" style="width:${f0(ha*100)}%;background:${A.color}"></div></div><span class="cmp-tv">${f0(ha*100)}%</span>
+      <div class="cmp-tbar"><div class="cmp-tb" style="width:${f0(hb*100)}%;background:${B.color}"></div></div><span class="cmp-tv">${f0(hb*100)}%</span></div>`;
+  }).join('');
+  // Счёт по командам
+  document.getElementById('cmp-teams').innerHTML=ALL.map(tid=>{
+    const a=A.scores[tid], b=B.scores[tid], d=a-b;
+    return `<tr><td>${TEAM_ICO[tid]} ${LBL[tid]}</td>
+      <td style="color:${A.color}">${f0(a)}</td><td style="color:${B.color}">${f0(b)}</td>
+      <td style="color:${d>=0?'var(--OK)':'var(--BD)'};font-weight:700">${d>=0?'+':''}${f0(d)}</td></tr>`;
+  }).join('');
 }
 
 // ━━━ РАЗДАЧА РОЛЕЙ ━━━
@@ -1178,6 +1357,7 @@ function rolesToGame(){ showScr('s-neg'); renderNegScreen(0); }
 // ━━━ RENDER ROUND ━━━
 function renderRound(r) {
   updateDots(r);
+  syncEditor(r);
   const res=SIM.results[r], dec=SIM.decisions[r];
   const sc=SCENARIOS[SIM.scenarioId];
 
@@ -1288,6 +1468,7 @@ function renderRound(r) {
 }
 
 function negToRound() {
+  editorOpen=false;
   showScr('s-round');
   renderRound(SIM.round);
 }
@@ -1296,6 +1477,36 @@ function nextRound() {
   SIM.round++;
   if(SIM.round>=4){renderAnalytics();showScr('s-analytics');}
   else{showScr('s-neg');renderNegScreen(SIM.round);}
+}
+
+// ━━━ ЭКСПОРТ РЕЗУЛЬТАТОВ ━━━
+function exportCSV() {
+  if (!SIM.results || !SIM.results.length) return;
+  const scName = (SCENARIOS[SIM.scenarioId]?.name || SIM.scenarioId);
+  const esc = v => `"${String(v).replace(/"/g,'""')}"`;
+  const rows = [];
+  rows.push(['FMCG-цепочка · итоги симуляции']);
+  rows.push(['Сценарий', scName]);
+  rows.push(['Размер команды', SIM.teamSize]);
+  rows.push([]);
+  rows.push(['Команда','Тип','Стратегия','Прибыль Тур 1','Прибыль Тур 2','Прибыль Тур 3','Прибыль Тур 4','Прибыль всего','Бонус здоровья','Итоговый счёт']);
+  ALL.forEach(tid => {
+    const perTour = SIM.results.map(res => f0(roundProfit(res, tid)));
+    rows.push([SIM.names[tid] || LBL[tid], TYPE[tid], SIM.strats[tid] || '—',
+               ...perTour, f0(SIM.totals[tid]), f0(SIM.bonuses[tid]), f0(SIM.scores[tid])]);
+  });
+  rows.push([]);
+  rows.push(['Здоровье цепочки по турам (%)']);
+  rows.push(['Тур','Здоровье H','Полка OSA','Нет дефицита','Нет хлыста','Нет списаний']);
+  SIM.health.forEach((h,r) => rows.push([turLabel(r),
+    f0(h.H*100), f0(h.OSA*100), f0(h.Deficit*100), f0(h.Bullwhip*100), f0(h.Waste*100)]));
+  const csv = '﻿' + rows.map(r => r.map(esc).join(';')).join('\r\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `fmcg-${SIM.scenarioId}-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 100);
 }
 
 // ━━━ ANALYTICS ━━━
@@ -1329,16 +1540,10 @@ function renderAnalytics() {
 function renderAwards() {
   // Гран-при — максимальный итоговый счёт
   const grand=ALL.reduce((a,b)=>SIM.scores[a]>=SIM.scores[b]?a:b);
-  // Архитектор цепочки — лучшее «служение» (OSA / fill-rate / сбалансированная загрузка)
+  // Архитектор цепочки — авторитетный вклад в здоровье (та же contribOf, что и в счёте), не отдельная эвристика
   const service={};
   ALL.forEach(tid=>{
-    const ri=RETS.indexOf(tid),si=SUPS.indexOf(tid); let acc=0;
-    SIM.results.forEach(res=>{
-      if(ri>=0) acc+=res.retOSA[ri];
-      else if(si>=0){const ord=res.ordFromSup[si]; acc+= ord>0?Math.min(1,res.totDel[si]/ord):1;}
-      else acc+= 1-Math.abs(res.dCoeff-0.9);
-    });
-    service[tid]=acc/SIM.results.length;
+    service[tid]=SIM.results.reduce((s,res)=>s+contribOf(res,tid),0)/SIM.results.length;
   });
   const architect=ALL.reduce((a,b)=>service[a]>=service[b]?a:b);
   // Антихлыст — минимальный коэффициент вариации собственного объёма
@@ -1363,7 +1568,7 @@ function renderAwards() {
     <div class="aw-s">${sub}</div></div>`;
   document.getElementById('an-awards').innerHTML=
     card('Гран-при','🏆',grand,`Итоговый счёт ${f0(SIM.scores[grand])} у.е.`,'#ffd700')+
-    card('Архитектор цепочки','🤝',architect,`Служение цепочке ${f0(service[architect]*100)}%`,'#34c759')+
+    card('Архитектор цепочки','🤝',architect,`Вклад в здоровье ${f0(service[architect]*100)}%`,'#34c759')+
     card('Антихлыст','📉',antiwhip,`Самый стабильный объём (CV ${f1(cv[antiwhip]*100)}%)`,'#3d6cb5');
 }
 
@@ -1395,7 +1600,7 @@ function renderProfitChart() {
   const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
   const rounds=[0,1,2,3];
   const teams=[...RETS,...SUPS,'D'];
-  const colors={R1:'#3d6cb5',R2:'#bc8cff',R3:'#34c759',S1:'#ff9f0a',S2:'#ff9f0a',S3:'#f85149',S4:'#79c0ff',D:'#56d364'};
+  const colors={R1:'#3d6cb5',R2:'#bc8cff',R3:'#34c759',R4:'#e879f9',S1:'#ff9f0a',S2:'#fbbf24',S3:'#f85149',S4:'#79c0ff',D:'#56d364'};
   const seriesData=teams.map(tid=>rounds.map(r=>{
     const ri=RETS.indexOf(tid),si=SUPS.indexOf(tid);
     if(ri>=0)return SIM.results[r].retProfit[ri];
@@ -1522,7 +1727,7 @@ function renderEffTable() {
   const rows=SIM.results.map((res,r)=>{
     const def=res.def.flat().reduce((s,v)=>s+v,0);
     const woff=res.woff.flat().reduce((s,v)=>s+v,0);
-    const osa=res.retOSA.reduce((s,v)=>s+v,0)/3;
+    const osa=res.retOSA.reduce((s,v)=>s+v,0)/RETS.length;
     const chainPft=res.retProfit.reduce((s,v)=>s+v,0)+res.supProfit.reduce((s,v)=>s+v,0)+res.dProfit;
     return `<tr>
       <td style="font-weight:700;color:var(--P)">Тур ${r+1}</td>

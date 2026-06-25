@@ -3,769 +3,807 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link rel="stylesheet" href="/fonts/onest.css">
 <title>Как проходит игра · FMCG-цепочка</title>
 <style>
-@font-face{font-family:'CG';src:url('/fonts/CenturyGothic.ttf') format('truetype');font-weight:400}
-@font-face{font-family:'CG';src:url('/fonts/CenturyGothic-Bold.ttf') format('truetype');font-weight:700}
-
+:root{
+  --bg:#f3f5f9; --panel:#ffffff; --panel2:#f7f9fc; --line:#e6eaf1; --line2:#eef1f6;
+  --ink:#0d1526; --ink2:#56627a; --ink3:#9aa6b8;
+  --ibs:#2563eb; --ibs-soft:#eef3ff; --ibs-line:#d7e3ff;
+  --ret:#2563eb; --ret-soft:#eef3ff;
+  --sup:#15a34a; --sup-soft:#ecfaf0;
+  --dist:#d97706; --dist-soft:#fdf5e9;
+  --c1:#2563eb; --c2:#15a34a; --c3:#d97706; --c4:#db2777;
+  --good:#15a34a; --warn:#d97706; --bad:#dc2626;
+  --sh:0 1px 2px rgba(13,21,38,.04), 0 2px 10px rgba(13,21,38,.04);
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
-body{font-family:'CG',system-ui,sans-serif;background:#070e1c;color:#fff;display:flex;flex-direction:column;height:100vh;user-select:none}
+body{font-family:'Onest',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;height:100vh;user-select:none;-webkit-font-smoothing:antialiased;font-size:15px}
 
 /* ── Header ── */
-.hdr{display:flex;align-items:center;gap:14px;padding:9px 20px;background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0}
-.ibs-mark{width:28px;height:28px;background:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:'Arial Black',sans-serif;font-size:10px;font-weight:900;color:#0d1929;flex-shrink:0}
-.hdr-title{font-size:13px;font-weight:700;color:rgba(255,255,255,.75);flex:1}
-.hdr-back{color:rgba(255,255,255,.35);font-size:12px;text-decoration:none;transition:color .15s}
-.hdr-back:hover{color:#fff}
+.hdr{height:60px;display:flex;align-items:center;gap:13px;padding:0 18px;background:var(--panel);border-bottom:1px solid var(--line);flex-shrink:0;z-index:5}
+.ibs{background:var(--ibs);color:#fff;font-weight:800;font-size:14px;padding:5px 11px;border-radius:7px;flex-shrink:0}
+.h-sep{width:1px;height:24px;background:var(--line);flex-shrink:0}
+.h-step{background:var(--ibs-soft);color:var(--ibs);border-radius:7px;padding:5px 12px;font-size:12.5px;font-weight:700;flex-shrink:0;white-space:nowrap}
+.h-title{font-size:17px;font-weight:800;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;letter-spacing:-.01em}
+.h-timer{display:flex;flex-direction:column;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:5px 16px;flex-shrink:0}
+.h-timer .k{font-size:9px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.1em}
+.h-timer .v{font-size:13.5px;font-weight:800;color:var(--ink2)}
+.h-nav{display:flex;gap:6px;flex-shrink:0}
+.btn{background:var(--panel2);border:1px solid var(--line);color:var(--ink2);border-radius:9px;padding:8px 14px;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit;transition:.15s}
+.btn:hover{background:#eef1f6;color:var(--ink)}
+.btn.pp{background:var(--ibs);border-color:var(--ibs);color:#fff}
+.btn.pp:hover{background:#1d4ed8}
+.h-back{color:var(--ink3);font-size:12px;text-decoration:none;flex-shrink:0;transition:.15s}
+.h-back:hover{color:var(--ink)}
 
-/* ── Info panel ── */
-.info{display:flex;align-items:flex-start;gap:16px;padding:10px 22px 9px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.06);min-height:68px}
-.info-left{flex:1;min-width:0}
-.info-step{font-size:13px;text-transform:uppercase;letter-spacing:1.4px;color:#3b82f6;font-weight:700;margin-bottom:4px;transition:opacity .2s}
-.info-title{font-size:26px;font-weight:700;line-height:1.2}
-.info-desc{font-size:16px;color:rgba(255,255,255,.62);margin-top:6px;line-height:1.55;max-width:700px}
-.info-badge{flex-shrink:0;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);border-radius:20px;padding:5px 18px;font-size:14px;color:rgba(255,255,255,.65);font-weight:600;margin-top:2px;white-space:nowrap}
+/* ── Layout ── */
+.layout{flex:1;display:flex;min-height:0;overflow:hidden}
 
-/* ── Scene area ── */
-.scene{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:6px 16px 4px}
-#svg-room{width:100%;height:100%;max-width:840px;max-height:395px;overflow:visible}
+/* ── Sidebar ── */
+.sb{width:240px;flex-shrink:0;border-right:1px solid var(--line);overflow-y:auto;background:var(--panel);padding:14px 11px;display:flex;flex-direction:column}
+.sb-h{font-size:10px;font-weight:800;color:var(--ink3);text-transform:uppercase;letter-spacing:.11em;padding:5px 8px 7px;margin-top:9px}
+.sb-h:first-child{margin-top:0}
+.sb-t{display:flex;align-items:center;gap:9px;padding:8px;border-radius:9px;margin-bottom:2px;border:1px solid transparent;transition:.2s}
+.sb-t.on{background:var(--panel2);border-color:var(--line)}
+.sb-t.dim{opacity:.38}
+.sb-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.sb-ic{font-size:15px;width:19px;text-align:center;flex-shrink:0}
+.sb-n{font-size:13.5px;font-weight:600;color:var(--ink);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.sb-tag{font-size:10.5px;font-weight:800;color:var(--ink3);flex-shrink:0}
+.sb-fl{font-size:12px;font-weight:800;flex-shrink:0}
+.sb-sp{flex:1;min-height:10px}
+.sb-card{margin-top:12px;padding:12px 13px;background:var(--panel2);border:1px solid var(--line);border-radius:12px}
+.sb-card .k{font-size:11px;color:var(--ink2);margin-bottom:5px;font-weight:600}
+.sb-card .v{font-size:23px;font-weight:800}
+.sb-card .v small{font-size:13px;font-weight:600;color:var(--ink3)}
+.sb-prog{margin-top:9px;height:5px;background:var(--line);border-radius:3px;overflow:hidden}
+.sb-prog>div{height:100%;background:var(--sup);border-radius:3px;transition:width .5s}
+.sb-hint{margin-top:10px;padding:12px 13px;background:var(--ibs-soft);border:1px solid var(--ibs-line);border-radius:12px}
+.sb-hint .k{font-size:10px;font-weight:800;color:var(--ibs);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+.sb-hint .t{font-size:12px;color:var(--ink2);line-height:1.55}
 
-/* ── Bottom controls ── */
-.bottom{flex-shrink:0;padding:8px 20px 10px;border-top:1px solid rgba(255,255,255,.07)}
-.tl-bar{position:relative;height:3px;background:rgba(255,255,255,.08);border-radius:2px;margin-bottom:9px}
-.tl-fill{position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,#1d4ed8,#3b82f6);border-radius:2px;transition:width .08s linear}
-.ctrl{display:flex;align-items:center;gap:8px}
-.btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.8);border-radius:8px;padding:7px 18px;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;transition:all .15s;letter-spacing:.2px}
-.btn:hover{background:rgba(255,255,255,.13);color:#fff}
-.btn-pp{background:#1e3461;border-color:#3b82f6;color:#93c5fd}
-.btn-pp:hover{background:#2563eb;color:#fff}
-.tl-dots{display:flex;gap:6px;align-items:center;margin-left:auto}
-.tdot{width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:rgba(255,255,255,.3);cursor:pointer;transition:all .2s;flex-shrink:0}
-.tdot:hover{border-color:rgba(255,255,255,.4);color:rgba(255,255,255,.6)}
-.tdot.done{border-color:#1e40af;color:#60a5fa;background:rgba(30,58,138,.3)}
-.tdot.cur{border-color:#3b82f6;color:#fff;background:#1e3461;box-shadow:0 0 10px rgba(59,130,246,.4)}
-.ctrl-sep{width:1px;height:20px;background:rgba(255,255,255,.1)}
+/* ── Main ── */
+.main{flex:1;display:flex;flex-direction:column;min-height:0;min-width:0}
+.stage{flex:1;min-height:0;overflow:hidden;padding:18px 22px;display:flex}
+.ph{flex:1;min-height:0;display:flex;flex-direction:column;animation:fadeUp .35s ease both}
+.ph-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:16px;flex-shrink:0}
+.ph-h1{font-size:25px;font-weight:800;letter-spacing:-.02em;line-height:1.15}
+.ph-sub{font-size:14px;color:var(--ink2);margin-top:4px}
+.ph-tag{flex-shrink:0;text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:9px 18px;box-shadow:var(--sh)}
+.ph-tag .k{font-size:10px;font-weight:800;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em}
+.ph-tag .v{font-size:25px;font-weight:900;margin-top:1px}
+.ph-body{flex:1;min-height:0;display:flex;flex-direction:column}
 
-/* ── CSS Animations ── */
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-@keyframes popIn{0%{opacity:0;transform:scale(.4)}65%{transform:scale(1.1)}100%{opacity:1;transform:scale(1)}}
-@keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:none}}
-@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-@keyframes dash{to{stroke-dashoffset:-20}}
-@keyframes dash2{to{stroke-dashoffset:-16}}
-@keyframes glowPulse{0%,100%{filter:drop-shadow(0 0 4px rgba(59,130,246,.4))}50%{filter:drop-shadow(0 0 14px rgba(59,130,246,.9))}}
-@keyframes screenBright{0%{opacity:.6}50%{opacity:1}100%{opacity:.8}}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-@keyframes bubblePop{0%{opacity:0;transform:scale(.3) translateY(8px)}60%{transform:scale(1.08) translateY(-2px)}100%{opacity:1;transform:scale(1) translateY(0)}}
-@keyframes trophyBounce{0%,100%{transform:translateY(0) scale(1)}40%{transform:translateY(-8px) scale(1.15)}}
-@keyframes checkPop{0%{opacity:0;transform:scale(.2)}60%{transform:scale(1.3)}100%{opacity:1;transform:scale(1)}}
-@keyframes typeText{from{stroke-dashoffset:200}to{stroke-dashoffset:0}}
-@keyframes confetti{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(30px) rotate(180deg);opacity:0}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh)}
+.card-pad{padding:22px 24px}
+.card-lbl{font-size:11px;font-weight:800;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:15px}
+
+/* ── START hero ── */
+.hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh);position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(900px 380px at 50% -10%, var(--ibs-soft), transparent 70%)}
+.hero>*{position:relative}
+.hero .pill{background:var(--ibs);color:#fff;font-weight:800;font-size:15px;padding:7px 16px;border-radius:9px;margin-bottom:24px}
+.hero h1{font-size:48px;font-weight:900;letter-spacing:-.03em;line-height:1.04}
+.hero .lead{font-size:18px;color:var(--ink2);margin-top:16px;margin-bottom:34px}
+.code{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:22px 46px}
+.code .k{font-size:11px;font-weight:800;color:var(--ink3);text-transform:uppercase;letter-spacing:.13em;margin-bottom:9px}
+.code .c{font-size:38px;font-weight:900;color:var(--ibs);letter-spacing:.16em}
+.code .s{font-size:13px;color:var(--ink3);margin-top:7px}
+
+/* ── ROLES ── */
+.roles{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:minmax(150px,1fr);gap:13px;overflow-y:auto;padding-right:4px}
+.tc{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--cc);border-radius:15px;box-shadow:var(--sh);padding:15px 17px;display:flex;flex-direction:column;animation:rowIn .4s ease both}
+.tc-top{display:flex;align-items:center;gap:11px;margin-bottom:11px}
+.tc-ic{font-size:25px}
+.tc-nm{font-size:15.5px;font-weight:800}
+.tc-ty{font-size:12px;font-weight:700;color:var(--cc);margin-top:1px}
+.tc-ch{display:inline-flex;align-self:flex-start;align-items:center;gap:7px;background:var(--chs);border:1px solid var(--chl);border-radius:9px;padding:5px 11px;margin-bottom:11px}
+.tc-ch .i{font-size:14px}
+.tc-ch .n{font-size:12px;font-weight:800;color:var(--chc)}
+.tc-rl{display:flex;flex-direction:column;gap:5px;margin-top:auto}
+.tc-r{font-size:12px;color:var(--ink2);display:flex;gap:8px;align-items:center}
+.tc-r .e{width:16px;text-align:center}
+
+/* ── BRIEFING ── */
+.g2{flex:1;min-height:0;display:grid;grid-template-columns:1.25fr 1fr;gap:16px}
+.g2>*{min-height:0}
+.dem{display:flex;flex-direction:column;justify-content:space-between;height:100%}
+.dem-row{flex:1;display:flex;flex-direction:column;justify-content:center}
+.dem-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
+.dem-cat{font-size:16px;font-weight:700}
+.dem-val{font-size:26px;font-weight:900}
+.dem-bar{height:14px;background:var(--line2);border-radius:7px;overflow:hidden}
+.dem-bar>div{height:100%;border-radius:7px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.rcol{display:flex;flex-direction:column;gap:14px;min-height:0}
+.ev{border-left:4px solid var(--ev);flex-shrink:0}
+.ev .l{font-size:11px;font-weight:800;color:var(--ev);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.ev .t{font-size:18px;font-weight:800;margin-bottom:8px}
+.ev .d{font-size:14px;color:var(--ink2);line-height:1.55}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:14px;flex-shrink:0}
+.stat .k{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-weight:700}
+.stat .v{font-size:26px;font-weight:900}
+.stat .s{font-size:12.5px;color:var(--ink3)}
+.trend{background:var(--sup-soft);border:1px solid #c9eed5;border-radius:12px;padding:14px 16px;font-size:14px;color:#117a37;font-weight:700;margin-top:auto;flex-shrink:0}
+
+/* ── PAIR negotiations ── */
+.pair{flex:1;min-height:0;display:flex;flex-direction:column;gap:14px}
+.duel{flex:1;min-height:0;display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:stretch}
+.party{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);border-top:4px solid var(--pc);padding:20px 22px;display:flex;flex-direction:column}
+.party-top{display:flex;align-items:center;gap:13px;margin-bottom:14px}
+.party-top .e{font-size:34px}
+.party-top .nm{font-size:19px;font-weight:800}
+.party-top .ty{font-size:12.5px;font-weight:700;color:var(--pc)}
+.party-ch{display:inline-flex;align-self:flex-start;align-items:center;gap:8px;background:var(--chs);border:1px solid var(--chl);border-radius:10px;padding:7px 13px;margin-bottom:14px}
+.party-ch .i{font-size:17px}
+.party-ch .n{font-size:13px;font-weight:800;color:var(--chc)}
+.bubble{margin-top:auto;background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--chc);border-radius:12px;padding:15px 17px;font-size:15px;color:var(--ink);font-style:italic;line-height:1.5}
+.duel-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.duel-mid .arr{font-size:30px;color:var(--ink3)}
+.duel-mid .badge{font-size:14px;font-weight:800;padding:8px 16px;border-radius:10px;white-space:nowrap;text-align:center}
+.duel-mid .cap{font-size:10px;color:var(--ink3);text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+.deals-strip{flex-shrink:0;background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh);padding:13px 16px}
+.deals-strip .l{font-size:10.5px;font-weight:800;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.deals-row{display:flex;gap:9px;flex-wrap:wrap}
+.deal-chip{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13px}
+.deal-chip b{font-weight:700}
+.deal-chip .bg{font-size:11.5px;font-weight:800;padding:2px 9px;border-radius:6px}
+
+/* ── GROUP ── */
+.flow{flex:1;min-height:0;display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:14px;align-items:center}
+.fcol{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:18px;height:100%;display:flex;flex-direction:column}
+.fcol .h{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:13px}
+.fitem{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;margin-bottom:8px;font-size:14px;font-weight:600;flex:1}
+.fitem:last-child{margin-bottom:0}
+.farr{font-size:30px;color:var(--ink3);text-align:center}
+.fhub{background:var(--panel);border:2px solid var(--dist);border-radius:18px;box-shadow:var(--sh);padding:24px;text-align:center}
+.fhub .e{font-size:44px}
+.fhub .n{font-size:17px;font-weight:800;color:var(--dist);margin-top:8px}
+.fhub .s{font-size:12.5px;color:var(--ink3);margin-top:4px}
+
+/* ── DECISIONS ── */
+.dec{flex:1;min-height:0;display:grid;grid-template-columns:.85fr 1.15fr;gap:16px}
+.dec>*{min-height:0;display:flex;flex-direction:column}
+.stgrid{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:9px}
+.stc{display:flex;align-items:center;gap:11px;padding:11px 13px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.stc.ok{background:var(--sup-soft);border-color:#c9eed5}
+.stc.wt{background:var(--dist-soft);border-color:#f1dcbb}
+.stc .e{font-size:19px}
+.stc .info{flex:1;min-width:0}
+.stc .nm{font-size:13.5px;font-weight:700}
+.stc .ty{font-size:11px;font-weight:600;margin-top:1px}
+.stc .fl{font-size:17px;font-weight:900}
+.form{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);overflow:hidden}
+.form-h{background:var(--ibs);color:#fff;padding:13px 18px;font-size:15px;font-weight:800;display:flex;align-items:center;gap:9px;flex-shrink:0}
+.ftbl{width:100%;border-collapse:collapse;flex:1}
+.ftbl th{font-size:11px;font-weight:800;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;text-align:center;padding:12px 8px;border-bottom:1px solid var(--line)}
+.ftbl th:first-child{text-align:left;padding-left:20px}
+.ftbl td{padding:11px 8px;border-bottom:1px solid var(--line2);text-align:center}
+.ftbl td:first-child{text-align:left;padding-left:20px}
+.fcat{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:700}
+.fdot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.ffore{font-size:15px;font-weight:700;color:var(--ink3)}
+.finp{width:68px;background:#fff;border:1.5px solid #ccd6e4;border-radius:9px;color:var(--ink);font-size:15px;font-weight:800;font-family:inherit;padding:8px 6px;text-align:center}
+.finp.pr{border-color:#e6c7d6}
+.fchk{width:18px;height:18px;accent-color:var(--ibs)}
+.form-f{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;gap:12px;flex-shrink:0;border-top:1px solid var(--line)}
+.form-f .h{font-size:12.5px;color:var(--ink3)}
+.bsub{background:var(--ibs);color:#fff;border:none;border-radius:10px;padding:11px 22px;font-size:14px;font-weight:800;font-family:inherit;cursor:pointer;white-space:nowrap}
+.decnote{margin-top:11px;display:flex;gap:10px;align-items:flex-start;background:var(--dist-soft);border:1px solid #f1dcbb;border-radius:12px;padding:13px 15px;flex-shrink:0}
+.decnote .i{font-size:17px}
+.decnote .t{font-size:13px;color:#8c6116;line-height:1.5;font-weight:600}
+
+/* ── RESULTS ── */
+.res{flex:1;min-height:0;display:grid;grid-template-columns:1.7fr 1fr;gap:16px}
+.res>*{min-height:0}
+.lb{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.lbh{display:grid;grid-template-columns:30px 1fr 78px 64px 70px 78px;padding:11px 18px;border-bottom:1px solid var(--line);flex-shrink:0}
+.lbh>div{font-size:10px;font-weight:800;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em}
+.lbb{flex:1;min-height:0;display:flex;flex-direction:column}
+.lbr{display:grid;grid-template-columns:30px 1fr 78px 64px 70px 78px;align-items:center;padding:0 18px;border-bottom:1px solid var(--line2);border-left:4px solid var(--rc);flex:1;animation:rowIn .4s ease both}
+.lbr .rk{font-size:15px;font-weight:800}
+.lbt{display:flex;align-items:center;gap:10px;min-width:0}
+.lbt .e{font-size:17px}
+.lbt .n{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lbt .ty{font-size:11px;font-weight:600}
+.lbn{font-size:14px;font-weight:700;text-align:right}
+.lbtot{font-size:16px;font-weight:900;text-align:right}
+.hcol{display:flex;flex-direction:column;gap:14px;min-height:0}
+.hbig{text-align:center}
+.hbig .k{font-size:11px;font-weight:800;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.hbig .v{font-size:52px;font-weight:900;line-height:1}
+.hbig .w{font-size:13px;font-weight:700;margin-top:2px}
+.hsub{display:flex;flex-direction:column;gap:11px;margin-top:18px}
+.hs{display:flex;align-items:center;gap:10px}
+.hs .nm{font-size:12.5px;color:var(--ink2);width:78px;font-weight:600}
+.hs .bar{flex:1;height:7px;background:var(--line2);border-radius:4px;overflow:hidden}
+.hs .bar>div{height:100%;border-radius:4px}
+.hs .vv{font-size:12.5px;font-weight:800;width:34px;text-align:right}
+.ins{flex:1;display:flex;gap:12px;align-items:flex-start;background:var(--ibs-soft);border:1px solid var(--ibs-line);border-radius:14px;padding:16px 18px}
+.ins .i{font-size:20px;flex-shrink:0}
+.ins .k{font-size:11px;font-weight:800;color:var(--ibs);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.ins .t{font-size:14px;color:var(--ink2);line-height:1.55}
+
+/* ── FINAL ── */
+.fin{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow-y:auto}
+.fin .tr{font-size:50px;animation:pop .6s ease both}
+.fin h1{font-size:36px;font-weight:900;letter-spacing:-.02em;margin-top:6px}
+.fin .lead{font-size:15px;color:var(--ink2);margin-top:6px;margin-bottom:24px}
+.awards{display:flex;gap:13px;margin-bottom:24px;flex-wrap:wrap;justify-content:center}
+.aw{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:18px 16px;width:178px;animation:pop .5s ease both}
+.aw .e{font-size:32px;margin-bottom:9px}
+.aw .t{font-size:12.5px;font-weight:800;margin-bottom:3px}
+.aw .s{font-size:10.5px;color:var(--ink3);margin-bottom:12px;min-height:24px}
+.aw .win{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:9px 11px}
+.aw .win .we{font-size:17px}
+.aw .win .wn{font-size:13.5px;font-weight:800;margin-top:2px}
+.aw .win .ws{font-size:11.5px;color:var(--ink2);margin-top:1px}
+.finlb{width:100%;max-width:600px}
+.finlb .lbr{padding:0 18px;min-height:42px}
+
+/* ── Description ── */
+.desc{flex-shrink:0;padding:12px 22px 13px;background:var(--panel);border-top:1px solid var(--line);display:flex;align-items:flex-start;gap:11px;min-height:52px}
+.desc .i{font-size:17px;flex-shrink:0;margin-top:1px}
+.desc .t{font-size:13px;color:var(--ink2);line-height:1.6}
+
+/* ── Bottom ── */
+.bottom{flex-shrink:0;padding:9px 22px 11px;border-top:1px solid var(--line);background:var(--panel)}
+.tlbar{position:relative;height:3px;background:var(--line);border-radius:2px;margin-bottom:10px}
+.tlfill{position:absolute;left:0;top:0;height:100%;background:var(--ibs);border-radius:2px;transition:width .08s linear}
+.ctrl{display:flex;align-items:center;gap:9px}
+.ctrl .lbl{font-size:12px;color:var(--ink3);font-weight:700;white-space:nowrap}
+.ctrl .sep{width:1px;height:18px;background:var(--line)}
+.dots{display:flex;gap:4px;align-items:center;margin-left:auto;flex-wrap:nowrap}
+.dot{width:9px;height:9px;border-radius:50%;background:#cfd8e6;cursor:pointer;transition:.2s;flex-shrink:0}
+.dot:hover{background:#9fb0c4;transform:scale(1.3)}
+.dot.done{background:#8eb0f3}
+.dot.cur{width:12px;height:12px;background:var(--ibs);box-shadow:0 0 0 3px var(--ibs-soft)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes rowIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{opacity:0;transform:scale(.5)}65%{transform:scale(1.07)}100%{opacity:1;transform:scale(1)}}
+
+/* ── COUNCIL (Совет команды) ── */
+.council{flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+.rc{background:var(--panel);border:1px solid var(--line);border-top:4px solid var(--rcc);border-radius:15px;box-shadow:var(--sh);padding:16px 16px;display:flex;flex-direction:column;animation:rowIn .4s ease both}
+.rc-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.rc-ic{font-size:24px}
+.rc-nm{font-size:14px;font-weight:800;line-height:1.1}
+.rc-du{font-size:11px;font-weight:700;color:var(--rcc);margin-top:2px}
+.rc-say{flex:1;margin-top:8px;background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--rcc);border-radius:11px;padding:12px 13px;font-size:13px;color:var(--ink);line-height:1.5;font-style:italic}
+.rc-out{margin-top:9px;display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--ink2)}
+.rc-out .e{font-size:14px}
+
+/* ── TEACH (обучающие сцены) ── */
+.teach{flex:1;min-height:0;display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+.teach.one{grid-template-columns:1fr}
+.teach>*{min-height:0}
+.tcard2{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:22px 24px;display:flex;flex-direction:column;overflow-y:auto}
+.tcard2 .tk{font-size:11px;font-weight:800;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
+.tlist{display:flex;flex-direction:column;gap:12px}
+.tli{display:flex;gap:13px;align-items:flex-start}
+.tli>div{min-width:0}
+.tli .e{font-size:22px;flex-shrink:0;width:30px;text-align:center}
+.tli .tt{font-size:14px;font-weight:800;margin-bottom:2px}
+.tli .td{font-size:13px;color:var(--ink2);line-height:1.5}
+.tformula{background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:16px 18px;font-size:15px;line-height:1.9;color:var(--ink)}
+.tformula .hl{font-weight:800;padding:2px 8px;border-radius:6px}
+.tnote{margin-top:auto;display:flex;gap:11px;align-items:flex-start;background:var(--ibs-soft);border:1px solid var(--ibs-line);border-radius:13px;padding:14px 16px}
+.tnote .i{font-size:19px;flex-shrink:0}
+.tnote .t{font-size:13px;color:var(--ink2);line-height:1.55}
+.tnote .t b{color:var(--ink)}
+.tbars{display:flex;flex-direction:column;gap:13px;margin-top:4px}
+.tbar .tbh{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+.tbar .tbh .w{font-weight:800}
+.tbar .tt2{height:11px;background:var(--line2);border-radius:6px;overflow:hidden}
+.tbar .tt2>div{height:100%;border-radius:6px}
+@media(max-width:1000px){.teach{grid-template-columns:1fr}.council{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
 
 <div class="hdr">
-  <div class="ibs-mark">IBS</div>
-  <span class="hdr-title">Как проходит игра · FMCG-цепочка</span>
-  <a href="/" class="hdr-back">← На главную</a>
-</div>
-
-<div class="info">
-  <div class="info-left">
-    <div class="info-step" id="i-step"></div>
-    <div class="info-title" id="i-title"></div>
-    <div class="info-desc" id="i-desc"></div>
+  <div class="ibs">IBS</div>
+  <div class="h-sep"></div>
+  <div class="h-step" id="i-step">— Старт —</div>
+  <div class="h-title" id="i-title">FMCG-цепочка поставок</div>
+  <div class="h-timer"><div class="k">Время</div><div class="v" id="i-time">Минута 0</div></div>
+  <div class="h-nav">
+    <button class="btn" onclick="prev()">◄</button>
+    <button class="btn pp" id="btn-pp" onclick="togglePlay()">▶ Играть</button>
+    <button class="btn" onclick="next()">Далее ►</button>
   </div>
-  <div class="info-badge" id="i-time"></div>
+  <a href="/" class="h-back">← Главная</a>
 </div>
 
-<div class="scene">
-<svg id="svg-room" viewBox="0 0 830 390" xmlns="http://www.w3.org/2000/svg">
-<defs>
-  <filter id="f-glow" x="-30%" y="-30%" width="160%" height="160%">
-    <feGaussianBlur stdDeviation="4" result="b"/>
-    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-  </filter>
-  <filter id="f-glow2" x="-40%" y="-40%" width="180%" height="180%">
-    <feGaussianBlur stdDeviation="8" result="b"/>
-    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-  </filter>
-  <marker id="arr-b" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
-    <polygon points="0 0,7 2.5,0 5" fill="rgba(59,130,246,.75)"/>
-  </marker>
-  <marker id="arr-y" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
-    <polygon points="0 0,7 2.5,0 5" fill="rgba(245,158,11,.75)"/>
-  </marker>
-  <marker id="arr-p" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
-    <polygon points="0 0,7 2.5,0 5" fill="rgba(167,139,250,.75)"/>
-  </marker>
-  <marker id="arr-g" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
-    <polygon points="0 0,7 2.5,0 5" fill="rgba(34,197,94,.75)"/>
-  </marker>
-</defs>
-
-<!-- ════════════════════════════════════════
-     PROJECTOR SCREEN (always visible)
-════════════════════════════════════════ -->
-<g id="g-screen">
-  <rect x="245" y="6" width="340" height="72" rx="6" fill="rgba(59,130,246,.06)" id="screen-glow"/>
-  <rect x="250" y="10" width="330" height="64" rx="5" fill="#080f1e" stroke="#1e40af" stroke-width="1.5" id="screen-frame"/>
-  <!-- Default content -->
-  <g id="scr-default">
-    <text x="415" y="34" text-anchor="middle" fill="#1e40af" font-size="12" font-family="'CG',sans-serif" font-weight="700" letter-spacing="2.5">FMCG-ЦЕПОЧКА</text>
-    <text x="415" y="53" text-anchor="middle" fill="#2563eb" font-size="17" font-family="'CG',sans-serif" font-weight="700">Добро пожаловать!</text>
-    <text x="415" y="67" text-anchor="middle" fill="rgba(255,255,255,.25)" font-size="10" font-family="'CG',sans-serif">ibsgame.ru · Бизнес-симуляция</text>
-  </g>
-  <!-- Briefing content (hidden) -->
-  <g id="scr-brief" opacity="0">
-    <text x="256" y="24" fill="rgba(255,255,255,.4)" font-size="9" font-family="'CG',sans-serif" letter-spacing="1">ТУР 1 · СТАРТОВЫЙ РЫНОК</text>
-    <text x="256" y="35" fill="#60a5fa" font-size="10" font-family="'CG',sans-serif" font-weight="700">Спрос по категориям (ед.):</text>
-    <rect x="260" y="41" width="26" height="16" fill="#3b82f6" rx="2"/>
-    <rect x="295" y="37" width="26" height="20" fill="#22c55e" rx="2"/>
-    <rect x="330" y="42" width="26" height="15" fill="#f59e0b" rx="2"/>
-    <rect x="365" y="39" width="26" height="18" fill="#ec4899" rx="2"/>
-    <text x="272" y="64" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="8" font-family="'CG',sans-serif">Бакалея</text>
-    <text x="307" y="64" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="8" font-family="'CG',sans-serif">Молочка</text>
-    <text x="342" y="64" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="8" font-family="'CG',sans-serif">Снеки</text>
-    <text x="377" y="64" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="8" font-family="'CG',sans-serif">Делик.</text>
-    <line x1="420" y1="22" x2="420" y2="70" stroke="rgba(255,255,255,.08)" stroke-width=".8"/>
-    <text x="428" y="30" fill="#fbbf24" font-size="9" font-family="'CG',sans-serif" font-weight="700">⚠ Событие тура:</text>
-    <text x="428" y="41" fill="rgba(255,255,255,.65)" font-size="9" font-family="'CG',sans-serif">Стартовый рынок</text>
-    <text x="428" y="51" fill="rgba(255,255,255,.4)" font-size="8" font-family="'CG',sans-serif">Базовые условия,</text>
-    <text x="428" y="60" fill="rgba(255,255,255,.4)" font-size="8" font-family="'CG',sans-serif">ориентируйтесь на тренд.</text>
-    <text x="428" y="68" fill="#4ade80" font-size="8" font-family="'CG',sans-serif">📈 Тренд: +3–8% по всем катег.</text>
-  </g>
-  <!-- Historical data (hidden) -->
-  <g id="scr-hist" opacity="0">
-    <text x="256" y="23" fill="rgba(255,255,255,.4)" font-size="9" font-family="'CG',sans-serif" letter-spacing="1">ИСТОРИЯ · 3 ПЕРИОДА ДО ИГРЫ</text>
-    <text x="256" y="33" fill="#60a5fa" font-size="9" font-family="'CG',sans-serif" font-weight="700">Динамика спроса по категориям:</text>
-    <!-- mini table -->
-    <text x="260" y="43" fill="rgba(255,255,255,.35)" font-size="7" font-family="'CG',sans-serif">Категория</text>
-    <text x="320" y="43" fill="rgba(255,255,255,.35)" font-size="7" font-family="'CG',sans-serif">П−3</text>
-    <text x="345" y="43" fill="rgba(255,255,255,.35)" font-size="7" font-family="'CG',sans-serif">П−2</text>
-    <text x="370" y="43" fill="rgba(255,255,255,.35)" font-size="7" font-family="'CG',sans-serif">П−1</text>
-    <text x="395" y="43" fill="rgba(255,255,255,.35)" font-size="7" font-family="'CG',sans-serif">Тренд</text>
-    <text x="260" y="52" fill="#60a5fa" font-size="7" font-family="'CG',sans-serif">Бакалея</text>
-    <text x="320" y="52" fill="rgba(255,255,255,.6)" font-size="7" font-family="'CG',sans-serif">104</text><text x="345" y="52" fill="rgba(255,255,255,.6)" font-size="7" font-family="'CG',sans-serif">110</text><text x="370" y="52" fill="rgba(255,255,255,.6)" font-size="7" font-family="'CG',sans-serif">115</text><text x="395" y="52" fill="#4ade80" font-size="7" font-family="'CG',sans-serif">▲+5%</text>
-    <text x="260" y="60" fill="#22c55e" font-size="7" font-family="'CG',sans-serif">Молочка</text>
-    <text x="320" y="60" fill="rgba(255,255,255,.6)" font-size="7" font-family="'CG',sans-serif">82</text><text x="345" y="60" fill="rgba(255,255,255,.6)" font-size="7" font-family="'CG',sans-serif">87</text><text x="370" y="60" fill="rgba(255,255,255,.6)" font-size="7" font-family="'CG',sans-serif">90</text><text x="395" y="60" fill="#4ade80" font-size="7" font-family="'CG',sans-serif">▲+3%</text>
-    <text x="260" y="68" fill="#f59e0b" font-size="7" font-family="'CG',sans-serif">Снеки</text>
-    <text x="320" y="68" fill="rgba(255,255,255,.6)" font-size="7" font-family="'CG',sans-serif">94</text><text x="345" y="68" fill="rgba(255,255,255,.6)" font-size="7" font-family="'CG',sans-serif">100</text><text x="370" y="68" fill="rgba(255,255,255,.6)" font-size="7" font-family="'CG',sans-serif">102</text><text x="395" y="68" fill="#4ade80" font-size="7" font-family="'CG',sans-serif">▲+8%</text>
-    <text x="450" y="35" fill="#60a5fa" font-size="9" font-family="'CG',sans-serif" font-weight="700">Исторические данные</text>
-    <text x="450" y="46" fill="rgba(255,255,255,.5)" font-size="8" font-family="'CG',sans-serif">Использует аналитик команды</text>
-    <text x="450" y="56" fill="rgba(255,255,255,.5)" font-size="8" font-family="'CG',sans-serif">для прогноза спроса Тура 1</text>
-    <text x="450" y="68" fill="#fbbf24" font-size="8" font-family="'CG',sans-serif">→ 3 периода + тренд по каждой кат.</text>
-  </g>
-  <!-- Decisions content (hidden) -->
-  <g id="scr-dec" opacity="0">
-    <text x="256" y="24" fill="rgba(255,255,255,.4)" font-size="9" font-family="'CG',sans-serif" letter-spacing="1">СТАТУС ВВОДА РЕШЕНИЙ · ТУР 1</text>
-    <!-- Progress squares -->
-    <rect x="260" y="30" width="28" height="18" rx="3" fill="rgba(34,197,94,.2)" stroke="#22c55e" stroke-width=".8"/>
-    <text x="274" y="43" text-anchor="middle" fill="#4ade80" font-size="11">✓</text>
-    <text x="274" y="53" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="7" font-family="'CG',sans-serif">R1</text>
-    <rect x="296" y="30" width="28" height="18" rx="3" fill="rgba(34,197,94,.2)" stroke="#22c55e" stroke-width=".8"/>
-    <text x="310" y="43" text-anchor="middle" fill="#4ade80" font-size="11">✓</text>
-    <text x="310" y="53" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="7" font-family="'CG',sans-serif">R2</text>
-    <rect x="332" y="30" width="28" height="18" rx="3" fill="rgba(34,197,94,.2)" stroke="#22c55e" stroke-width=".8"/>
-    <text x="346" y="43" text-anchor="middle" fill="#4ade80" font-size="11">✓</text>
-    <text x="346" y="53" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="7" font-family="'CG',sans-serif">R3</text>
-    <rect x="368" y="30" width="28" height="18" rx="3" fill="rgba(34,197,94,.2)" stroke="#22c55e" stroke-width=".8"/>
-    <text x="382" y="43" text-anchor="middle" fill="#4ade80" font-size="11">✓</text>
-    <text x="382" y="53" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="7" font-family="'CG',sans-serif">R4</text>
-    <rect x="404" y="30" width="28" height="18" rx="3" fill="rgba(34,197,94,.2)" stroke="#22c55e" stroke-width=".8"/>
-    <text x="418" y="43" text-anchor="middle" fill="#4ade80" font-size="11">✓</text>
-    <text x="418" y="53" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="7" font-family="'CG',sans-serif">S1</text>
-    <rect x="440" y="30" width="28" height="18" rx="3" fill="rgba(245,158,11,.15)" stroke="#f59e0b" stroke-width=".8" id="scr-dec-pending"/>
-    <text x="454" y="43" text-anchor="middle" fill="#fbbf24" font-size="10">…</text>
-    <text x="454" y="53" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="7" font-family="'CG',sans-serif">S2</text>
-    <rect x="476" y="30" width="28" height="18" rx="3" fill="rgba(30,58,138,.2)" stroke="#1e40af" stroke-width=".8"/>
-    <text x="490" y="53" text-anchor="middle" fill="rgba(255,255,255,.25)" font-size="7" font-family="'CG',sans-serif">S3</text>
-    <text x="256" y="64" fill="rgba(255,255,255,.3)" font-size="9" font-family="'CG',sans-serif">Подано: <tspan fill="#60a5fa" font-weight="700">5 / 9</tspan> команд</text>
-  </g>
-  <!-- Results content (hidden) -->
-  <g id="scr-res" opacity="0">
-    <text x="256" y="22" fill="rgba(255,255,255,.4)" font-size="9" font-family="'CG',sans-serif" letter-spacing="1">ИТОГИ ТУРА 1 · РЕЙТИНГ</text>
-    <rect x="257" y="26" width="35" height="9" fill="#2563eb" rx="1.5"/>
-    <text x="259" y="33" fill="#fff" font-size="8" font-family="'CG',sans-serif">R2: 218 у.е.</text>
-    <rect x="257" y="37" width="29" height="9" fill="#1d4ed8" rx="1.5"/>
-    <text x="259" y="44" fill="#fff" font-size="8" font-family="'CG',sans-serif">R3: 182 у.е.</text>
-    <rect x="257" y="48" width="23" height="9" fill="#1e3a8a" rx="1.5"/>
-    <text x="259" y="55" fill="#fff" font-size="8" font-family="'CG',sans-serif">S2: 148 у.е.</text>
-    <rect x="257" y="59" width="18" height="9" fill="#1e3461" rx="1.5"/>
-    <text x="259" y="66" fill="#fff" font-size="8" font-family="'CG',sans-serif">R1: 112 у.е.</text>
-    <line x1="420" y1="20" x2="420" y2="72" stroke="rgba(255,255,255,.07)" stroke-width=".8"/>
-    <text x="430" y="28" fill="#a78bfa" font-size="10" font-family="'CG',sans-serif" font-weight="700">❤️ Здоровье цепочки</text>
-    <rect x="430" y="32" width="120" height="7" fill="rgba(255,255,255,.06)" rx="2"/>
-    <rect x="430" y="32" width="90" height="7" fill="#7c3aed" rx="2"/>
-    <text x="432" y="38" fill="#fff" font-size="7" font-family="'CG',sans-serif">75% — хорошо</text>
-    <text x="430" y="50" fill="#fbbf24" font-size="9" font-family="'CG',sans-serif" font-weight="700">🏆 R2 Супермаркет</text>
-    <text x="430" y="59" fill="rgba(255,255,255,.4)" font-size="8" font-family="'CG',sans-serif">Лучший счёт тура</text>
-    <text x="430" y="68" fill="#4ade80" font-size="8" font-family="'CG',sans-serif">Бонус цепочки: +188 у.е.</text>
-  </g>
-</g>
-<text x="415" y="84" text-anchor="middle" fill="rgba(255,255,255,.18)" font-size="10" font-family="'CG',sans-serif" letter-spacing="1.5">ПРОЕКТОР</text>
-
-<!-- ════════════════════════════════════════
-     FACILITATOR
-════════════════════════════════════════ -->
-<g id="g-lead">
-  <rect x="382" y="96" width="66" height="30" rx="5" fill="rgba(124,58,237,.12)" stroke="rgba(124,58,237,.35)" stroke-width="1.2"/>
-  <circle cx="415" cy="90" r="12" fill="#4c1d95" stroke="#7c3aed" stroke-width="1.5"/>
-  <text x="415" y="94" text-anchor="middle" font-size="15">🎙</text>
-  <text x="415" y="106" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="9" font-family="'CG',sans-serif" letter-spacing=".5">ВЕДУЩИЙ</text>
-  <!-- Speech bubble (visible in some scenes) -->
-  <g id="lead-bubble" opacity="0">
-    <rect x="432" y="74" width="95" height="24" rx="5" fill="#2e1065" stroke="#7c3aed" stroke-width="1"/>
-    <polygon points="432,90 423,95 432,96" fill="#2e1065"/>
-    <text x="480" y="84" text-anchor="middle" fill="#c4b5fd" font-size="9" font-family="'CG',sans-serif" font-weight="700" id="lead-bubble-text">Добро пожаловать!</text>
-    <text x="480" y="93" text-anchor="middle" fill="rgba(255,255,255,.45)" font-size="8" font-family="'CG',sans-serif" id="lead-bubble-sub">Начинаем игру!</text>
-  </g>
-</g>
-
-<!-- ════════════════════════════════════════
-     SECTOR LABELS
-════════════════════════════════════════ -->
-<text x="148" y="152" text-anchor="middle" fill="rgba(59,130,246,.45)" font-size="11" font-family="'CG',sans-serif" font-weight="700" letter-spacing="1.5">РИТЕЙЛЕРЫ</text>
-<text x="652" y="152" text-anchor="middle" fill="rgba(34,197,94,.45)" font-size="11" font-family="'CG',sans-serif" font-weight="700" letter-spacing="1.5">ПОСТАВЩИКИ</text>
-
-<!-- ════════════════════════════════════════
-     RETAILER TABLES
-════════════════════════════════════════ -->
-<!-- R1 Дискаунтер -->
-<g id="g-R1" class="tbl">
-  <rect x="22" y="158" width="122" height="72" rx="8" fill="rgba(30,58,138,.28)" stroke="#3b82f6" stroke-width="1.5"/>
-  <text x="35" y="174" fill="#60a5fa" font-size="13" font-family="'CG',sans-serif" font-weight="700">🛒 R1 Дискаунтер</text>
-  <circle class="p ret" cx="44"  cy="198" r="6.5" fill="#1d4ed8" opacity=".85"/>
-  <circle class="p ret" cx="62"  cy="198" r="6.5" fill="#2563eb" opacity=".8"/>
-  <circle class="p ret" cx="80"  cy="198" r="6.5" fill="#3b82f6" opacity=".75"/>
-  <circle class="p ret" cx="98"  cy="198" r="6.5" fill="#60a5fa" opacity=".65"/>
-  <text x="83" y="220" text-anchor="middle" fill="rgba(255,255,255,.2)" font-size="9" font-family="'CG',sans-serif">4 игрока</text>
-</g>
-<!-- R2 Супермаркет -->
-<g id="g-R2" class="tbl">
-  <rect x="158" y="158" width="122" height="72" rx="8" fill="rgba(30,58,138,.28)" stroke="#3b82f6" stroke-width="1.5"/>
-  <text x="171" y="174" fill="#60a5fa" font-size="13" font-family="'CG',sans-serif" font-weight="700">🛒 R2 Супермаркет</text>
-  <circle class="p ret" cx="178" cy="198" r="6.5" fill="#1d4ed8" opacity=".85"/>
-  <circle class="p ret" cx="196" cy="198" r="6.5" fill="#2563eb" opacity=".8"/>
-  <circle class="p ret" cx="214" cy="198" r="6.5" fill="#3b82f6" opacity=".75"/>
-  <circle class="p ret" cx="232" cy="198" r="6.5" fill="#60a5fa" opacity=".65"/>
-  <text x="219" y="220" text-anchor="middle" fill="rgba(255,255,255,.2)" font-size="9" font-family="'CG',sans-serif">4 игрока</text>
-</g>
-<!-- R3 Гипермаркет -->
-<g id="g-R3" class="tbl">
-  <rect x="22" y="248" width="122" height="72" rx="8" fill="rgba(30,58,138,.28)" stroke="#3b82f6" stroke-width="1.5"/>
-  <text x="35" y="264" fill="#60a5fa" font-size="13" font-family="'CG',sans-serif" font-weight="700">🛒 R3 Гипермаркет</text>
-  <circle class="p ret" cx="44"  cy="290" r="6.5" fill="#1d4ed8" opacity=".85"/>
-  <circle class="p ret" cx="62"  cy="290" r="6.5" fill="#2563eb" opacity=".8"/>
-  <circle class="p ret" cx="80"  cy="290" r="6.5" fill="#3b82f6" opacity=".75"/>
-  <circle class="p ret" cx="98"  cy="290" r="6.5" fill="#60a5fa" opacity=".65"/>
-  <text x="83" y="312" text-anchor="middle" fill="rgba(255,255,255,.2)" font-size="9" font-family="'CG',sans-serif">4 игрока</text>
-</g>
-<!-- R4 Премиум -->
-<g id="g-R4" class="tbl">
-  <rect x="158" y="248" width="122" height="72" rx="8" fill="rgba(30,58,138,.28)" stroke="#3b82f6" stroke-width="1.5"/>
-  <text x="171" y="264" fill="#60a5fa" font-size="13" font-family="'CG',sans-serif" font-weight="700">🛒 R4 Премиум</text>
-  <circle class="p ret" cx="178" cy="290" r="6.5" fill="#1d4ed8" opacity=".85"/>
-  <circle class="p ret" cx="196" cy="290" r="6.5" fill="#2563eb" opacity=".8"/>
-  <circle class="p ret" cx="214" cy="290" r="6.5" fill="#3b82f6" opacity=".75"/>
-  <circle class="p ret" cx="232" cy="290" r="6.5" fill="#60a5fa" opacity=".65"/>
-  <text x="219" y="312" text-anchor="middle" fill="rgba(255,255,255,.2)" font-size="9" font-family="'CG',sans-serif">4 игрока</text>
-</g>
-
-<!-- ════════════════════════════════════════
-     SUPPLIER TABLES
-════════════════════════════════════════ -->
-<!-- S1 -->
-<g id="g-S1" class="tbl">
-  <rect x="510" y="158" width="122" height="72" rx="8" fill="rgba(20,83,45,.28)" stroke="#22c55e" stroke-width="1.5"/>
-  <text x="523" y="174" fill="#4ade80" font-size="13" font-family="'CG',sans-serif" font-weight="700">🏭 S1 Базовый</text>
-  <circle class="p sup" cx="532" cy="198" r="6.5" fill="#15803d" opacity=".9"/>
-  <circle class="p sup" cx="550" cy="198" r="6.5" fill="#16a34a" opacity=".85"/>
-  <circle class="p sup" cx="568" cy="198" r="6.5" fill="#22c55e" opacity=".75"/>
-  <circle class="p sup" cx="586" cy="198" r="6.5" fill="#4ade80" opacity=".65"/>
-  <text x="571" y="220" text-anchor="middle" fill="rgba(255,255,255,.2)" font-size="9" font-family="'CG',sans-serif">4 игрока</text>
-</g>
-<!-- S2 -->
-<g id="g-S2" class="tbl">
-  <rect x="646" y="158" width="122" height="72" rx="8" fill="rgba(20,83,45,.28)" stroke="#22c55e" stroke-width="1.5"/>
-  <text x="659" y="174" fill="#4ade80" font-size="13" font-family="'CG',sans-serif" font-weight="700">🏭 S2 Fresh</text>
-  <circle class="p sup" cx="666" cy="198" r="6.5" fill="#15803d" opacity=".9"/>
-  <circle class="p sup" cx="684" cy="198" r="6.5" fill="#16a34a" opacity=".85"/>
-  <circle class="p sup" cx="702" cy="198" r="6.5" fill="#22c55e" opacity=".75"/>
-  <circle class="p sup" cx="720" cy="198" r="6.5" fill="#4ade80" opacity=".65"/>
-  <text x="707" y="220" text-anchor="middle" fill="rgba(255,255,255,.2)" font-size="9" font-family="'CG',sans-serif">4 игрока</text>
-</g>
-<!-- S3 -->
-<g id="g-S3" class="tbl">
-  <rect x="510" y="248" width="122" height="72" rx="8" fill="rgba(20,83,45,.28)" stroke="#22c55e" stroke-width="1.5"/>
-  <text x="523" y="264" fill="#4ade80" font-size="13" font-family="'CG',sans-serif" font-weight="700">🏭 S3 Промо-хиты</text>
-  <circle class="p sup" cx="532" cy="290" r="6.5" fill="#15803d" opacity=".9"/>
-  <circle class="p sup" cx="550" cy="290" r="6.5" fill="#16a34a" opacity=".85"/>
-  <circle class="p sup" cx="568" cy="290" r="6.5" fill="#22c55e" opacity=".75"/>
-  <circle class="p sup" cx="586" cy="290" r="6.5" fill="#4ade80" opacity=".65"/>
-  <text x="571" y="312" text-anchor="middle" fill="rgba(255,255,255,.2)" font-size="9" font-family="'CG',sans-serif">4 игрока</text>
-</g>
-<!-- S4 -->
-<g id="g-S4" class="tbl">
-  <rect x="646" y="248" width="122" height="72" rx="8" fill="rgba(20,83,45,.28)" stroke="#22c55e" stroke-width="1.5"/>
-  <text x="659" y="264" fill="#4ade80" font-size="13" font-family="'CG',sans-serif" font-weight="700">🏭 S4 Импорт</text>
-  <circle class="p sup" cx="666" cy="290" r="6.5" fill="#15803d" opacity=".9"/>
-  <circle class="p sup" cx="684" cy="290" r="6.5" fill="#16a34a" opacity=".85"/>
-  <circle class="p sup" cx="702" cy="290" r="6.5" fill="#22c55e" opacity=".75"/>
-  <circle class="p sup" cx="720" cy="290" r="6.5" fill="#4ade80" opacity=".65"/>
-  <text x="707" y="312" text-anchor="middle" fill="rgba(255,255,255,.2)" font-size="9" font-family="'CG',sans-serif">4 игрока</text>
-</g>
-
-<!-- ════════════════════════════════════════
-     DISTRIBUTOR TABLE
-════════════════════════════════════════ -->
-<g id="g-D" class="tbl">
-  <rect x="302" y="340" width="226" height="60" rx="8" fill="rgba(120,53,15,.28)" stroke="#f59e0b" stroke-width="1.5"/>
-  <text x="415" y="358" text-anchor="middle" fill="#fbbf24" font-size="13" font-family="'CG',sans-serif" font-weight="700">🚛 D · Дистрибьютор</text>
-  <circle class="p dist" cx="356" cy="378" r="6.5" fill="#b45309" opacity=".9"/>
-  <circle class="p dist" cx="376" cy="378" r="6.5" fill="#d97706" opacity=".85"/>
-  <circle class="p dist" cx="396" cy="378" r="6.5" fill="#f59e0b" opacity=".75"/>
-  <circle class="p dist" cx="416" cy="378" r="6.5" fill="#fbbf24" opacity=".65"/>
-  <text x="415" y="395" text-anchor="middle" fill="rgba(255,255,255,.18)" font-size="9" font-family="'CG',sans-serif">перевозчик · 4 игрока</text>
-</g>
-
-<!-- ════════════════════════════════════════
-     ROLE CARDS (scene 1)
-════════════════════════════════════════ -->
-<g id="g-cards" opacity="0">
-  <g class="role-card" id="rc-R1" style="transform-origin:83px 198px">
-    <rect x="46" y="185" width="74" height="26" rx="4" fill="#1e3a8a" stroke="#60a5fa" stroke-width="1"/>
-    <text x="83" y="196" text-anchor="middle" fill="#93c5fd" font-size="11" font-family="'CG',sans-serif" font-weight="700">🎩 Директор</text>
-    <text x="83" y="206" text-anchor="middle" fill="rgba(255,255,255,.5)" font-size="9" font-family="'CG',sans-serif">🦁 Жёсткий</text>
-  </g>
-  <g class="role-card" id="rc-R2" style="transform-origin:219px 198px">
-    <rect x="182" y="185" width="74" height="26" rx="4" fill="#1e3a8a" stroke="#60a5fa" stroke-width="1"/>
-    <text x="219" y="196" text-anchor="middle" fill="#93c5fd" font-size="11" font-family="'CG',sans-serif" font-weight="700">📈 Аналитик</text>
-    <text x="219" y="206" text-anchor="middle" fill="rgba(255,255,255,.5)" font-size="9" font-family="'CG',sans-serif">📊 Аналитик</text>
-  </g>
-  <g class="role-card" id="rc-R3" style="transform-origin:83px 290px">
-    <rect x="46" y="277" width="74" height="26" rx="4" fill="#1e3a8a" stroke="#60a5fa" stroke-width="1"/>
-    <text x="83" y="288" text-anchor="middle" fill="#93c5fd" font-size="11" font-family="'CG',sans-serif" font-weight="700">📦 Закупщик</text>
-    <text x="83" y="298" text-anchor="middle" fill="rgba(255,255,255,.5)" font-size="9" font-family="'CG',sans-serif">🤝 Кооперат.</text>
-  </g>
-  <g class="role-card" id="rc-R4" style="transform-origin:219px 290px">
-    <rect x="182" y="277" width="74" height="26" rx="4" fill="#1e3a8a" stroke="#60a5fa" stroke-width="1"/>
-    <text x="219" y="288" text-anchor="middle" fill="#93c5fd" font-size="11" font-family="'CG',sans-serif" font-weight="700">🎩 Директор</text>
-    <text x="219" y="298" text-anchor="middle" fill="rgba(255,255,255,.5)" font-size="9" font-family="'CG',sans-serif">🦊 Хитрый</text>
-  </g>
-  <g class="role-card" id="rc-S1" style="transform-origin:571px 198px">
-    <rect x="534" y="185" width="74" height="26" rx="4" fill="#14532d" stroke="#4ade80" stroke-width="1"/>
-    <text x="571" y="196" text-anchor="middle" fill="#86efac" font-size="11" font-family="'CG',sans-serif" font-weight="700">🏭 Директор</text>
-    <text x="571" y="206" text-anchor="middle" fill="rgba(255,255,255,.5)" font-size="9" font-family="'CG',sans-serif">😤 Упрямый</text>
-  </g>
-  <g class="role-card" id="rc-S4" style="transform-origin:707px 290px">
-    <rect x="670" y="277" width="74" height="26" rx="4" fill="#14532d" stroke="#4ade80" stroke-width="1"/>
-    <text x="707" y="288" text-anchor="middle" fill="#86efac" font-size="11" font-family="'CG',sans-serif" font-weight="700">📊 S&amp;OP</text>
-    <text x="707" y="298" text-anchor="middle" fill="rgba(255,255,255,.5)" font-size="9" font-family="'CG',sans-serif">🤝 Кооперат.</text>
-  </g>
-  <g class="role-card" id="rc-D" style="transform-origin:415px 375px">
-    <rect x="362" y="362" width="106" height="26" rx="4" fill="#78350f" stroke="#fbbf24" stroke-width="1"/>
-    <text x="415" y="373" text-anchor="middle" fill="#fcd34d" font-size="11" font-family="'CG',sans-serif" font-weight="700">🚛 Упр. директор</text>
-    <text x="415" y="383" text-anchor="middle" fill="rgba(255,255,255,.5)" font-size="9" font-family="'CG',sans-serif">🦊 Хитрый</text>
-  </g>
-  <!-- Team name badge -->
-  <g id="rc-name-R2" style="transform-origin:219px 163px" opacity="0">
-    <rect x="172" y="155" width="94" height="18" rx="4" fill="#1d3461" stroke="#3b82f6" stroke-width=".8"/>
-    <text x="219" y="167" text-anchor="middle" fill="#93c5fd" font-size="9" font-family="'CG',sans-serif" font-weight="700">«Торговые Акулы»</text>
-  </g>
-</g>
-
-<!-- ════════════════════════════════════════
-     NEGOTIATION ARROWS (scene 4)
-════════════════════════════════════════ -->
-<g id="g-arrows" opacity="0">
-  <!-- R1 → S1 (Бакалея) -->
-  <line id="arr1" x1="144" y1="194" x2="510" y2="188" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="7 5" marker-end="url(#arr-b)"/>
-  <rect x="270" y="182" width="86" height="15" rx="3.5" fill="#1e3a8a" stroke="#3b82f6" stroke-width=".7"/>
-  <text x="313" y="192" text-anchor="middle" fill="#93c5fd" font-size="9" font-family="'CG',sans-serif">скидка −12%</text>
-  <!-- R2 → D -->
-  <line id="arr2" x1="219" y1="230" x2="370" y2="340" stroke="#f59e0b" stroke-width="1.3" stroke-dasharray="6 4" marker-end="url(#arr-y)"/>
-  <rect x="238" y="272" width="90" height="15" rx="3.5" fill="#78350f" stroke="#f59e0b" stroke-width=".7"/>
-  <text x="283" y="282" text-anchor="middle" fill="#fcd34d" font-size="9" font-family="'CG',sans-serif">тариф 1.5 у.е.</text>
-  <!-- R3 → S4 (деликатесы) -->
-  <line id="arr3" x1="144" y1="284" x2="646" y2="284" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="7 5" marker-end="url(#arr-p)"/>
-  <rect x="330" y="276" width="90" height="15" rx="3.5" fill="#2e1065" stroke="#7c3aed" stroke-width=".7"/>
-  <text x="375" y="286" text-anchor="middle" fill="#c4b5fd" font-size="9" font-family="'CG',sans-serif">объём 45 ед.</text>
-  <!-- R4 → S4 (Премиум фокус) -->
-  <line id="arr4" x1="280" y1="278" x2="682" y2="248" stroke="#ec4899" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#arr-p)"/>
-  <rect x="426" y="252" width="90" height="14" rx="3.5" fill="#500724" stroke="#ec4899" stroke-width=".7"/>
-  <text x="471" y="261" text-anchor="middle" fill="#f9a8d4" font-size="9" font-family="'CG',sans-serif">приоритет деликатесы</text>
-  <!-- R1 → S3 (промо) -->
-  <line id="arr5" x1="144" y1="204" x2="510" y2="274" stroke="#22c55e" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#arr-g)"/>
-</g>
-
-<!-- ════════════════════════════════════════
-     LAPTOP ICONS (scene 5)
-════════════════════════════════════════ -->
-<g id="g-laptops" opacity="0">
-  <!-- Each table gets a small laptop + checkmark -->
-  <!-- R1 -->
-  <rect x="68" y="188" width="28" height="18" rx="2" fill="#0f172a" stroke="#3b82f6" stroke-width=".8"/>
-  <rect x="71" y="191" width="8" height="6" rx=".8" fill="#1e40af" opacity=".6"/>
-  <rect x="71" y="199" width="12" height="1.5" rx=".5" fill="rgba(255,255,255,.25)"/>
-  <rect x="71" y="202" width="9" height="1.5" rx=".5" fill="rgba(255,255,255,.18)"/>
-  <!-- R2 -->
-  <rect x="202" y="188" width="28" height="18" rx="2" fill="#0f172a" stroke="#3b82f6" stroke-width=".8"/>
-  <rect x="205" y="191" width="8" height="6" rx=".8" fill="#1e40af" opacity=".6"/>
-  <!-- R3 -->
-  <rect x="68" y="278" width="28" height="18" rx="2" fill="#0f172a" stroke="#3b82f6" stroke-width=".8"/>
-  <rect x="71" y="281" width="8" height="6" rx=".8" fill="#1e40af" opacity=".6"/>
-  <!-- R4 -->
-  <rect x="202" y="278" width="28" height="18" rx="2" fill="#0f172a" stroke="#3b82f6" stroke-width=".8"/>
-  <!-- S1 -->
-  <rect x="556" y="188" width="28" height="18" rx="2" fill="#0f172a" stroke="#22c55e" stroke-width=".8"/>
-  <rect x="559" y="191" width="8" height="6" rx=".8" fill="#14532d" opacity=".6"/>
-  <!-- S2 -->
-  <rect x="692" y="188" width="28" height="18" rx="2" fill="#0f172a" stroke="#22c55e" stroke-width=".8"/>
-  <!-- S3 -->
-  <rect x="556" y="278" width="28" height="18" rx="2" fill="#0f172a" stroke="#22c55e" stroke-width=".8"/>
-  <!-- S4 -->
-  <rect x="692" y="278" width="28" height="18" rx="2" fill="#0f172a" stroke="#22c55e" stroke-width=".8"/>
-  <!-- D -->
-  <rect x="388" y="362" width="28" height="18" rx="2" fill="#0f172a" stroke="#f59e0b" stroke-width=".8"/>
-  <rect x="391" y="365" width="8" height="6" rx=".8" fill="#78350f" opacity=".6"/>
-</g>
-
-<!-- ════════════════════════════════════════
-     SUBMIT CHECKMARKS (scene 5)
-════════════════════════════════════════ -->
-<g id="g-checks" opacity="0">
-  <g class="chk" id="chk0"><circle cx="134" cy="163" r="10" fill="#15803d" stroke="#22c55e" stroke-width="1"/><text x="134" y="168" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">✓</text></g>
-  <g class="chk" id="chk1"><circle cx="270" cy="163" r="10" fill="#15803d" stroke="#22c55e" stroke-width="1"/><text x="270" y="168" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">✓</text></g>
-  <g class="chk" id="chk2"><circle cx="134" cy="253" r="10" fill="#15803d" stroke="#22c55e" stroke-width="1"/><text x="134" y="258" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">✓</text></g>
-  <g class="chk" id="chk3"><circle cx="270" cy="253" r="10" fill="#15803d" stroke="#22c55e" stroke-width="1"/><text x="270" y="258" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">✓</text></g>
-  <g class="chk" id="chk4"><circle cx="622" cy="163" r="10" fill="#15803d" stroke="#22c55e" stroke-width="1"/><text x="622" y="168" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">✓</text></g>
-  <g class="chk" id="chk5"><circle cx="758" cy="163" r="10" fill="#15803d" stroke="#22c55e" stroke-width="1"/><text x="758" y="168" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">✓</text></g>
-  <g class="chk" id="chk6"><circle cx="622" cy="253" r="10" fill="#15803d" stroke="#22c55e" stroke-width="1"/><text x="622" y="258" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">✓</text></g>
-  <g class="chk" id="chk7"><circle cx="758" cy="253" r="10" fill="#15803d" stroke="#22c55e" stroke-width="1"/><text x="758" y="258" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">✓</text></g>
-  <g class="chk" id="chk8"><circle cx="519" cy="346" r="10" fill="#15803d" stroke="#22c55e" stroke-width="1"/><text x="519" y="351" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">✓</text></g>
-</g>
-
-<!-- ════════════════════════════════════════
-     CALCULATION SPINNER (scene 6)
-════════════════════════════════════════ -->
-<g id="g-spinner" opacity="0">
-  <rect x="330" y="200" width="170" height="95" rx="10" fill="rgba(7,14,28,.92)" stroke="#1e40af" stroke-width="1.2"/>
-  <circle cx="415" cy="240" r="28" fill="none" stroke="#1e3a8a" stroke-width="4"/>
-  <g id="spin-g" style="transform-origin:415px 240px">
-    <path d="M415 212 A28 28 0 0 1 443 240" fill="none" stroke="#3b82f6" stroke-width="4" stroke-linecap="round"/>
-  </g>
-  <text x="415" y="246" text-anchor="middle" fill="rgba(255,255,255,.75)" font-size="12" font-family="'CG',sans-serif" font-weight="700">Расчёт тура…</text>
-  <text x="415" y="258" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="9" font-family="'CG',sans-serif">движок обрабатывает решения</text>
-  <text x="415" y="270" text-anchor="middle" fill="#3b82f6" font-size="9" font-family="'CG',sans-serif">прибыль · здоровье · хлыст · OSA</text>
-  <text x="415" y="286" text-anchor="middle" fill="rgba(255,255,255,.2)" font-size="9" font-family="'CG',sans-serif">Ведущий нажимает кнопку «Рассчитать»</text>
-</g>
-
-<!-- ════════════════════════════════════════
-     RESULTS TROPHY (scene 7)
-════════════════════════════════════════ -->
-<g id="g-trophy" opacity="0">
-  <circle cx="415" cy="255" r="38" fill="rgba(245,158,11,.08)" stroke="#f59e0b" stroke-width="1" id="trophy-glow"/>
-  <text x="415" y="268" text-anchor="middle" font-size="36" id="trophy-ico">🏆</text>
-  <!-- Confetti dots -->
-  <circle class="conf" cx="375" cy="220" r="3" fill="#fbbf24"/>
-  <circle class="conf" cx="460" cy="215" r="2.5" fill="#3b82f6"/>
-  <circle class="conf" cx="390" cy="300" r="3" fill="#22c55e"/>
-  <circle class="conf" cx="445" cy="305" r="2" fill="#ec4899"/>
-  <circle class="conf" cx="350" cy="260" r="2" fill="#a78bfa"/>
-  <circle class="conf" cx="480" cy="258" r="2.5" fill="#fbbf24"/>
-</g>
-
-</svg>
+<div class="layout">
+  <div class="sb" id="sb"></div>
+  <div class="main">
+    <div class="stage" id="stage"></div>
+    <div class="desc"><span class="i">💡</span><div class="t" id="i-desc"></div></div>
+  </div>
 </div>
 
 <div class="bottom">
-  <div class="tl-bar"><div class="tl-fill" id="tl-fill" style="width:0%"></div></div>
+  <div class="tlbar"><div class="tlfill" id="tlfill" style="width:0%"></div></div>
   <div class="ctrl">
-    <button class="btn btn-pp" id="btn-pp" onclick="togglePlay()">⏸ Пауза</button>
-    <button class="btn" onclick="prev()">← Назад</button>
-    <button class="btn" onclick="next()">Вперёд →</button>
-    <div class="ctrl-sep"></div>
-    <span style="font-size:11px;color:rgba(255,255,255,.3)" id="ctrl-lbl">Шаг 1 из 8</span>
-    <div class="tl-dots" id="tl-dots"></div>
+    <span class="lbl" id="ctrl-lbl">1 из 23</span>
+    <div class="sep"></div>
+    <div class="dots" id="dots"></div>
   </div>
 </div>
 
 <script>
-const SCENES = [
-  {
-    step:'— Старт —', title:'Ведущий открывает игру', time:'Мин 0',
-    desc:'До 32 участников занимают места за столами 9 команд (4 ритейлера, 4 поставщика, 1 дистрибьютор). Ведущий выходит к проектору и объясняет задачу.',
-    dur:10000, fn: () => {
-      animTbls();
-      setBubble('Добро пожаловать!','Начинаем игру!', true);
-    }
-  },
-  {
-    step:'Шаг 1 из 7', title:'Команды получают роли', time:'Мин 0–3',
-    desc:'Ведущий раздаёт карточки ролей (Директор, Аналитик, Закупщик, Планировщик) и характеров (Жёсткий, Кооперативный, Хитрый…). Команды придумывают себе название.',
-    dur:12000, fn: () => {
-      show('g-cards');
-      animCards();
-      setBubble('Берите карточки!','Роль + характер каждому', true);
-    }
-  },
-  {
-    step:'Шаг 2 из 7', title:'Брифинг — история рынка', time:'Мин 3–6',
-    desc:'Ведущий показывает на проекторе 3 исторических периода спроса по 4 категориям. Аналитик каждой команды изучает тренды и строит прогноз для своей команды.',
-    dur:12000, fn: () => {
-      showScr('scr-hist');
-      show('g-devices');
-      setBubble('Изучите историю!','3 периода + тренд', true);
-    }
-  },
-  {
-    step:'Шаг 3 из 7', title:'Брифинг — текущий тур', time:'Мин 6–10',
-    desc:'Проектор переключается на данные текущего тура: спрос, событие (шок / промо / квота). Аналитик уточняет прогноз, совет команды вырабатывает позицию для переговоров.',
-    dur:12000, fn: () => {
-      showScr('scr-brief');
-      show('g-devices');
-      glowTbls('ret');
-      setBubble('Тур 1 открыт!','Данные рынка на экране', true);
-    }
-  },
-  {
-    step:'Шаг 4 из 7', title:'Переговоры — 12 минут', time:'Мин 10–22',
-    desc:'Ритейлеры физически подходят к поставщикам и договариваются о скидках, объёмах и приоритетах. Дистрибьютор договаривается с ритейлерами о тарифе. Все сделки фиксируются в интерфейсе.',
-    dur:14000, fn: () => {
-      show('g-arrows');
-      animArrows();
-      setBubble('Переговоры!','12 минут · ходите к поставщикам', true);
-    }
-  },
-  {
-    step:'Шаг 5 из 7', title:'Ввод решений — 7 минут', time:'Мин 22–29',
-    desc:'Каждая команда вводит финальные цифры в свой интерфейс: ритейлеры — заказы, цены и промо; поставщики — объём выпуска и скидки; дистрибьютор — тариф и мощность.',
-    dur:12000, fn: () => {
-      showScr('scr-dec');
-      show('g-laptops');
-      animChecks();
-      setBubble('Вводите решения!','7 минут · все данные в форму', true);
-    }
-  },
-  {
-    step:'Шаг 6 из 7', title:'Движок рассчитывает тур', time:'Мин 29–31',
-    desc:'Ведущий нажимает «Рассчитать». Сервер автоматически считает прибыль, OSA, дефицит, буллвип-эффект и здоровье цепочки для всех 9 команд за секунды.',
-    dur:9000, fn: () => {
-      show('g-spinner');
-      spinIt();
-      dimTbls();
-      hideBubble();
-    }
-  },
-  {
-    step:'Шаг 7 из 7', title:'Итоги и разбор', time:'Мин 31–45',
-    desc:'Проектор показывает рейтинг, прибыль, здоровье цепочки и 4 специальных награды. Ведущий разбирает обучающие моменты тура. Затем — следующий тур или финал.',
-    dur:14000, fn: () => {
-      showScr('scr-res');
-      show('g-trophy');
-      animTrophy();
-      restoreTbls();
-      setBubble('Объявляем итоги!','Разбираем цепочку вместе', true);
-    }
-  },
+/* ════ DATA ════ */
+const TEAMS=[
+  {id:'R1',name:'Дискаунтер',     type:'Ритейлер',     kind:'ret', ico:'🛒',col:'#2563eb',char:'tough'},
+  {id:'R2',name:'Супермаркет',     type:'Ритейлер',     kind:'ret', ico:'🛒',col:'#3b82f6',char:'analyst'},
+  {id:'R3',name:'Гипермаркет',     type:'Ритейлер',     kind:'ret', ico:'🛒',col:'#6366f1',char:'cunning'},
+  {id:'R4',name:'Премиум-маркет',  type:'Ритейлер',     kind:'ret', ico:'🛒',col:'#8b5cf6',char:'stubborn'},
+  {id:'S1',name:'Базовый',         type:'Поставщик',    kind:'sup', ico:'🏭',col:'#15a34a',char:'stubborn'},
+  {id:'S2',name:'Молочный завод',  type:'Поставщик',    kind:'sup', ico:'🏭',col:'#10b981',char:'coop'},
+  {id:'S3',name:'Промо-поставщик', type:'Поставщик',    kind:'sup', ico:'🏭',col:'#14b8a6',char:'cunning'},
+  {id:'S4',name:'Импортёр',        type:'Поставщик',    kind:'sup', ico:'🏭',col:'#0891b2',char:'analyst'},
+  {id:'D', name:'Дистрибьютор',    type:'Дистрибьютор', kind:'dist',ico:'🚛',col:'#d97706',char:'coop'},
+];
+const T={}; TEAMS.forEach(t=>T[t.id]=t);
+const CHARS={
+  tough:   {ico:'🦁',name:'Жёсткий',     col:'#dc2626',soft:'#fdecec',line:'#f6cccc',q:'Скидку ниже 8% не рассматриваю.'},
+  analyst: {ico:'📊',name:'Аналитик',     col:'#2563eb',soft:'#eef3ff',line:'#d7e3ff',q:'По расчётам, 6% — оптимально.'},
+  cunning: {ico:'🦊',name:'Хитрый',       col:'#9333ea',soft:'#f6edfd',line:'#e8d3fa',q:'У меня есть альтернативные предложения…'},
+  stubborn:{ico:'😤',name:'Упрямый',      col:'#ea580c',soft:'#fdf0e8',line:'#f7d8c2',q:'Моя позиция неизменна.'},
+  coop:    {ico:'🤝',name:'Кооперативный',col:'#15a34a',soft:'#ecfaf0',line:'#c9eed5',q:'Давайте найдём взаимовыгодное решение.'},
+};
+const ROLES={
+  ret:[['🎩','Директор сети'],['📈','Аналитик спроса'],['📦','Директор по закупкам'],['🏷️','Категорийный менеджер']],
+  sup:[['🎩','Генеральный директор'],['🏭','Директор производства'],['💼','Коммерческий директор'],['📊','Планировщик S&OP']],
+  dist:[['🎩','Управляющий директор'],['🚚','Директор логистики'],['🤝','Менеджер по клиентам'],['🧮','Аналитик загрузки']],
+};
+const CATS=[['Бакалея','#2563eb'],['Молочка','#15a34a'],['Снеки','#d97706'],['Деликатесы','#db2777']];
+
+const TOURS=[
+  {n:'Тур 1',label:'Стартовый рынок',demand:[120,90,70,45],
+   evC:'#2563eb',evT:'Базовые условия рынка',evD:'Стабильный старт. Ориентируйтесь на тренды роста 3–8% по всем категориям.',
+   trend:'📈 Стабильный рост — держите запасы',
+   neg:[{a:'R1',b:'S1',l:'скидка −12%',c:'#2563eb'},{a:'R2',b:'D',l:'тариф 1.5 у.е.',c:'#d97706'},{a:'R3',b:'S4',l:'объём 45 ед.',c:'#9333ea'}],
+   res:{health:75,bonus:188,winner:'Супермаркет',sub:{osa:82,def:85,bw:68,waste:80},
+        board:[['R2',350],['R3',270],['D',142],['S2',92],['R1',80],['S3',70],['S1',60],['S4',48],['R4',40]],
+        insight:'Аналитик Супермаркета точно угадал спрос на бакалею — минимум дефицита и максимум маржи.'}},
+  {n:'Тур 2',label:'Промо-снеки',demand:[125,95,110,50],
+   evC:'#d97706',evT:'Промо-акция: снеки +57%',evD:'Снеки взлетели с 70 до 110. Кто запасся снеками у Промо-поставщика — поймает волну.',
+   trend:'🎪 Промо-хаос: снеки +57%, остальные +4–11%',
+   neg:[{a:'R1',b:'S3',l:'промо снеки',c:'#ea580c'},{a:'R2',b:'S2',l:'промо молочка',c:'#2563eb'},{a:'D',b:'R3',l:'надбавка +20%',c:'#d97706'}],
+   res:{health:62,bonus:155,winner:'Гипермаркет',sub:{osa:65,def:70,bw:50,waste:68},
+        board:[['R3',330],['R2',315],['S3',195],['D',165],['R1',150],['S2',130],['S1',95],['S4',80],['R4',70]],
+        insight:'Гипермаркет вовремя заказал снеки у Промо-поставщика — поймал волну спроса. Хлыст начал расти.'}},
+  {n:'Тур 3',label:'Шок поставки',demand:[110,130,80,25],
+   evC:'#dc2626',evT:'Дефицит мощности!',evD:'Молочка +37%, деликатесы −50%. Мощность Дистрибьютора 120 ед. — дефицит неизбежен.',
+   trend:'💥 Шок цепочки — кто не договорился, теряет',
+   neg:[{a:'D',b:'R1',l:'приоритет!',c:'#dc2626'},{a:'D',b:'R2',l:'приоритет!',c:'#dc2626'},{a:'S4',b:'R3',l:'квота 25 ед.',c:'#9333ea'}],
+   res:{health:38,bonus:95,winner:'Дистрибьютор',sub:{osa:45,def:35,bw:30,waste:48},
+        board:[['D',355],['R1',285],['R2',275],['S2',215],['S1',180],['R3',150],['S3',120],['S4',95],['R4',80]],
+        insight:'Дистрибьютор — монополист. Здоровье цепочки 38% — антирекорд. Эффект хлыста в полную силу.'}},
+  {n:'Тур 4',label:'Стабилизация',demand:[120,115,90,35],
+   evC:'#15a34a',evT:'Рынок стабилен',evD:'Шанс восстановить цепочку. Долгосрочные сделки и кооперация дают бонус для всех.',
+   trend:'🤝 Кооперация вознаграждается — бонус для всех',
+   neg:[{a:'R1',b:'S1',l:'−15% надолго',c:'#2563eb'},{a:'R3',b:'S4',l:'+15 ед. объёма',c:'#9333ea'},{a:'R2',b:'D',l:'тариф 1.2 у.е.',c:'#d97706'}],
+   res:{health:75,bonus:188,winner:'Супермаркет',sub:{osa:80,def:82,bw:68,waste:75},
+        board:[['R2',432],['R3',392],['D',282],['S1',192],['S2',175],['R1',160],['S3',140],['S4',120],['R4',95]],
+        insight:'Супермаркет договорился о тарифе 1.2 — минимум издержек. Пакт стабильности поднял здоровье до 75%.'}},
+];
+const FINALS=[
+  {e:'🏆',t:'Гран-при',s:'Макс. суммарный счёт',id:'R2',sc:1428},
+  {e:'🥇',t:'Лучший ритейлер',s:'Прибыль в типе',id:'R3',sc:1392},
+  {e:'🥇',t:'Лучший поставщик',s:'Прибыль в типе',id:'S2',sc:1064},
+  {e:'🤝',t:'Архитектор цепочки',s:'Вклад в здоровье',id:'D',sc:1184},
+  {e:'📉',t:'Антихлыст',s:'Минимум колебаний',id:'S1',sc:980},
+];
+const FINAL_BOARD=[['R2',1428],['R3',1392],['D',1184],['R1',1120],['S2',1064],['S3',1010],['S1',980],['S4',910],['R4',870]];
+
+/* Совет команды — внутренние роли на примере «Супермаркета» (по турам) */
+const COUNCIL=[
+  {analyst:'Спрос растёт ровно: бакалея ~120, молочка 90, снеки 70. Резких событий нет — берём базовый прогноз +5%.',
+   buyer:'Заказываю близко к спросу: бакалея 125, молочка 92 (скоропорт — не перебираю), снеки 72.',
+   cat:'Цены держим стандартные. Промо пока не включаю — спрос и так стабилен.',
+   director:'Иду к Базовому за скидкой на бакалею и к Перевозчику за нормальным тарифом. Жёстко не давлю — старт.'},
+  {analyst:'Промо-волна: снеки взлетят с 70 до 110 (+57%). Но буст работает ТОЛЬКО при скидке поставщика ≥10%.',
+   buyer:'Под снеки добираю объём, но осторожно — если промо не сложится, останусь с перезапасом.',
+   cat:'Включаю промо на снеки и договариваюсь о скидке ≥10% — иначе буста не будет, только потеря маржи.',
+   director:'Главная цель — Промо-поставщик. Иду первым, пока конкуренты не разобрали объём.'},
+  {analyst:'Двойной шок: молочка +37%, деликатесы −50%, мощность Перевозчика урезана. Дефицит неизбежен.',
+   buyer:'Молочка — скоропорт: перезакажу — спишу в убыток, недозакажу — пустая полка. Беру с запасом 10%.',
+   cat:'Цены вверх по дефицитным позициям — спрос неэластичен, когда товара мало.',
+   director:'Бьюсь за приоритет доставки у Перевозчика. Без него мой заказ просто не довезут.'},
+  {analyst:'Рынок успокоился. Шанс восстановить сервис и заработать на стабильных, предсказуемых заказах.',
+   buyer:'Заказываю ровно под спрос — никаких рывков. Стабильность заказов = здоровье цепочки = бонус всем.',
+   cat:'Возвращаю нормальные цены. Долгосрочная скидка важнее разовой выгоды.',
+   director:'Заключаю долгосрочные сделки: фиксированная скидка и низкий тариф. Пакт стабильности.'},
 ];
 
-let cur = 0, playing = true, timer = null, fillTimer = null, fillStart = 0;
+/* Обучающие сцены — объяснение ключевых механик */
+const TEACH={
+  score:{title:'Как считается успех команды', icon:'🎯',
+    sub:'Два слагаемых: личная прибыль + бонус за здоровье всей цепочки',
+    rows:[
+      ['💰','Прибыль команды','Своя выручка минус затраты. У магазина: продажи × цена − закупка − тариф. У производителя: отгрузка − себестоимость. У перевозчика: тариф × объём.'],
+      ['❤️','Бонус здоровья','Фонд 250 у.е. за тур × индекс здоровья H × личный вклад команды. Здоровье — общее: если цепочка здорова, бонус получают ВСЕ.'],
+      ['⚖️','Личный вклад','Магазин — полнота полки (OSA), производитель — выполнение заказов, перевозчик — доля довезённого. Ничего не сделал → вклад 0 → бонуса нет.'],
+    ],
+    formula:'Счёт за тур = <span class="hl" style="background:#eef3ff;color:#2563eb">Прибыль</span> + <span class="hl" style="background:#ecfaf0;color:#15a34a">250 × H × вклад</span>',
+    note:'<b>Побеждает умный, а не жадный.</b> Можно урвать прибыль и обрушить цепочку — но тогда H упадёт, и бонус потеряют все, включая вас.'},
+  health:{title:'Из чего складывается «здоровье цепочки» H', icon:'❤️',
+    sub:'Один индекс 0–100% из четырёх частей — общий для всех команд',
+    bars:[
+      ['Полка (OSA)',35,'Есть ли товар на полках магазинов. Главный вес.','#15a34a'],
+      ['Нет дефицита',25,'Сколько спроса осталось неудовлетворённым по всей цепочке.','#2563eb'],
+      ['Нет хлыста',25,'Насколько заказы раздулись относительно реального спроса.','#d97706'],
+      ['Нет списаний',15,'Сколько скоропорта испортилось из-за перезаказа.','#db2777'],
+    ],
+    note:'Веса подобраны так, что <b>пустая полка и эффект хлыста</b> бьют по здоровью сильнее всего. Это и есть две главные болезни реальных цепочек поставок.'},
+  bullwhip:{title:'Эффект хлыста — почему цепочку «раскачивает»', icon:'🌊',
+    sub:'Маленькое колебание спроса → огромные колебания заказов вверх по цепочке',
+    rows:[
+      ['🛒','Магазин перестраховывается','Видит рост спроса на 10% — заказывает +30% «на всякий случай».'],
+      ['🏭','Производитель усиливает','Видит скачок заказов — наращивает выпуск ещё сильнее, копит запас.'],
+      ['💥','Цепочку срывает','Реальный спрос не вырос так сильно → перепроизводство, склады, списания, убытки у всех.'],
+    ],
+    note:'В игре хлыст прямо снижает здоровье цепочки. <b>Лекарство — делиться прогнозом</b> и заказывать близко к реальному спросу, а не к панике соседа.'},
+  promo:{title:'Промо-механика — скидка должна быть настоящей', icon:'🎪',
+    sub:'Промо даёт всплеск спроса ×1.5 — но только при выполнении условия',
+    rows:[
+      ['🏷️','Магазин включает промо','Категорийный менеджер ставит флаг «промо» на категорию (обычно снеки).'],
+      ['🤝','Поставщик даёт скидку ≥10%','Буст спроса ×1.5 срабатывает ТОЛЬКО если скидка производителя ≥ 10%. Иначе — просто потеря маржи.'],
+      ['📈','Всплеск спроса','При выполнении условия спрос на категорию вырастает в 1.5 раза — кто запасся, ловит волну.'],
+    ],
+    note:'Промо без скидки ≥10% — <b>деньги на ветер</b>: флаг стоит, а буста нет. Это договорённость магазина и поставщика на переговорах.'},
+  shock:{title:'Тур 3 — двойной шок цепочки', icon:'💥',
+    sub:'Самый напряжённый тур: проверка на кооперацию под давлением',
+    rows:[
+      ['🚚','Мощность перевозчика урезана','Перевозчик физически не довезёт всё, что заказали. Кому отдать приоритет — решают переговоры.'],
+      ['🧀','Квота Импорта обрезана','Поставщик деликатесов не может выпустить столько, сколько хотят. Дефицитный товар — на вес золота.'],
+      ['🥛','Молочка скачет','Спрос на скоропорт +37%. Перезакажешь — спишешь, недозакажешь — пустая полка.'],
+    ],
+    note:'Кто заранее <b>договорился о приоритете</b> с перевозчиком — переживёт шок. Кто действовал в одиночку — потеряет больше всех.'},
+};
 
-// ── Helpers ──
-const $ = id => document.getElementById(id);
-function show(id) { const e = $(id); if(!e) return; e.style.opacity='1'; e.style.animation='fadeIn .45s ease forwards'; }
-function hide(id) { const e = $(id); e.style.opacity='0'; e.style.animation=''; }
+/* ════ SCENES ════ */
+const SC=[
+ {step:'— Старт —',type:'start',title:'Ведущий открывает игру',time:'Минута 0',
+  hint:'Откройте игру и сообщите код комнаты участникам.',
+  desc:'ВЕДУЩИЙ: «Займите места — одна команда за одним экраном. Перед вами цепочка поставок FMCG: 4 тура, в каждом 5 фаз. Цель — заработать максимум прибыли и сохранить здоровье цепочки. Сейчас раздам карточки ролей».'},
+ {step:'Подготовка',type:'roles',title:'Распределение ролей и характеров',time:'Минуты 0–3',
+  hint:'Раздайте карточки. Характер Директора задаёт переговорный стиль команды.',
+  desc:'Ведущий раздаёт карточки ролей (🎩 Директор, 📈 Аналитик, 📦 Директор по закупкам, 📊 Планировщик) и характеров (🦁 / 🤝 / 🦊 / 😤 / 📊). Характер Директора определяет переговорный стиль всей команды. Кнопка «Перетасовать» назначает роли заново.'},
 
-function showScr(id) {
-  ['scr-default','scr-brief','scr-hist','scr-dec','scr-res'].forEach(s=>{
-    const e=$(s); e.style.opacity = s===id?'1':'0';
-    if(s===id) e.style.animation='fadeIn .5s ease forwards';
-  });
-  // Glow screen when showing data
-  if(id!=='scr-default') $('screen-glow').style.animation='screenBright 2s ease-in-out infinite';
-}
+ {step:'Механика · 1 из 2',type:'teach',teach:'score',title:'Как считается успех',time:'Перед игрой',
+  hint:'Объясните: важна не только своя прибыль, но и здоровье общей цепочки.',
+  desc:'Счёт команды за тур = собственная прибыль + бонус за здоровье цепочки. Здоровье цепочки общее для всех, но бонус каждой команды масштабируется её личным вкладом. Это превращает игру из «каждый за себя» в баланс конкуренции и кооперации.'},
+ {step:'Механика · 2 из 2',type:'teach',teach:'health',title:'Индекс здоровья цепочки',time:'Перед игрой',
+  hint:'Покажите 4 составляющих здоровья — на них команды влияют решениями.',
+  desc:'Здоровье H — это один индекс из четырёх частей: полнота полки, отсутствие дефицита, отсутствие эффекта хлыста, отсутствие списаний. Полка и хлыст весят больше всего.'},
 
-function setBubble(line1, line2, visible) {
-  $('lead-bubble-text').textContent = line1;
-  $('lead-bubble-sub').textContent = line2;
-  const b = $('lead-bubble');
-  if(visible){ b.style.opacity='1'; b.style.animation='bubblePop .4s cubic-bezier(.34,1.56,.64,1) .1s both'; }
-  else hideBubble();
-}
-function hideBubble() {
-  const b=$('lead-bubble'); b.style.opacity='0'; b.style.animation='';
-}
+ {step:'Тур 1 · Фаза 1 из 5',type:'briefing',t:0,title:'Брифинг — Стартовый рынок',time:'Минуты 3–10',
+  hint:'Дайте командам изучить прогноз. Ритейлеры — главные на этой фазе.',
+  desc:'Проектор показывает спрос по 4 категориям: Бакалея 120, Молочка 90, Снеки 70, Деликатесы 45. Аналитик строит прогноз, команда вырабатывает позицию для переговоров — кого просить и на каких условиях.'},
+ {step:'Тур 1 · Фаза 2 из 5',type:'council',t:0,title:'Совет команды',time:'Минуты 10–15',
+  hint:'Роли совещаются: аналитик — прогноз, директор по закупкам — объём, категорийщик — цена, директор — позиция.',
+  desc:'Внутри команды каждая роль вносит свой вклад: аналитик читает рынок, директор по закупкам считает объёмы, категорийщик решает по цене и промо, директор сводит всё в позицию для переговоров. Так роли «оживают».'},
+ {step:'Тур 1 · Фаза 3 из 5',type:'pair',t:0,title:'Переговоры',time:'Минуты 15–25',
+  hint:'Директора команд договариваются: скидки, тарифы, объёмы. Реплики зависят от характера.',
+  desc:'Директора ведут переговоры между командами — скидки, тарифы, объёмы, приоритеты. Реплики зависят от характера Директора. Итоги фиксируются и подставляются в форму решений по умолчанию.'},
+ {step:'Тур 1 · Фаза 4 из 5',type:'decisions',t:0,title:'Решения',time:'Минуты 25–32',
+  hint:'Ждите, пока все команды сдадут решения. Итоги переговоров уже подставлены.',
+  desc:'Команды вводят финальные данные: ритейлеры — заказы, цены, промо; поставщики — выпуск и скидки; Дистрибьютор — тариф и мощность. Статус-бар показывает, кто сдал. Кнопка «Отправить показатели».'},
+ {step:'Тур 1 · Фаза 5 из 5',type:'results',t:0,title:'Расчёт — Итоги Тура 1',time:'Минуты 32–45',
+  hint:'Объявите результаты. Прокомментируйте здоровье цепочки и разбор счёта лидера.',
+  desc:'Супермаркет: прибыль 350 + бонус цепочки 188 = 538 у.е. Здоровье цепочки 75% — хороший старт. Ведущий разбирает, почему Супермаркет выиграл и где цепочка давала сбои.'},
 
-function animTbls() {
-  document.querySelectorAll('.tbl').forEach((g,i)=>{
-    g.style.opacity='0';
-    g.style.filter='';
-    g.style.animation=`fadeInUp .5s ease ${i*.07}s both`;
-  });
-}
-function glowTbls(type) {
-  document.querySelectorAll('.tbl').forEach(g=>{
-    const isRet = g.id.startsWith('g-R');
-    const isSup = g.id.startsWith('g-S');
-    if(type==='ret' && isRet) g.style.filter='drop-shadow(0 0 8px rgba(59,130,246,.6))';
-    else if(type==='sup' && isSup) g.style.filter='drop-shadow(0 0 8px rgba(34,197,94,.6))';
-    else if(type==='all') g.style.filter='drop-shadow(0 0 6px rgba(255,255,255,.2))';
-  });
-}
-function dimTbls() {
-  document.querySelectorAll('.tbl').forEach(g=>{ g.style.opacity='.25'; g.style.filter=''; });
-}
-function restoreTbls() {
-  document.querySelectorAll('.tbl').forEach(g=>{ g.style.opacity='1'; g.style.filter=''; });
-}
+ {step:'Механика',type:'teach',teach:'bullwhip',title:'Эффект хлыста',time:'Разбор после Тура 1',
+  hint:'Главная болезнь цепочек. Покажите, как перестраховка раздувает заказы.',
+  desc:'Эффект хлыста — почему цепочку «раскачивает»: маленькое колебание спроса превращается в огромные колебания заказов вверх по цепочке. Это прямо снижает здоровье и бьёт по всем.'},
 
-function animCards() {
-  document.querySelectorAll('.role-card').forEach((g,i)=>{
-    g.style.opacity='0';
-    g.style.animation=`popIn .45s cubic-bezier(.34,1.56,.64,1) ${.1+i*.1}s both`;
-  });
-  // Team name badge
-  const nb=$('rc-name-R2');
-  nb.style.opacity='0';
-  setTimeout(()=>{ nb.style.opacity='1'; nb.style.animation='bubblePop .4s ease both'; }, 1400);
-}
+ {step:'Механика',type:'teach',teach:'promo',title:'Промо-механика',time:'Перед Туром 2',
+  hint:'Объясните условие промо-буста: скидка поставщика ≥10%, иначе буста нет.',
+  desc:'Промо даёт всплеск спроса ×1.5 — но только если поставщик дал скидку ≥10%. Промо без скидки — просто потеря маржи. Это договорённость магазина и поставщика на переговорах.'},
+ {step:'Тур 2 · Фаза 1 из 5',type:'briefing',t:1,title:'Брифинг — Промо-снеки',time:'Минуты 46–53',
+  hint:'Промо-акция. Снеки под давлением, аналитик переключает прогноз.',
+  desc:'Снеки выросли с 70 до 110 (+57%) — промо-акция. Бакалея и молочка тоже растут. Кто заключил сделку с Промо-поставщиком — получит дефицитный товар.'},
+ {step:'Тур 2 · Фаза 2 из 5',type:'council',t:1,title:'Совет команды',time:'Минуты 53–58',
+  hint:'Категорийщик решает по промо, аналитик предупреждает про условие скидки ≥10%.',
+  desc:'Команда решает, ставить ли промо на снеки. Аналитик напоминает: буст сработает только при скидке поставщика ≥10%. Директор по закупкам считает риск перезапаса, если промо не сложится.'},
+ {step:'Тур 2 · Фаза 3 из 5',type:'pair',t:1,title:'Переговоры — фокус на снеки',time:'Минуты 58–68',
+  hint:'Конкуренция за Промо-поставщика максимальная.',
+  desc:'Все хотят Промо-поставщика. Ключевые сделки: Дискаунтер → Промо снеки, Супермаркет → Молочный завод промо-молочка, Дистрибьютор → Гипермаркет надбавка +20%.'},
+ {step:'Тур 2 · Фаза 4 из 5',type:'decisions',t:1,title:'Решения Тура 2',time:'Минуты 68–75',
+  hint:'Промо-поставщик вводит увеличенный объём производства.',
+  desc:'Форма показывает договорённости по снекам. Команды корректируют цифры. Промо-поставщик вводит увеличенный объём. Кнопка «Отправить показатели».'},
+ {step:'Тур 2 · Фаза 5 из 5',type:'results',t:1,title:'Расчёт — Итоги Тура 2',time:'Минуты 75–90',
+  hint:'Обратите внимание на эффект хлыста — здоровье начало падать.',
+  desc:'Гипермаркет выигрывает тур: 330 + 155 = 485 у.е. Здоровье цепочки упало до 62% — эффект хлыста: Промо-поставщик перепроизвёл снеки.'},
 
-function animArrows() {
-  const lines = document.querySelectorAll('#g-arrows line');
-  lines.forEach((l,i)=>{
-    l.style.opacity='0';
-    l.style.strokeDashoffset='0';
-    setTimeout(()=>{
-      l.style.opacity='1';
-      l.style.animation=`fadeIn .3s ease both, dash .7s linear ${i*.05}s infinite`;
-    }, i*200);
-  });
-}
+ {step:'Механика',type:'teach',teach:'shock',title:'Двойной шок Тура 3',time:'Перед Туром 3',
+  hint:'Самый напряжённый тур. Кто договорился о приоритете — переживёт.',
+  desc:'В Туре 3 урезают мощность перевозчика и квоту Импорта, а спрос на скоропорт скачет. Дефицит неизбежен — выигрывает тот, кто заранее договорился о приоритете доставки.'},
+ {step:'Тур 3 · Фаза 1 из 5',type:'briefing',t:2,title:'Брифинг — Шок поставки',time:'Минуты 91–98',
+  hint:'Дефицит мощности. Кто договорился с Дистрибьютором — получит приоритет.',
+  desc:'Двойной шок: молочка +37%, деликатесы −50%. Мощность Дистрибьютора 120 ед. — дефицит неизбежен. Самый напряжённый тур.'},
+ {step:'Тур 3 · Фаза 2 из 5',type:'council',t:2,title:'Совет команды',time:'Минуты 98–103',
+  hint:'Директор по закупкам балансирует скоропорт, директор готовит борьбу за приоритет.',
+  desc:'Команда решает под давлением дефицита: директор по закупкам аккуратно с молочкой-скоропортом, категорийщик поднимает цены на дефицит, директор готовится биться за приоритет доставки.'},
+ {step:'Тур 3 · Фаза 3 из 5',type:'pair',t:2,title:'Переговоры — борьба за мощность',time:'Минуты 103–113',
+  hint:'Дистрибьютор в позиции монополиста — характеры проявляются полностью.',
+  desc:'Дистрибьютор раздаёт приоритеты Дискаунтеру и Супермаркету. Импортёр квотирует Гипермаркет: 25 ед. вместо 40. Самые острые переговоры игры.'},
+ {step:'Тур 3 · Фаза 4 из 5',type:'decisions',t:2,title:'Решения Тура 3',time:'Минуты 113–120',
+  hint:'Команды вводят решения в условиях неопределённости.',
+  desc:'Команды вводят решения, не зная наверняка, получат ли поставку. После отправки — тревожное ожидание расчёта.'},
+ {step:'Тур 3 · Фаза 5 из 5',type:'results',t:2,title:'Расчёт — Итоги Тура 3',time:'Минуты 120–135',
+  hint:'Покажите, как кооперация могла помочь. Здоровье — антирекорд.',
+  desc:'Дистрибьютор выигрывает тур: 355 + 95 = 450 у.е. Здоровье цепочки 38% — антирекорд! Ведущий разбирает ошибки команд.'},
 
-function animChecks() {
-  document.querySelectorAll('.chk').forEach((g,i)=>{
-    g.style.opacity='0';
-    setTimeout(()=>{
-      g.style.opacity='1';
-      g.style.animation=`checkPop .35s cubic-bezier(.34,1.56,.64,1) both`;
-    }, i*350);
-  });
-}
+ {step:'Тур 4 · Фаза 1 из 5',type:'briefing',t:3,title:'Брифинг — Стабилизация',time:'Минуты 136–143',
+  hint:'Финальный тур. Долгосрочные сделки дают бонус.',
+  desc:'Рынок стабилен. Шанс восстановить цепочку. Супермаркет и Гипермаркет идут ноздря в ноздрю — всё решится здесь.'},
+ {step:'Тур 4 · Фаза 2 из 5',type:'council',t:3,title:'Совет команды',time:'Минуты 143–148',
+  hint:'Команда делает ставку на стабильность — ровные заказы ради бонуса всем.',
+  desc:'Команда решает играть на стабильность: ровные заказы под спрос, нормальные цены, долгосрочные сделки. Стабильность заказов = здоровье цепочки = бонус всем командам.'},
+ {step:'Тур 4 · Фаза 3 из 5',type:'pair',t:3,title:'Переговоры — долгосрочные сделки',time:'Минуты 148–158',
+  hint:'Бонус здоровья получают ВСЕ — стимул к кооперации.',
+  desc:'Ключевые сделки: Дискаунтер → Базовый −15% надолго, Гипермаркет → Импортёр +15 ед., Супермаркет → Дистрибьютор тариф 1.2. «Пакт стабильности» — впервые все выигрывают вместе.'},
+ {step:'Тур 4 · Фаза 4 из 5',type:'decisions',t:3,title:'Решения Тура 4',time:'Минуты 158–165',
+  hint:'Команды максимально точны — ошибка стоит дорого.',
+  desc:'Последняя форма ввода. Команды максимально точны. После отправки — подтверждение и обратный отсчёт до расчёта.'},
+ {step:'Тур 4 · Фаза 5 из 5',type:'results',t:3,title:'Расчёт — Итоги Тура 4',time:'Минуты 165–180',
+  hint:'Здоровье восстановилось. Готовьтесь к финалу.',
+  desc:'Супермаркет: 432 + 188 = 620 у.е. — лучший тур за игру. Здоровье восстановилось до 75%. Гипермаркет второй.'},
 
-function spinIt() {
-  $('spin-g').style.transformOrigin='415px 240px';
-  $('spin-g').style.animation='spin 1.1s linear infinite';
-}
+ {step:'— Финал —',type:'final',title:'Итоговый рейтинг и победители',time:'Минута 180',
+  hint:'Поздравьте победителей! Проведите дебриф.',
+  desc:'Супермаркет — Гран-при с 1428 у.е.! Победа за счёт точного прогноза, кооперации с Дистрибьютором и стабильных заказов. Дистрибьютор — Архитектор цепочки. Базовый — Антихлыст.'},
+];
 
-function animTrophy() {
-  $('trophy-ico').style.animation='trophyBounce 1.4s ease-in-out infinite';
-  $('trophy-glow').style.animation='screenBright 1.5s ease-in-out infinite';
-  document.querySelectorAll('.conf').forEach((c,i)=>{
-    c.style.animation=`confetti 2s ease-in ${i*.2}s infinite`;
-  });
-}
+/* ════ HELPERS ════ */
+const $=id=>document.getElementById(id);
+const hCol=h=>h>=70?'var(--good)':h>=50?'var(--warn)':'var(--bad)';
+const hWord=h=>h>=70?'хорошо':h>=50?'удовлетв.':'опасно';
+const tag=id=>id.replace('R','Р').replace('S','П');
 
-// ── Reset all overlays ──
-function resetAll() {
-  ['g-cards','g-arrows','g-laptops','g-checks','g-spinner','g-trophy','g-devices','lead-bubble'].forEach(id=>{
-    const e=$(id); if(e){ e.style.opacity='0'; e.style.animation=''; }
-  });
-  // Reset card animations
-  document.querySelectorAll('.role-card,.chk').forEach(g=>{ g.style.opacity=''; g.style.animation=''; });
-  document.querySelectorAll('#g-arrows line').forEach(l=>{ l.style.opacity=''; l.style.animation=''; });
-  $('rc-name-R2').style.opacity='0'; $('rc-name-R2').style.animation='';
-  $('spin-g').style.animation='';
-  $('trophy-ico').style.animation='';
-  $('trophy-glow').style.animation='';
-  document.querySelectorAll('.conf').forEach(c=>c.style.animation='');
-  $('screen-glow').style.animation='';
-  // Default screen
-  ['scr-default','scr-brief','scr-hist','scr-dec','scr-res'].forEach(s=>{
-    const e=$(s); if(e){ e.style.opacity=s==='scr-default'?'1':'0'; e.style.animation=''; }
-  });
-  restoreTbls();
-}
-
-// ── Navigation ──
-function goTo(i) {
-  if(i<0||i>=SCENES.length) return;
-  cur=i;
-  const s=SCENES[cur];
-  // Update info panel
-  ['i-step','i-title','i-desc','i-time'].forEach(id=>{
-    const e=$(id); e.style.animation='none'; e.offsetHeight;
-    e.style.animation='fadeIn .3s ease forwards';
-  });
-  $('i-step').textContent  = s.step;
-  $('i-title').textContent = s.title;
-  $('i-desc').textContent  = s.desc;
-  $('i-time').textContent  = s.time;
-  $('ctrl-lbl').textContent = `Шаг ${cur+1} из ${SCENES.length}`;
-  // Reset + run scene
-  resetAll();
-  s.fn();
-  updateDots();
-  resetFill();
-  if(playing){ startFill(s.dur); schedNext(s.dur); }
-}
-
-function schedNext(dur) {
-  clearTimeout(timer);
-  timer = setTimeout(()=>{
-    if(!playing) return;
-    if(cur<SCENES.length-1) goTo(cur+1);
-    else { playing=false; updatePPBtn(); }
-  }, dur);
-}
-
-// ── Play / Pause ──
-function togglePlay() {
-  playing=!playing; updatePPBtn();
-  if(playing){ startFill(SCENES[cur].dur); schedNext(SCENES[cur].dur); }
-  else { clearTimeout(timer); stopFill(); }
-}
-function updatePPBtn() {
-  $('btn-pp').textContent = playing?'⏸ Пауза':'▶ Играть';
-}
-function prev() { clearTimeout(timer); stopFill(); if(cur>0) goTo(cur-1); }
-function next() { clearTimeout(timer); stopFill(); if(cur<SCENES.length-1) goTo(cur+1); }
-
-// ── Progress bar ──
-function startFill(dur) {
-  clearInterval(fillTimer);
-  fillStart = Date.now();
-  fillTimer = setInterval(()=>{
-    const pct = Math.min(100,(Date.now()-fillStart)/dur*100);
-    $('tl-fill').style.width = pct+'%';
-    if(pct>=100) clearInterval(fillTimer);
-  }, 40);
-}
-function stopFill() { clearInterval(fillTimer); }
-function resetFill() { $('tl-fill').style.width='0%'; }
-
-// ── Timeline dots ──
-function buildDots() {
-  $('tl-dots').innerHTML = SCENES.map((_,i)=>`<div class="tdot" id="td${i}" onclick="clearTimeout(timer);stopFill();goTo(${i})">${i+1}</div>`).join('');
-}
-function updateDots() {
-  SCENES.forEach((_,i)=>{
-    $(`td${i}`).className='tdot'+(i<cur?' done':i===cur?' cur':'');
-  });
+function sidebar(active,status){
+  const grp=(lbl,ids)=>`<div class="sb-h">${lbl}</div>`+ids.map(id=>{
+    const t=T[id], on=!active||active.includes(t.kind), st=status&&status[id];
+    const right=st?`<span class="sb-fl" style="color:${st.c}">${st.x}</span>`:`<span class="sb-tag">${tag(id)}</span>`;
+    return `<div class="sb-t ${active?(on?'on':'dim'):''}"><span class="sb-dot" style="background:${t.col}"></span>
+      <span class="sb-ic">${t.ico}</span><span class="sb-n">${t.name}</span>${right}</div>`;
+  }).join('');
+  const ready=status?Object.values(status).filter(s=>s.x==='✓').length:9;
+  $('sb').innerHTML=grp('Ритейлеры',['R1','R2','R3','R4'])+grp('Поставщики',['S1','S2','S3','S4'])+grp('Дистрибьютор',['D'])+
+    `<div class="sb-sp"></div>
+     <div class="sb-card"><div class="k">Готовы сдать решения</div><div class="v">${ready} <small>/ 9</small></div>
+       <div class="sb-prog"><div style="width:${Math.round(ready/9*100)}%"></div></div></div>
+     <div class="sb-hint"><div class="k">Подсказка ведущему</div><div class="t" id="sb-hint"></div></div>`;
 }
 
-// ── Init ──
-buildDots();
-goTo(0);
+function pStart(){return `<div class="hero"><div class="pill">IBS</div>
+  <h1>FMCG-цепочка<br>поставок</h1>
+  <div class="lead">Деловая игра · 9 команд · 4 тура · 5 фаз в каждом</div>
+  <div class="code"><div class="k">Код комнаты</div><div class="c">47-C9-X2</div><div class="s">Сообщите участникам для входа</div></div></div>`;}
 
-// Keyboard nav
+function pRoles(){
+  const cards=TEAMS.map((t,i)=>{const c=CHARS[t.char];
+    const roles=ROLES[t.kind].map(r=>`<div class="tc-r"><span class="e">${r[0]}</span><span>${r[1]}</span></div>`).join('');
+    return `<div class="tc" style="--cc:${t.col};--chs:${c.soft};--chl:${c.line};--chc:${c.col};animation-delay:${i*.04}s">
+      <div class="tc-top"><span class="tc-ic">${t.ico}</span><div><div class="tc-nm">${t.name}</div><div class="tc-ty" style="--cc:${t.col}">${t.type} · ${tag(t.id)}</div></div></div>
+      <div class="tc-ch"><span class="i">${c.ico}</span><span class="n">${c.name}</span></div>
+      <div class="tc-rl">${roles}</div></div>`;}).join('');
+  return `<div class="ph"><div class="ph-head"><div><div class="ph-h1">Распределение ролей и характеров</div>
+    <div class="ph-sub">9 команд · до 4 игроков · роли и характеры розданы случайно</div></div>
+    <div class="ph-tag"><div class="k">Команд</div><div class="v" style="color:var(--ibs)">9</div></div></div>
+    <div class="ph-body"><div class="roles">${cards}</div></div></div>`;}
+
+function pBrief(ti){
+  const tr=TOURS[ti], mx=Math.max(...tr.demand);
+  const bars=CATS.map((c,i)=>`<div class="dem-row"><div class="dem-top"><span class="dem-cat">${c[0]}</span>
+    <span class="dem-val" style="color:${c[1]}">${tr.demand[i]}</span></div>
+    <div class="dem-bar"><div style="width:${Math.round(tr.demand[i]/mx*100)}%;background:${c[1]}"></div></div></div>`).join('');
+  return `<div class="ph"><div class="ph-head"><div><div class="ph-h1">Прогноз спроса · ${tr.n}</div>
+    <div class="ph-sub">${tr.label} — общий экран для всех команд</div></div>
+    <div class="ph-tag"><div class="k">Тур</div><div class="v" style="color:var(--ibs)">${ti+1}<span style="font-size:15px;color:var(--ink3);font-weight:700"> / 4</span></div></div></div>
+    <div class="ph-body"><div class="g2">
+      <div class="card card-pad"><div class="card-lbl">Ожидаемый спрос по категориям (ед.)</div><div class="dem">${bars}</div></div>
+      <div class="rcol">
+        <div class="card card-pad ev" style="--ev:${tr.evC}"><div class="l">⚡ Событие тура</div><div class="t">${tr.evT}</div><div class="d">${tr.evD}</div></div>
+        <div class="stats">
+          <div class="card card-pad stat"><div class="k">Участники</div><div class="v" style="color:var(--ink)">9</div><div class="s">команд онлайн</div></div>
+          <div class="card card-pad stat"><div class="k">Категорий</div><div class="v" style="color:var(--ibs)">4</div><div class="s">К1–К4</div></div>
+        </div>
+        <div class="trend">${tr.trend}</div>
+      </div></div></div></div>`;}
+
+function pPair(ti){
+  const tr=TOURS[ti], d0=tr.neg[0], a=T[d0.a], b=T[d0.b], ca=CHARS[a.char], cb=CHARS[b.char];
+  const party=(t,c,role)=>`<div class="party" style="--pc:${t.col}">
+    <div class="party-top"><span class="e">${t.ico}</span><div><div class="nm">${t.name}</div><div class="ty" style="color:${t.col}">${role}</div></div></div>
+    <div class="party-ch" style="--chs:${c.soft};--chl:${c.line};--chc:${c.col}"><span class="i">${c.ico}</span><span class="n">Директор: ${c.name}</span></div>
+    <div class="bubble" style="--chc:${c.col}">«${c.q}»</div></div>`;
+  const chips=tr.neg.map(d=>`<div class="deal-chip"><b>${T[d.a].name}</b><span style="color:var(--ink3)">↔</span><b>${T[d.b].name}</b>
+    <span class="bg" style="background:${d.c}1f;color:${d.c}">${d.l}</span></div>`).join('');
+  return `<div class="ph"><div class="ph-head"><div><div class="ph-h1">Переговоры · ${tr.n}</div>
+    <div class="ph-sub">Директора команд договариваются: скидки, тарифы, объёмы. Реплики зависят от характера</div></div>
+    <div class="ph-tag"><div class="k">Фаза</div><div class="v" style="color:var(--ibs)">3<span style="font-size:15px;color:var(--ink3);font-weight:700"> / 5</span></div></div></div>
+    <div class="ph-body"><div class="pair">
+      <div class="duel">
+        ${party(a,ca,a.kind==='ret'?'Ритейлер':a.type)}
+        <div class="duel-mid"><span class="cap">переговоры</span><span class="arr">↔</span>
+          <span class="badge" style="background:${d0.c}1f;color:${d0.c}">${d0.l}</span></div>
+        ${party(b,cb,b.type)}
+      </div>
+      <div class="deals-strip"><div class="l">Ключевые сделки тура (фиксируются в решениях)</div><div class="deals-row">${chips}</div></div>
+    </div></div></div>`;}
+
+function pGroup(ti){
+  const tr=TOURS[ti];
+  const col=(ids,c,soft)=>ids.map(id=>`<div class="fitem" style="background:${soft}"><span>${T[id].ico}</span><span>${T[id].name}</span></div>`).join('');
+  return `<div class="ph"><div class="ph-head"><div><div class="ph-h1">Групповые переговоры · ${tr.n}</div>
+    <div class="ph-sub">Все команды договариваются через Дистрибьютора</div></div></div>
+    <div class="ph-body"><div class="flow">
+      <div class="fcol"><div class="h" style="color:var(--ret)">Ритейлеры</div>${col(['R1','R2','R3','R4'],'','var(--ret-soft)')}</div>
+      <div class="farr">→</div>
+      <div class="fhub"><div class="e">🚛</div><div class="n">Дистрибьютор</div><div class="s">Центр координации</div></div>
+      <div class="farr">→</div>
+      <div class="fcol"><div class="h" style="color:var(--sup)">Поставщики</div>${col(['S1','S2','S3','S4'],'','var(--sup-soft)')}</div>
+    </div></div></div>`;}
+
+function pCouncil(ti){
+  const tr=TOURS[ti], c=COUNCIL[ti], team=T['R2'];
+  const data=[
+    ['📈','Аналитик спроса','#2563eb',c.analyst,'📊','Прогноз готов'],
+    ['📦','Директор по закупкам','#15a34a',c.buyer,'📦','Объёмы заказа'],
+    ['🏷️','Категорийный менеджер','#d97706',c.cat,'🏷️','Цена и промо'],
+    ['🎩','Директор сети','#db2777',c.director,'🎩','Позиция на переговоры'],
+  ];
+  const cards=data.map((r,i)=>`<div class="rc" style="--rcc:${r[2]};animation-delay:${i*.06}s">
+    <div class="rc-top"><span class="rc-ic">${r[0]}</span><div><div class="rc-nm">${r[1]}</div><div class="rc-du" style="color:${r[2]}">${team.name}</div></div></div>
+    <div class="rc-say">«${r[3]}»</div>
+    <div class="rc-out"><span class="e">${r[4]}</span><span>${r[5]}</span></div></div>`).join('');
+  return `<div class="ph"><div class="ph-head"><div><div class="ph-h1">Совет команды · ${tr.n}</div>
+    <div class="ph-sub">Внутри команды роли совещаются перед переговорами — на примере «${team.name}»</div></div>
+    <div class="ph-tag"><div class="k">Фаза</div><div class="v" style="color:var(--ibs)">2<span style="font-size:15px;color:var(--ink3);font-weight:700"> / 5</span></div></div></div>
+    <div class="ph-body"><div class="council">${cards}</div></div></div>`;
+}
+
+function pTeach(key){
+  const t=TEACH[key];
+  let left='';
+  if(t.rows){
+    left=`<div class="tcard2"><div class="tk">Как это работает</div><div class="tlist">`+
+      t.rows.map(r=>`<div class="tli"><span class="e">${r[0]}</span><div><div class="tt">${r[1]}</div><div class="td">${r[2]}</div></div></div>`).join('')+
+      `</div></div>`;
+  } else if(t.bars){
+    left=`<div class="tcard2"><div class="tk">Четыре составляющих · вес в индексе</div><div class="tbars">`+
+      t.bars.map(b=>`<div class="tbar"><div class="tbh"><span>${b[0]}</span><span class="w" style="color:${b[3]}">${b[1]}%</span></div>
+        <div class="tt2"><div style="width:${Math.round(b[1]/35*100)}%;background:${b[3]}"></div></div>
+        <div class="td" style="font-size:12px;color:var(--ink2);margin-top:6px;line-height:1.45">${b[2]}</div></div>`).join('')+
+      `</div></div>`;
+  }
+  let right=`<div class="tcard2">`;
+  if(t.formula) right+=`<div class="tk">Формула</div><div class="tformula">${t.formula}</div>`;
+  else right+=`<div class="tk">Почему это важно</div>`;
+  right+=`<div style="flex:1;min-height:10px"></div><div class="tnote"><span class="i">💡</span><div class="t">${t.note}</div></div></div>`;
+  return `<div class="ph"><div class="ph-head"><div><div class="ph-h1">${t.icon} ${t.title}</div>
+    <div class="ph-sub">${t.sub}</div></div><div class="ph-tag"><div class="k">Механика</div><div class="v">${t.icon}</div></div></div>
+    <div class="ph-body"><div class="teach">${left}${right}</div></div></div>`;
+}
+
+function pDecisions(ti){
+  const tr=TOURS[ti], done=['R1','R2','R3','S1','S2','S3','S4'];
+  const status={}; TEAMS.forEach(t=>status[t.id]=done.includes(t.id)?{x:'✓',c:'var(--good)'}:{x:'…',c:'var(--warn)'});
+  const cells=TEAMS.map(t=>{const ok=done.includes(t.id);
+    return `<div class="stc ${ok?'ok':'wt'}"><span class="e">${t.ico}</span>
+      <div class="info"><div class="nm">${t.name}</div><div class="ty" style="color:${t.col}">${t.type}</div></div>
+      <span class="fl" style="color:${ok?'var(--good)':'var(--warn)'}">${ok?'✓':'…'}</span></div>`;}).join('');
+  const orders=[tr.demand[0]+5,tr.demand[1]+2,tr.demand[2]-3,tr.demand[3]+2], prices=['16.5','22.0','18.0','35.0'], promo=[true,false,true,false];
+  const rows=CATS.map((c,i)=>`<tr><td><div class="fcat"><span class="fdot" style="background:${c[1]}"></span>${c[0]}</div></td>
+    <td><span class="ffore">${tr.demand[i]}</span></td><td><input class="finp" value="${orders[i]}"></td>
+    <td><input class="finp pr" value="${prices[i]}"></td><td><input type="checkbox" class="fchk" ${promo[i]?'checked':''}></td></tr>`).join('');
+  return {status, html:`<div class="ph"><div class="ph-head"><div><div class="ph-h1">Решения · ${tr.n}</div>
+    <div class="ph-sub">Так выглядит экран команды. Итоги переговоров уже подставлены</div></div>
+    <div class="ph-tag"><div class="k">Сдали</div><div class="v" style="color:var(--good)">7<span style="font-size:15px;color:var(--ink3);font-weight:700"> / 9</span></div></div></div>
+    <div class="ph-body"><div class="dec">
+      <div><div class="card-lbl" style="margin-bottom:11px">Статус команд</div><div class="stgrid">${cells}</div>
+        <div class="decnote"><span class="i">⏳</span><span class="t">Ждём Премиум-маркет и Дистрибьютора. Ведущий следит за таймером (≈2:14) и не запускает расчёт, пока не сдадут все.</span></div></div>
+      <div><div class="card-lbl" style="margin-bottom:11px">Интерфейс ввода (команда «Супермаркет»)</div>
+        <div class="form"><div class="form-h">💻 Супермаркет · ${tr.n}</div>
+          <table class="ftbl"><thead><tr><th>Категория</th><th>Прогноз</th><th>Заказ</th><th>Цена</th><th>Промо</th></tr></thead><tbody>${rows}</tbody></table>
+          <div class="form-f"><span class="h">Заполните поля и подтвердите</span><button class="bsub">📤 Отправить показатели</button></div></div></div>
+    </div></div></div>`};
+}
+
+function pResults(ti){
+  const tr=TOURS[ti], r=tr.res, ranks=['🥇','🥈','🥉'];
+  const rows=r.board.map(([id,p],i)=>{const x=T[id], tot=p+r.bonus;
+    return `<div class="lbr" style="--rc:${x.col};animation-delay:${i*.04}s">
+      <div class="rk">${ranks[i]||(i+1)}</div>
+      <div class="lbt"><span class="e">${x.ico}</span><div><div class="n">${x.name}</div><div class="ty" style="color:${x.col}">${x.type}</div></div></div>
+      <div class="lbn" style="color:var(--ink2)">${p}</div><div class="lbn" style="color:var(--good)">+${r.bonus}</div>
+      <div class="lbn" style="color:var(--ink3)">${x.kind==='dist'?'—':r.sub.osa+'%'}</div><div class="lbtot">${tot}</div></div>`;}).join('');
+  const sub=[['OSA',r.sub.osa],['Дефицит',r.sub.def],['Хлыст',r.sub.bw],['Списания',r.sub.waste]];
+  const subBars=sub.map(([nm,v])=>`<div class="hs"><span class="nm">${nm}</span><div class="bar"><div style="width:${v}%;background:${hCol(v)}"></div></div><span class="vv" style="color:${hCol(v)}">${v}</span></div>`).join('');
+  const win=T[r.board[0][0]], winP=r.board[0][1];
+  return `<div class="ph"><div class="ph-head"><div><div class="ph-h1">Итоги ${tr.n}</div>
+    <div class="ph-sub">Счёт = Прибыль + Бонус здоровья · бонус = 250 × H × вклад команды</div></div></div>
+    <div class="ph-body"><div class="res">
+      <div class="card lb"><div class="lbh"><div>#</div><div>Команда</div><div style="text-align:right">Прибыль</div>
+        <div style="text-align:right">Бонус</div><div style="text-align:right">OSA</div><div style="text-align:right">Итого</div></div>
+        <div class="lbb">${rows}</div></div>
+      <div class="hcol">
+        <div class="card card-pad hbig"><div class="k">Индекс здоровья цепочки H</div>
+          <div class="v" style="color:${hCol(r.health)}">${r.health}%</div><div class="w" style="color:${hCol(r.health)}">${hWord(r.health)}</div>
+          <div class="hsub">${subBars}</div></div>
+        <div class="card card-pad" style="padding:14px 16px"><div class="k" style="font-size:10px;font-weight:800;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px">Разбор счёта лидера · ${win.name}</div>
+          <div style="display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;font-size:14px">
+            <span style="color:var(--ink2)">${winP} прибыль</span><span style="color:var(--ink3)">+</span>
+            <span style="color:var(--good)">${r.bonus} бонус</span><span style="color:var(--ink3)">=</span>
+            <span style="font-weight:900;font-size:18px">${winP+r.bonus} у.е.</span></div>
+          <div style="font-size:12px;color:var(--ink3);margin-top:6px;line-height:1.4">Бонус = 250 × ${(r.health/100).toFixed(2)} H × вклад. Здоровье общее — этот же бонус получают все, кто работал.</div></div>
+        <div class="ins"><span class="i">💡</span><div><div class="k">Инсайт тура</div><div class="t">${r.insight}</div></div></div>
+      </div></div></div></div>`;}
+
+function pFinal(){
+  const aw=FINALS.map((a,i)=>{const x=T[a.id];
+    return `<div class="aw" style="animation-delay:${.15+i*.08}s"><div class="e">${a.e}</div><div class="t">${a.t}</div><div class="s">${a.s}</div>
+      <div class="win"><div class="we">${x.ico}</div><div class="wn" style="color:${x.col}">${x.name}</div><div class="ws">${a.sc} у.е.</div></div></div>`;}).join('');
+  const ranks=['🥇','🥈','🥉'];
+  const board=FINAL_BOARD.map(([id,tot],i)=>{const x=T[id];
+    return `<div class="lbr" style="--rc:${x.col};grid-template-columns:34px 1fr 110px;animation-delay:${i*.04}s">
+      <div class="rk">${ranks[i]||(i+1)}</div>
+      <div class="lbt"><span class="e">${x.ico}</span><div><div class="n">${x.name}</div><div class="ty" style="color:${x.col}">${x.type}</div></div></div>
+      <div class="lbtot">${tot} <span style="font-size:11px;color:var(--ink3);font-weight:600">у.е.</span></div></div>`;}).join('');
+  return `<div class="ph"><div class="ph-body"><div class="fin"><div class="tr">🏆</div><h1>Финал игры</h1>
+    <div class="lead">FMCG-цепочка поставок · 4 тура завершены</div>
+    <div class="awards">${aw}</div>
+    <div class="card finlb"><div class="lbb">${board}</div></div></div></div></div>`;}
+
+/* ════ NAV ════ */
+let cur=0, playing=false, timer=null, fillTimer=null, fillStart=0;
+const DUR={start:9000,roles:11000,teach:13000,briefing:11000,council:12000,pair:12000,group:9000,decisions:13000,results:13000,final:14000};
+
+function render(){
+  const s=SC[cur];
+  $('i-step').textContent=s.step; $('i-title').textContent=s.title; $('i-desc').textContent=s.desc; $('i-time').textContent=s.time;
+  $('ctrl-lbl').textContent=(cur+1)+' из '+SC.length;
+  let html='', status=null, active=null;
+  if(s.type==='start')html=pStart();
+  else if(s.type==='roles')html=pRoles();
+  else if(s.type==='teach')html=pTeach(s.teach);
+  else if(s.type==='briefing'){html=pBrief(s.t);active=['ret'];}
+  else if(s.type==='council'){html=pCouncil(s.t);active=['ret'];}
+  else if(s.type==='pair')html=pPair(s.t);
+  else if(s.type==='group'){html=pGroup(s.t);active=['dist'];}
+  else if(s.type==='decisions'){const d=pDecisions(s.t);html=d.html;status=d.status;}
+  else if(s.type==='results')html=pResults(s.t);
+  else if(s.type==='final')html=pFinal();
+  $('stage').innerHTML=html;
+  sidebar(active,status);
+  const h=$('sb-hint'); if(h)h.textContent=s.hint;
+  dots(); resetFill();
+  if(playing){startFill(DUR[s.type]||11000);schedNext(DUR[s.type]||11000);}
+}
+function goTo(i){if(i<0||i>=SC.length)return;clearTimeout(timer);cur=i;render();}
+function prev(){clearTimeout(timer);stopFill();if(cur>0)goTo(cur-1);}
+function next(){clearTimeout(timer);stopFill();if(cur<SC.length-1)goTo(cur+1);}
+function schedNext(d){clearTimeout(timer);timer=setTimeout(()=>{if(!playing)return;if(cur<SC.length-1)goTo(cur+1);else{playing=false;updatePP();}},d);}
+function togglePlay(){playing=!playing;updatePP();const d=DUR[SC[cur].type]||11000;if(playing){startFill(d);schedNext(d);}else{clearTimeout(timer);stopFill();}}
+function updatePP(){$('btn-pp').textContent=playing?'⏸ Пауза':'▶ Играть';}
+function startFill(d){clearInterval(fillTimer);fillStart=Date.now();fillTimer=setInterval(()=>{const p=Math.min(100,(Date.now()-fillStart)/d*100);$('tlfill').style.width=p+'%';if(p>=100)clearInterval(fillTimer);},40);}
+function stopFill(){clearInterval(fillTimer);}
+function resetFill(){$('tlfill').style.width='0%';}
+function dots(){$('dots').innerHTML=SC.map((s,i)=>`<div class="dot" id="d${i}" title="${s.step}" onclick="goTo(${i})"></div>`).join('');SC.forEach((_,i)=>{const e=$('d'+i);if(e)e.className='dot'+(i<cur?' done':i===cur?' cur':'');});}
+
+render(); updatePP();
 document.addEventListener('keydown',e=>{
-  if(e.key==='ArrowRight'||e.key===' ') { e.preventDefault(); if(e.key===' ') togglePlay(); else next(); }
-  if(e.key==='ArrowLeft')  { e.preventDefault(); prev(); }
+  if(e.key==='ArrowRight'){e.preventDefault();next();}
+  if(e.key==='ArrowLeft'){e.preventDefault();prev();}
+  if(e.key===' '){e.preventDefault();togglePlay();}
 });
 </script>
 </body>

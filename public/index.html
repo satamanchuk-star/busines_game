@@ -4,11 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>FMCG-цепочка — Деловая игра IBS</title>
+<link rel="stylesheet" href="/fonts/onest.css">
 <style>
-@font-face{font-family:'Century Gothic';src:url('/fonts/CenturyGothic.ttf') format('truetype');font-weight:400;font-style:normal}
-@font-face{font-family:'Century Gothic';src:url('/fonts/CenturyGothic-Bold.ttf') format('truetype');font-weight:700;font-style:normal}
-@font-face{font-family:'Century Gothic';src:url('/fonts/CenturyGothic-Italic.ttf') format('truetype');font-weight:400;font-style:italic}
-@font-face{font-family:'Century Gothic';src:url('/fonts/CenturyGothic-BoldItalic.ttf') format('truetype');font-weight:700;font-style:italic}
 
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -24,7 +21,7 @@
   --sh:0 2px 20px rgba(0,0,0,.06);
 }
 html{scroll-behavior:smooth}
-body{font-family:'Century Gothic',sans-serif;background:#f5f5f7;color:var(--T);min-height:100vh;line-height:1.6}
+body{font-family:'Onest',sans-serif;background:#f5f5f7;color:var(--T);min-height:100vh;line-height:1.6}
 
 /* ── NAV ── */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;
@@ -38,7 +35,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
   color:#1a3565;letter-spacing:-.5px}
 .nav-title{font-size:15px;font-weight:700;color:var(--W)}
 .nav-links{display:flex;align-items:center;gap:18px}
-.nav-link{font-size:13px;color:var(--W3);text-decoration:none;transition:color .2s}
+.skip-link{position:absolute;left:-9999px;top:4px;z-index:200;background:#fff;color:var(--dark);
+  padding:8px 16px;border-radius:8px;font-size:14px;font-weight:700;text-decoration:none}
+.skip-link:focus{left:12px}
+.nav-link{font-size:13px;color:var(--W2);text-decoration:none;transition:color .2s}
 .nav-link:hover{color:var(--W)}
 .btn-play-sm{padding:7px 20px;background:var(--W);color:var(--dark);border:none;border-radius:8px;
   font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .2s;letter-spacing:.2px}
@@ -60,7 +60,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
 .hero h1 span{color:rgba(255,255,255,.52)}
 .hero-sub{font-size:clamp(16px,2.2vw,20px);color:var(--W2);max-width:520px;margin:0 auto 16px;font-weight:400;line-height:1.75}
 .hero-meta{display:flex;align-items:center;gap:18px;justify-content:center;margin-bottom:52px;flex-wrap:wrap}
-.hero-meta-item{font-size:13px;color:var(--W3)}
+.hero-meta-item{font-size:13px;color:var(--W2)}
 .hero-meta-dot{width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.25)}
 .btn-play{display:inline-flex;align-items:center;gap:10px;padding:18px 52px;
   background:#fff;color:var(--dark);border:none;
@@ -70,14 +70,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;
 .btn-play:active{transform:translateY(-1px)}
 .btn-play-arrow{font-size:20px;transition:transform .2s}
 .btn-play:hover .btn-play-arrow{transform:translateX(4px)}
-.hero-note{margin-top:22px;font-size:12px;color:var(--W3)}
+.hero-note{margin-top:22px;font-size:12px;color:var(--W2)}
 
 /* ── SECTION WRAPPERS ── */
 .sec-w{background:#fff}
 .sec-w-alt{background:#f5f5f7}
 section{max-width:960px;margin:0 auto;padding:96px 24px}
 .section-tag{font-size:11px;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;
-  color:var(--T3);margin-bottom:14px}
+  color:#5e6a7a;margin-bottom:14px}
 .section-title{font-size:clamp(26px,4vw,40px);font-weight:800;margin-bottom:18px;line-height:1.15;color:var(--T)}
 .section-lead{font-size:16px;color:var(--T2);max-width:620px;line-height:1.78}
 
@@ -92,7 +92,7 @@ section{max-width:960px;margin:0 auto;padding:96px 24px}
 .conflict-box em{color:var(--A);font-style:normal;font-weight:700}
 
 /* ── ROLES ── */
-.roles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:40px}
+.roles-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:40px}
 .role-card{background:#fff;border:1px solid var(--BD);border-radius:var(--r);
   padding:22px;transition:all .2s;box-shadow:var(--sh)}
 .role-card:hover{border-color:var(--BDH);box-shadow:0 8px 32px rgba(0,0,0,.09);transform:translateY(-2px)}
@@ -116,7 +116,7 @@ section{max-width:960px;margin:0 auto;padding:96px 24px}
   background:var(--A);color:#fff;border-radius:50%;font-size:9px;font-weight:700;
   display:flex;align-items:center;justify-content:center}
 .step-label{font-size:13px;font-weight:700;margin-bottom:4px;color:var(--T)}
-.step-time{font-size:10px;color:var(--T3);font-weight:600;margin-bottom:5px;letter-spacing:.4px;text-transform:uppercase}
+.step-time{font-size:10px;color:#5e6a7a;font-weight:600;margin-bottom:5px;letter-spacing:.4px;text-transform:uppercase}
 .step-desc{font-size:11px;color:var(--T2);line-height:1.48;padding:0 4px}
 
 /* ── SCORE ── */
@@ -159,6 +159,8 @@ footer{background:var(--dark);border-top:1px solid rgba(255,255,255,.06);padding
 </head>
 <body>
 
+<a class="skip-link" href="#main-content">Перейти к основному содержимому</a>
+
 <!-- NAV -->
 <nav>
   <div class="nav-brand">
@@ -174,19 +176,20 @@ footer{background:var(--dark);border-top:1px solid rgba(255,255,255,.06);padding
   </div>
 </nav>
 
+<main id="main-content">
 <!-- HERO -->
 <section class="hero">
   <div class="hero-badge">⚡ Деловая игра · IBS · FMCG</div>
   <h1>FMCG-<span>цепочка</span></h1>
   <p class="hero-sub">Каждая команда управляет своим бизнесом в общей цепочке поставок продуктов: магазины заказывают товар, производители его выпускают, перевозчик доставляет. Зарабатывайте — но не обрушьте цепочку.</p>
   <div class="hero-meta">
-    <span class="hero-meta-item">👥 До 32 участников</span>
-    <span class="hero-meta-dot"></span>
+    <span class="hero-meta-item">👥 До 36 участников</span>
+    <span class="hero-meta-dot" aria-hidden="true"></span>
     <span class="hero-meta-item">⏱ ~90 минут</span>
-    <span class="hero-meta-dot"></span>
+    <span class="hero-meta-dot" aria-hidden="true"></span>
     <span class="hero-meta-item">🎯 4 тура</span>
-    <span class="hero-meta-dot"></span>
-    <span class="hero-meta-item">🏆 8 команд</span>
+    <span class="hero-meta-dot" aria-hidden="true"></span>
+    <span class="hero-meta-item">🏆 9 команд</span>
   </div>
   <a href="/play.html" class="btn-play">
     ИГРАТЬ <span class="btn-play-arrow">→</span>
@@ -205,7 +208,7 @@ footer{background:var(--dark);border-top:1px solid rgba(255,255,255,.06);padding
   <h2 class="section-title">Цепочка поставок — живой организм.<br>Каждое решение бьёт по всем.</h2>
   <div class="about-grid">
     <div class="about-text">
-      <p>Вы управляете одним из 8 звеньев цепочки: ритейлер заказывает товар, поставщик его производит, дистрибьютор везёт. Цель каждого — заработать. Но цепочка едина: перезакажете — обрушите склад соседу; пожадничаете на скидке — потеряете покупателя у всех.</p>
+      <p>Вы управляете одним из 3 звеньев цепочки: ритейлер заказывает товар, поставщик его производит, дистрибьютор везёт. Цель каждого — заработать. Но цепочка едина: перезакажете — столкнётесь с проблемой перестока и пропускной способности дистрибьютора; пожадничаете на скидке — снизите трафик в вашем магазине.</p>
       <p>За 4 тура вы пройдёте через промо-инициативу, внешний шок (дефицит мощностей и квоты) и финальную стабилизацию. Победит не самый жадный — а тот, кто умеет и зарабатывать, и договариваться.</p>
     </div>
     <div class="conflict-box">
@@ -221,8 +224,8 @@ footer{background:var(--dark);border-top:1px solid rgba(255,255,255,.06);padding
 <div class="sec-w-alt">
 <section id="roles">
   <div class="section-tag">Кто играет</div>
-  <h2 class="section-title">8 команд в одной цепочке:<br>магазины, производители, перевозчик</h2>
-  <p class="section-lead">Каждая команда — до 4 человек. Роли внутри раздаются случайно: директор ведёт переговоры с другими командами, остальные готовят прогноз, считают объёмы и цены. Все команды связаны: товар идёт от производителей через перевозчика в магазины.</p>
+  <h2 class="section-title">9 команд в одной цепочке:<br>магазины, производители, перевозчик</h2>
+  <p class="section-lead">Каждая команда — до 4 человек. Роли внутри раздаются случайно: директор ведёт переговоры с другими командами и принимает финальное решение, категорийный менеджер определяет ценовую политику и промо-стратегию, директор по закупкам — объём заказов и отслеживает объём запасов, аналитик формирует прогнозы, директор производства отвечает за объём выпуска продукции. Все команды связаны: товар идёт от производителей через перевозчика в магазины.</p>
   <div class="roles-grid">
     <div class="role-card">
       <div class="role-ico">🛒</div>
@@ -243,6 +246,12 @@ footer{background:var(--dark);border-top:1px solid rgba(255,255,255,.06);padding
       <span class="role-tag">Магазин (ритейлер)</span>
     </div>
     <div class="role-card">
+      <div class="role-ico">🛒</div>
+      <div class="role-name">Премиум</div>
+      <div class="role-desc">Сеть с высоким чеком: фокус на деликатесах, качественной бакалее и полной полке.</div>
+      <span class="role-tag">Магазин (ритейлер)</span>
+    </div>
+    <div class="role-card">
       <div class="role-ico">🏭</div>
       <div class="role-name">Производители: Базовый · Fresh · Промо</div>
       <div class="role-desc">Бакалея (долгий срок), Молочка и Фреш (быстро портятся!), Снеки и напитки под промо. Выпускают товар и дают скидки магазинам.</div>
@@ -251,7 +260,7 @@ footer{background:var(--dark);border-top:1px solid rgba(255,255,255,.06);padding
     <div class="role-card">
       <div class="role-ico">🏭</div>
       <div class="role-name">Производитель: Импорт</div>
-      <div class="role-desc">Деликатесы из-за рубежа. Мощность ограничена, в 3-м туре квоту урезают — главная точка дефицита.</div>
+      <div class="role-desc">Деликатесы из-за рубежа. Мощность ограничена.</div>
       <span class="role-tag">Производитель (поставщик)</span>
     </div>
     <div class="role-card">
@@ -274,7 +283,7 @@ footer{background:var(--dark);border-top:1px solid rgba(255,255,255,.06);padding
     <div class="role-card">
       <div class="role-ico">🥛</div>
       <div class="role-name">Молочка и Фреш</div>
-      <div class="role-desc">Молоко, овощи, зелень. Быстро портятся — перезаказал, не продал — списал в убыток.</div>
+      <div class="role-desc">Молоко, овощи, зелень. Быстро портятся: перезаказал и не продал — списал в убыток.</div>
       <span class="role-tag">Скоропорт</span>
     </div>
     <div class="role-card">
@@ -305,7 +314,7 @@ footer{background:var(--dark);border-top:1px solid rgba(255,255,255,.06);padding
       <div>
         <div class="step-label">Брифинг</div>
         <div class="step-time">~2 мин</div>
-        <div class="step-desc">Спрос на 4 категории товара, событие тура, условия рынка</div>
+        <div class="step-desc">Описание тура, условий рынка</div>
       </div>
     </div>
     <div class="turn-step">
@@ -313,7 +322,7 @@ footer{background:var(--dark);border-top:1px solid rgba(255,255,255,.06);padding
       <div>
         <div class="step-label">Совет команды</div>
         <div class="step-time">~3 мин</div>
-        <div class="step-desc">Аналитик — прогноз, закупщик — объём, коммерсант — цены</div>
+        <div class="step-desc">Аналитик — прогноз, директор по закупкам — объём, категорийный менеджер — цены</div>
       </div>
     </div>
     <div class="turn-step">
@@ -329,7 +338,7 @@ footer{background:var(--dark);border-top:1px solid rgba(255,255,255,.06);padding
       <div>
         <div class="step-label">Решения</div>
         <div class="step-time">~2 мин</div>
-        <div class="step-desc">Финальные цифры: заказы, объём, тариф — и подтверждение</div>
+        <div class="step-desc">Ввод финальных договорённостей: заказы, объём, тариф</div>
       </div>
     </div>
     <div class="turn-step">
@@ -337,7 +346,7 @@ footer{background:var(--dark);border-top:1px solid rgba(255,255,255,.06);padding
       <div>
         <div class="step-label">Расчёт</div>
         <div class="step-time">~3 мин</div>
-        <div class="step-desc">Движок считает. Экран — KPI, прибыль, здоровье цепочки</div>
+        <div class="step-desc">Формируется расчёт и подведение результатов тура: KPI, прибыль, здоровье цепочки</div>
       </div>
     </div>
   </div>
@@ -353,9 +362,9 @@ footer{background:var(--dark);border-top:1px solid rgba(255,255,255,.06);padding
   <div class="score-grid">
     <div class="score-card">
       <h3>🏆 Из чего складываются очки</h3>
-      <p>Своя прибыль — это понятно. «Здоровье цепочки» — это когда на полках есть товар, нет дефицита, никто не перезаказывает и ничего не портится. Чем оно выше — тем больше бонус, и он один на всех.</p>
+      <p>Своя прибыль — это понятно. «Здоровье цепочки» (H) — это когда на полках есть товар, нет дефицита, никто не перезаказывает и ничего не портится. H общее для всех, но бонус каждой команды зависит ещё и от её <strong>личного вклада</strong>: кто сильнее помог цепочке (полная полка, выполненные заказы, довезённый товар) — получает больше.</p>
       <div class="score-formula">
-        Очки за тур = <span class="hi">своя прибыль</span> + <span class="hi">бонус за здоровье цепочки</span>
+        Очки за тур = <span class="hi">своя прибыль</span> + <span class="hi">бонус здоровья (250 × H × личный вклад)</span>
       </div>
     </div>
     <div class="score-card">
@@ -384,6 +393,7 @@ footer{background:var(--dark);border-top:1px solid rgba(255,255,255,.06);padding
     <a href="/live.html" class="cta-link">📺 Экран проектора</a>
   </div>
 </div>
+</main>
 
 <footer>
   © IBS 2026 · FMCG-цепочка · Деловая игра по управлению цепочкой поставок

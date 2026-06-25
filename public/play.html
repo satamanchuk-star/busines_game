@@ -4,27 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>IBS · FMCG-цепочка</title>
+<link rel="stylesheet" href="/fonts/onest.css">
 <style>
-@font-face{font-family:'Century Gothic';src:url('/fonts/CenturyGothic.ttf') format('truetype');font-weight:400;font-style:normal}
-@font-face{font-family:'Century Gothic';src:url('/fonts/CenturyGothic-Bold.ttf') format('truetype');font-weight:700;font-style:normal}
-@font-face{font-family:'Century Gothic';src:url('/fonts/CenturyGothic-Italic.ttf') format('truetype');font-weight:400;font-style:italic}
-@font-face{font-family:'Century Gothic';src:url('/fonts/CenturyGothic-BoldItalic.ttf') format('truetype');font-weight:700;font-style:italic}
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --P:#0d1929;--PL:#1c2d4a;--A:#1d3461;--AL:#2c4a7c;
-  --OK:#34c759;--WN:#ff9f0a;--BD:#ff3b30;
-  --g1:#f5f5f7;--g2:#ebebf0;--g3:#d8d8de;--g5:#8e8e93;--g7:#48484a;--g9:#1d1d1f;
-  --W:#fff;--sh:0 2px 16px rgba(0,0,0,.07);--shl:0 8px 32px rgba(0,0,0,.12);--r:12px;
+  --P:#2563eb;--PL:#1d4ed8;--A:#2563eb;--AL:#3b82f6;
+  --OK:#15a34a;--WN:#d97706;--BD:#dc2626;
+  --g1:#f3f5f9;--g2:#eef1f6;--g3:#e6eaf1;--g5:#9aa6b8;--g7:#56627a;--g9:#0d1526;
+  --W:#fff;--sh:0 2px 8px rgba(13,21,38,.07);--shl:0 4px 24px rgba(13,21,38,.10);--r:10px;
 }
 .ibs-logo{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:#fff;border-radius:5px;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.15)}
 .ibs-logo span{font-family:'Arial Black',Arial,sans-serif;font-size:12px;font-weight:900;color:#1c2d4a;letter-spacing:-.5px}
-body{font-family:'Century Gothic',sans-serif;background:var(--g1);color:var(--g9);min-height:100vh;font-size:14px}
+body{font-family:'Onest',sans-serif;background:var(--g1);color:var(--g9);min-height:100vh;font-size:14px}
 /* ── Header ── */
-.hdr{background:linear-gradient(135deg,var(--P),var(--PL));color:#fff;height:54px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.hdr{background:var(--W);color:var(--g9);height:54px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:1.5px solid var(--g3);box-shadow:0 1px 4px rgba(13,21,38,.05)}
 .hdr-l{display:flex;align-items:center;gap:12px}
 .hdr h1{font-size:15px;font-weight:700}
-.phase-badge{background:rgba(255,255,255,.2);border-radius:20px;padding:3px 12px;font-size:12px;font-weight:600}
+.phase-badge{background:var(--g1);border:1px solid var(--g3);color:var(--g7);border-radius:20px;padding:3px 12px;font-size:12px;font-weight:500}
 .restore-banner{display:flex;align-items:center;gap:10px;background:#fff8e6;border-bottom:1px solid #f3d98a;
   color:#7a5b00;padding:9px 18px;font-size:13px}
 .restore-banner .rb-ico{font-size:16px;font-weight:700;color:#b8860b}
@@ -33,13 +30,13 @@ body{font-family:'Century Gothic',sans-serif;background:var(--g1);color:var(--g9
   font-size:12px;font-weight:700;color:#7a5b00;cursor:pointer;transition:background .15s;white-space:nowrap}
 .restore-banner .rb-close:hover{background:#ecc95f}
 .rdots{display:flex;gap:4px}
-.rdot{width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:rgba(255,255,255,.45)}
-.rdot.cur{border-color:#fff;color:#fff;background:rgba(255,255,255,.2)}
+.rdot{width:28px;height:28px;border-radius:50%;border:2px solid var(--g3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--g5);background:var(--g1)}
+.rdot.cur{border-color:var(--P);color:var(--P);background:#eef3ff}
 .rdot.done{background:var(--OK);border-color:var(--OK);color:#fff}
 .hdr-r{display:flex;align-items:center;gap:12px}
-#timerDisp{font-size:14px;font-weight:700;color:rgba(255,255,255,.9);cursor:pointer;min-width:70px;text-align:right}
-#timerDisp.tick{color:#ffd700;animation:none}
-#timerDisp.exp{color:#ff6b6b}
+#timerDisp{font-size:14px;font-weight:700;color:var(--g7);cursor:pointer;min-width:70px;text-align:right;background:var(--g1);border:1.5px solid var(--g3);border-radius:8px;padding:4px 11px}
+#timerDisp.tick{color:var(--WN);animation:none}
+#timerDisp.exp{color:var(--BD);border-color:var(--BD)}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
 .conn-dot{width:9px;height:9px;border-radius:50%;background:#aaa;flex-shrink:0}
 .conn-dot.ok{background:var(--OK)}
@@ -89,7 +86,8 @@ body{font-family:'Century Gothic',sans-serif;background:var(--g1);color:var(--g9
 .main-content{flex:1;overflow-y:auto;padding:20px;max-height:calc(100vh - 54px)}
 /* ── Cards ── */
 .card{background:var(--W);border-radius:var(--r);box-shadow:var(--sh);padding:18px;margin-bottom:16px}
-.card-t{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--g5);margin-bottom:14px}
+.card-t{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#5e6a7a;margin-bottom:14px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 /* ── Page header ── */
 .pg-h{margin-bottom:18px}
 .pg-title{font-size:20px;font-weight:700;color:var(--P)}
@@ -110,17 +108,17 @@ body{font-family:'Century Gothic',sans-serif;background:var(--g1);color:var(--g9
 .sup-card{background:var(--W);border-radius:var(--r);box-shadow:var(--sh);padding:12px}
 .sup-card h4{font-size:12px;font-weight:700;color:var(--P);margin-bottom:8px}
 /* ── Retailer grid ── */
-.ret-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.ret-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:14px}
 .ret-card{background:var(--W);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
 .ret-hdr{padding:10px 14px;font-weight:700;font-size:13px;color:#fff;display:flex;align-items:center;justify-content:space-between}
-.ret-hdr.r0{background:#2e5f8a}.ret-hdr.r1{background:#7b3fa0}.ret-hdr.r2{background:#1a7a5e}
+.ret-hdr.r0{background:#2e5f8a}.ret-hdr.r1{background:#7b3fa0}.ret-hdr.r2{background:#1a7a5e}.ret-hdr.r3{background:#8b5cf6}
 .ret-body{padding:10px}
 .cat-row{border:1px solid var(--g2);border-radius:7px;padding:9px 11px;margin-bottom:7px}
 .cat-row.off{opacity:.35;pointer-events:none}
 .cat-rt{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
 .cat-nm{font-weight:600;font-size:12px}
 .tgl{position:relative;display:inline-block;width:36px;height:20px}
-.tgl input{display:none}
+.tgl input{position:absolute;opacity:0;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
 .tgl-s{position:absolute;cursor:pointer;inset:0;background:var(--g3);border-radius:20px;transition:.2s}
 .tgl-s::before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .tgl input:checked+.tgl-s{background:var(--OK)}
@@ -128,9 +126,9 @@ body{font-family:'Century Gothic',sans-serif;background:var(--g1);color:var(--g9
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:5px}
 .frow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:5px}
 .fld{display:flex;flex-direction:column;gap:2px}
-.fld label{font-size:10px;text-transform:uppercase;letter-spacing:.3px;color:var(--g5)}
+.fld label{font-size:11px;text-transform:uppercase;letter-spacing:.3px;color:#5e6a7a}
 .fld input,.fld select{padding:5px 8px;border:1px solid var(--g3);border-radius:5px;font-size:12px;width:100%}
-.fld input:focus,.fld select:focus{outline:none;border-color:var(--PL)}
+.fld input:focus,.fld select:focus{outline:none;border-color:var(--PL);box-shadow:0 0 0 3px rgba(37,99,235,.18)}
 /* ── Tables ── */
 .tbl{width:100%;border-collapse:collapse;font-size:12px}
 .tbl th{background:var(--P);color:#fff;padding:8px 11px;text-align:left;font-size:11px;font-weight:600}
@@ -140,9 +138,9 @@ body{font-family:'Century Gothic',sans-serif;background:var(--g1);color:var(--g9
 /* ── KPI ── */
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
 .kpi{background:var(--g1);border-radius:8px;padding:11px 13px}
-.kpi .kl{font-size:10px;color:var(--g5);text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px}
+.kpi .kl{font-size:10px;color:#5e6a7a;text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px}
 .kpi .kv{font-size:20px;font-weight:700}
-.kpi .ks{font-size:11px;color:var(--g5);margin-top:1px}
+.kpi .ks{font-size:11px;color:#5e6a7a;margin-top:1px}
 .kpi-ok .kv{color:var(--OK)}.kpi-bad .kv{color:var(--BD)}.kpi-wn .kv{color:var(--WN)}.kpi-n .kv{color:var(--P)}
 /* ── Score bar ── */
 .sbar-w{display:flex;align-items:center;gap:7px}
@@ -156,12 +154,12 @@ body{font-family:'Century Gothic',sans-serif;background:var(--g1);color:var(--g9
 .ms-row input[type=range]{flex:1;cursor:pointer}
 .ms-val{font-size:13px;font-weight:700;color:var(--P);min-width:26px;text-align:right}
 /* ── Announcement bar ── */
-.announce-bar{background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;padding:10px 18px;border-radius:8px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600}
+.announce-bar{background:#fffbeb;border:1px solid #fcd34d;color:#92400e;padding:10px 18px;border-radius:8px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600}
 /* ── Event banner ── */
-.evt{background:linear-gradient(135deg,#c0392b,#e74c3c);border-radius:var(--r);padding:13px 16px;color:#fff;margin-bottom:14px;display:flex;gap:10px}
+.evt{background:#fef2f2;border:1px solid #fca5a5;border-radius:var(--r);padding:13px 16px;color:var(--g9);margin-bottom:14px;display:flex;gap:10px}
 .evt .ico{font-size:20px}
-.evt h3{font-weight:700;font-size:14px;margin-bottom:3px}
-.evt p{font-size:12px;opacity:.92;line-height:1.5}
+.evt h3{font-weight:700;font-size:14px;margin-bottom:3px;color:var(--BD)}
+.evt p{font-size:12px;color:#7f1d1d;line-height:1.5}
 /* ── Team panel ── */
 #s-team{flex-direction:column;min-height:100vh}
 .team-body{flex:1;display:grid;grid-template-columns:1fr 280px;min-height:0;max-height:calc(100vh - 54px - 58px);overflow:hidden}
@@ -207,7 +205,7 @@ body{font-family:'Century Gothic',sans-serif;background:var(--g1);color:var(--g9
 .secret-content{font-size:13px;color:var(--g7);line-height:1.6;background:var(--g1);border-radius:8px;padding:12px;display:none}
 /* ── Action bar ── */
 .action-bar{position:sticky;bottom:0;background:var(--W);border-top:1px solid var(--g2);padding:11px 18px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 -4px 12px rgba(0,0,0,.07);z-index:50}
-.action-bar .hint{font-size:12px;color:var(--g5)}
+.action-bar .hint{font-size:12px;color:#5e6a7a}
 /* ── Timer modal ── */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:none;align-items:center;justify-content:center}
 .modal-bg.on{display:flex}
@@ -253,7 +251,7 @@ body{font-family:'Century Gothic',sans-serif;background:var(--g1);color:var(--g9
     <button class="rtab" onclick="selRole('player')">👤 Участник</button>
   </div>
 
-  <div id="login-err" class="err-msg"></div>
+  <div id="login-err" class="err-msg" role="alert"></div>
 
   <!-- Ведущий -->
   <div id="f-admin" style="display:none">
@@ -281,7 +279,7 @@ body{font-family:'Century Gothic',sans-serif;background:var(--g1);color:var(--g9
     <div style="display:flex;flex-direction:column;gap:7px">
       <a href="sim.html"
          style="display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 22px;
-                border-radius:8px;background:linear-gradient(135deg,#1a3a5c,#2e5f8a);border:1.5px solid #2e5f8a;
+                border-radius:8px;background:linear-gradient(135deg,#1d4ed8,#2563eb);border:1.5px solid #2563eb;
                 color:#fff;font-size:13px;font-weight:700;text-decoration:none;transition:all .15s"
          onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
         🔬 Лаборатория цепочки — полная симуляция
@@ -304,7 +302,7 @@ body{font-family:'Century Gothic',sans-serif;background:var(--g1);color:var(--g9
 <div id="s-admin" class="scr">
   <header class="hdr">
     <div class="hdr-l">
-      <div id="c-dot" class="conn-dot"></div>
+      <div id="c-dot" class="conn-dot" role="img" aria-label="Не подключено"></div>
       <div class="ibs-logo"><span>IBS</span></div>
       <h1>FMCG-цепочка · Ведущий</h1>
       <span id="a-phase" class="phase-badge">лобби</span>
@@ -327,10 +325,10 @@ body{font-family:'Century Gothic',sans-serif;background:var(--g1);color:var(--g9
       <div class="sb-title">Фазы</div>
       <button class="phase-btn" onclick="setPhase('lobby')">🏠 Лобби</button>
       <button class="phase-btn" onclick="setPhase('roles')">🎲 Роли</button>
-      <button class="phase-btn" onclick="setPhase('briefing')">📋 Брифинг</button>
+      <button class="phase-btn" onclick="setPhase('briefing')">📢 Брифинг</button>
       <button class="phase-btn" onclick="setPhase('negotiation')">🤝 Переговоры</button>
-      <button class="phase-btn" onclick="setPhase('decisions')">📝 Решения</button>
-      <button class="phase-btn" onclick="setPhase('results')">📊 Итоги тура</button>
+      <button class="phase-btn" onclick="setPhase('decisions')">✏️ Решения</button>
+      <button class="phase-btn" onclick="setPhase('results')">📊 Расчёт</button>
       <button class="phase-btn" onclick="setPhase('final')">🏆 Финал</button>
 
       <div class="sb-title mt3" style="margin-top:14px">Туры</div>
@@ -367,7 +365,7 @@ body{font-family:'Century Gothic',sans-serif;background:var(--g1);color:var(--g9
 <div id="s-team" class="scr">
   <header class="hdr">
     <div class="hdr-l">
-      <div id="t-dot" class="conn-dot"></div>
+      <div id="t-dot" class="conn-dot" role="img" aria-label="Не подключено"></div>
       <div class="ibs-logo"><span>IBS</span></div>
       <h1 id="t-title">Команда</h1>
       <span id="t-phase" class="phase-badge">…</span>
@@ -391,7 +389,7 @@ body{font-family:'Century Gothic',sans-serif;background:var(--g1);color:var(--g9
 <div id="s-player" class="scr">
   <header class="hdr">
     <div class="hdr-l">
-      <div id="p-dot" class="conn-dot"></div>
+      <div id="p-dot" class="conn-dot" role="img" aria-label="Не подключено"></div>
       <div class="ibs-logo"><span>IBS</span></div>
       <h1 id="p-title">Участник</h1>
       <span id="p-phase" class="phase-badge">…</span>
@@ -438,16 +436,16 @@ body{font-family:'Century Gothic',sans-serif;background:var(--g1);color:var(--g9
 // ═══════════════════════════════════════
 const G = Object.assign({}, GAME_CONFIG, {
   catColor: ['#2e5f8a','#1a7a5e','#7b3fa0','#c0392b'],
-  retColors:['#2e5f8a','#7b3fa0','#1a7a5e'],
+  retColors:['#2e5f8a','#7b3fa0','#1a7a5e','#8b5cf6'],
   events:[
     null,
     {t:'Промо-инициатива',d:'Спрос на снеки вырос до 110. Промо-буст ×1.5 — только при скидке производителя ≥10% и включённом промо.'},
     {t:'⚠️ ДВОЙНОЙ ШОК — вскрыть внезапно',d:'Мощность перевозчика: 320→200 | Квота Импорта: 70→30 | Спрос на молочку→130, на деликатесы→25. Команды приоритизируют поставки.'},
     {t:'Стабилизация',d:'Рынок восстанавливается. Молочка=115, Снеки=90, Деликатесы=35. Восстановите сервис и маржу.'},
   ],
-  phaseName:{lobby:'Лобби',roles:'Распределение ролей',briefing:'Брифинг',negotiation:'Переговоры',decisions:'Ввод решений',results:'Итоги тура',final:'Финал'},
+  phaseName:{lobby:'Лобби',roles:'Распределение ролей',briefing:'Брифинг',negotiation:'Переговоры',decisions:'Решения',results:'Расчёт',final:'Финал'},
   CHARS:{'Жёсткий':{ico:'🦁',clr:'#e74c3c'},'Кооперативный':{ico:'🤝',clr:'#27ae60'},'Хитрый':{ico:'🦊',clr:'#f39c12'},'Упрямый':{ico:'😤',clr:'#e8522a'},'Аналитик':{ico:'📊',clr:'#2e5f8a'}},
-  type:t=>['R1','R2','R3','R4'].includes(t)?'ret':['S1','S2','S3','S4'].includes(t)?'sup':'dist',
+  type:t=>GAME_CONFIG.retIds.includes(t)?'ret':GAME_CONFIG.supIds.includes(t)?'sup':'dist',
   roleData:{
     R1:{name:'Дискаунтер',roles:['Коммерческий директор','Директор по логистике','Финансовый директор'],
         kpis:['Маржа ≥ стандарт','OSA ≥ 85%','Минимум дефицита'],secrets:['Агрессивная цена бьёт по марже — не увлекайтесь без договорённости','OSA критична: дефицит = потеря лояльности','Следите за R4: лучше недозаказать']},
@@ -527,6 +525,15 @@ let timerInt = null;
 let mySubmitted = false;
 let myDecData = null; // my current form data (team only)
 
+// ── Устойчивость связи: авто-reconnect + восстановление сессии ──
+let creds = null;             // { role, teamId, name, password } — для переподключения
+let reconnectTimer = null;
+let reconnectDelay = 1000;    // backoff 1s → 5s
+let manualClose = false;      // true при auth-ошибке/reset → не переподключаться
+const SESS_KEY = 'fmcg_play';
+function saveCreds(c)  { try { sessionStorage.setItem(SESS_KEY, JSON.stringify(c)); } catch(e){} }
+function clearCreds()  { creds = null; try { sessionStorage.removeItem(SESS_KEY); } catch(e){} }
+
 // ═══════════════════════════════════════
 // LOGIN
 // ═══════════════════════════════════════
@@ -546,6 +553,19 @@ let selTeamVal = '';
     tp.appendChild(b);
   });
   selRole('team');
+})();
+
+// Авто-восстановление сессии после перезагрузки/случайного закрытия вкладки.
+// creds в sessionStorage → молча переподключаемся, не заставляя выбирать команду заново.
+;(function tryResume(){
+  let saved = null;
+  try { saved = JSON.parse(sessionStorage.getItem(SESS_KEY) || 'null'); } catch(e){}
+  if (saved && saved.role) {
+    Object.assign(me, { role:saved.role, teamId:saved.teamId, name:saved.name });
+    creds = saved; manualClose = false; reconnectDelay = 1000;
+    document.getElementById('login-status').textContent = 'Восстановление сессии…';
+    openSocket();
+  }
 })();
 
 function selRole(r) {
@@ -577,22 +597,68 @@ function doLogin() {
 // WEBSOCKET
 // ═══════════════════════════════════════
 function connectWS(role, teamId, name, password) {
+  creds = { role, teamId, name, password };
+  saveCreds(creds);            // переживает перезагрузку вкладки (sessionStorage — без кросс-табного затирания)
+  manualClose = false;
+  reconnectDelay = 1000;
+  openSocket();
+}
+
+function openSocket() {
+  if (!creds) return;
   const proto = location.protocol==='https:'?'wss:':'ws:';
   wsock = new WebSocket(`${proto}//${location.host}`);
 
   wsock.onopen = () => {
+    reconnectDelay = 1000;
     document.getElementById('login-status').textContent = 'Авторизация…';
-    wsock.send(JSON.stringify({type:'join',role,teamId,name,password}));
+    wsock.send(JSON.stringify({type:'join', ...creds}));
     setConnDot(true);
+    hideReconnBanner();
   };
   wsock.onmessage = e => { try{ onMsg(JSON.parse(e.data)); }catch(ex){ console.error(ex); } };
-  wsock.onclose = () => { setConnDot(false); showConnLost(); };
+  wsock.onclose = (evt) => {
+    setConnDot(false);
+    if (evt && evt.code === 4001) {   // гейт отклонил WS (истёк доступ) — не сеть, а авторизация
+      manualClose = true; clearCreds(); location.href = '/login.html'; return;
+    }
+    if (manualClose || !creds) { showConnLost(); return; }
+    scheduleReconnect();       // разрыв связи (сон, WiFi, рестарт сервера) → переподключаемся сами
+  };
   wsock.onerror = () => { setConnDot(false); };
 }
 
+function scheduleReconnect() {
+  if (reconnectTimer) return;
+  if (gs) showReconnBanner();  // уже в игре → оверлей поверх экрана
+  else document.getElementById('login-status').textContent = 'Переподключение…';
+  reconnectTimer = setTimeout(() => {
+    reconnectTimer = null;
+    openSocket();
+    reconnectDelay = Math.min(Math.round(reconnectDelay * 1.5), 5000);
+  }, reconnectDelay);
+}
+
+function showReconnBanner() {
+  let b = document.getElementById('reconn-banner');
+  if (!b) {
+    b = document.createElement('div');
+    b.id = 'reconn-banner';
+    b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#ff9f0a;'
+      + 'color:#1d1d1f;text-align:center;padding:9px;font-weight:700;font-size:14px;'
+      + 'box-shadow:0 2px 12px rgba(0,0,0,.25)';
+    b.textContent = '⚠ Связь потеряна — переподключение…';
+    document.body.appendChild(b);
+  }
+  b.style.display = 'block';
+}
+function hideReconnBanner() { const b = document.getElementById('reconn-banner'); if (b) b.style.display = 'none'; }
+
 function setConnDot(on) {
   ['c-dot','t-dot','p-dot'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.classList.toggle('ok',on);
+    const el=document.getElementById(id); if(!el) return;
+    el.classList.toggle('ok',on);
+    el.setAttribute('aria-label', on ? 'Подключено' : 'Нет соединения');
   });
 }
 
@@ -619,6 +685,7 @@ function onMsg(msg) {
       render();
       break;
     case 'err':
+      manualClose = true; clearCreds();   // неверный пароль/код команды → не переподключаемся
       document.getElementById('login-err').textContent = msg.msg;
       document.getElementById('login-err').style.display = 'block';
       document.getElementById('login-status').textContent = '';
@@ -693,6 +760,7 @@ function onMsg(msg) {
       render();
       break;
     case 'reset':
+      manualClose = true; clearCreds();   // игра сброшена → чистый вход, без авто-rejoin
       location.reload();
       break;
   }
@@ -742,7 +810,9 @@ function renderAdminSidebar() {
   // Phase buttons
   document.querySelectorAll('.phase-btn').forEach(b => {
     const ph = b.getAttribute('onclick').match(/'(\w+)'/)?.[1];
-    b.classList.toggle('cur', ph===gs.phase);
+    const active = ph===gs.phase;
+    b.classList.toggle('cur', active);
+    b.setAttribute('aria-current', active ? 'step' : 'false');
   });
   // Teams
   const el = document.getElementById('a-teams');
@@ -868,13 +938,13 @@ function renderAdminBriefing(r) {
   h += `</div>
   <div class="card"><div class="card-t">Тайминг тура</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      ${['3 мин · Анонс','12 мин · Переговоры','7 мин · Решения','8 мин · Расчёт','5 мин · Итог']
+      ${['3 мин · Брифинг','5 мин · Совет команды','12 мин · Переговоры','7 мин · Решения','5 мин · Расчёт']
         .map(t=>`<button class="btn btn-S btn-sm" onclick="startTimer(${parseInt(t)})">⏱ ${t}</button>`).join('')}
     </div>
   </div>
   <div style="display:flex;gap:8px;margin-top:4px">
     <button class="btn btn-S" onclick="setPhase('negotiation')">🤝 Переговоры</button>
-    <button class="btn btn-P" onclick="setPhase('decisions')">📝 К решениям →</button>
+    <button class="btn btn-P" onclick="setPhase('decisions')">✏️ К решениям →</button>
   </div>`;
   return h;
 }
@@ -938,12 +1008,12 @@ function renderAdminDecisions(r) {
       h += `<div class="cat-row${asm?'':' off'}" id="cr-${ri}-${ci}">
         <div class="cat-rt">
           <span class="cat-nm" style="color:${G.catColor[ci]}">${cat} ${G.catNames[ci]}</span>
-          <label class="tgl"><input type="checkbox" id="a-${ri}-${ci}" ${asm?'checked':''} onchange="togRow(${ri},${ci})"><span class="tgl-s"></span></label>
+          <label class="tgl" aria-label="${cat} ${G.catNames[ci]} — включить в заказ"><input type="checkbox" id="a-${ri}-${ci}" ${asm?'checked':''} onchange="togRow(${ri},${ci})"><span class="tgl-s" aria-hidden="true"></span></label>
         </div>
         <div class="frow">
           <div class="fld"><label>Заказ</label><input type="number" id="o-${ri}-${ci}" value="${defOrd}" min="0"></div>
           <div class="fld"><label>Цена</label><select id="p-${ri}-${ci}">
-            <option value="0"${op(prc,0)}>Агрессивная</option><option value="1"${op(prc,1)}>Стандарт</option><option value="2"${op(prc,2)}>Премиальная</option>
+            <option value="0"${op(prc,0)}>Агрессивная</option><option value="1"${op(prc,1)}>Стандарт</option><option value="2"${op(prc,2)}>Премиальная</option><option value="3"${op(prc,3)}>Люкс</option>
           </select></div>
         </div>
         <div class="frow">
@@ -1028,7 +1098,7 @@ function renderAdminResults(r) {
   // Manual scores
   const teams = [...G.retIds,...G.supIds,'D'];
   h += `<div class="card"><div class="card-t">🎯 Оценки ведущего (0–100)</div>
-    <p style="font-size:12px;color:var(--g5);margin-bottom:4px">Качество переговоров, соблюдение договорённостей</p>
+    <p style="font-size:12px;color:var(--g5);margin-bottom:4px">Качество переговоров. Множитель бонуса здоровья: 80 — нейтрально (×1.0), 100 → ×1.25, 0 → ×0. Прибыль не трогает.</p>
     <div class="ms-grid">`;
   teams.forEach(tid=>{
     const sv = gs.manual?.[r]?.[tid]??80;
@@ -1048,8 +1118,8 @@ function renderAdminFinal() {
   const results = (gs.results||[]).filter(r=>r);
   if (!results.length) return `<div class="waiting"><div class="ico">📊</div><h3>Нет данных по турам</h3></div>`;
 
-  // Прибыль, служение, стабильность
-  const profit={}, service={}, cv={};
+  // Прибыль, вклад в здоровье (серверный), стабильность
+  const profit={}, contrib={}, cv={};
   G.allTeams.forEach(t=>profit[t]=0);
   results.forEach(res=>{
     G.retIds.forEach((_,ri)=>profit[G.retIds[ri]]+=res.retProfit?.[ri]||0);
@@ -1057,13 +1127,15 @@ function renderAdminFinal() {
     profit['D']+=res.dProfit||0;
   });
   G.allTeams.forEach(t=>{
-    const ri=G.retIds.indexOf(t),si=G.supIds.indexOf(t); let acc=0;
+    const ri=G.retIds.indexOf(t),si=G.supIds.indexOf(t);
+    // Архитектор — АВТОРИТЕТНЫЙ серверный вклад в здоровье (res.contrib), не локальная эвристика
+    contrib[t]=results.reduce((s,res)=>s+(res.contrib?.[t]||0),0)/results.length;
+    // Антихлыст — вариативность объёма по турам (CV)
     const series=results.map(res=>{
-      if(ri>=0){acc+=res.retOSA?.[ri]||0; return (res.def?.[ri]||[]).reduce((s,v)=>s+v,0)+(res.sold?.[ri]||[]).reduce((s,v)=>s+v,0);}
-      if(si>=0){const o=res.ordFromSup?.[si]||0; acc+= o>0?Math.min(1,(res.totDel?.[si]||0)/o):1; return res.totDel?.[si]||0;}
-      acc+= 1-Math.abs((res.dCoeff||0)-0.9); return res.totDelivered||0;
+      if(ri>=0) return (res.def?.[ri]||[]).reduce((s,v)=>s+v,0)+(res.sold?.[ri]||[]).reduce((s,v)=>s+v,0);
+      if(si>=0) return res.totDel?.[si]||0;
+      return res.totDelivered||0;
     });
-    service[t]=acc/results.length;
     const m=series.reduce((s,v)=>s+v,0)/series.length;
     const vv=series.reduce((s,x)=>s+(x-m)**2,0)/series.length;
     cv[t]= m>0?Math.sqrt(vv)/m:0;
@@ -1073,7 +1145,7 @@ function renderAdminFinal() {
   const grand=G.allTeams.reduce((a,b)=>scores[a]>=scores[b]?a:b);
   const retWin=G.retIds.reduce((a,b)=>profit[a]>profit[b]?a:b);
   const supWin=G.supIds.reduce((a,b)=>profit[a]>profit[b]?a:b);
-  const architect=G.allTeams.reduce((a,b)=>service[a]>=service[b]?a:b);
+  const architect=G.allTeams.reduce((a,b)=>contrib[a]>=contrib[b]?a:b);
   const antiwhip=G.allTeams.reduce((a,b)=>cv[a]<=cv[b]?a:b);
 
   let cDef=0,cOv=0,cWo=0;
@@ -1099,7 +1171,7 @@ function renderAdminFinal() {
   <div class="pg-h"><div class="pg-title">📊 Финальные итоги</div></div>
   <div class="g3 mb3">
     ${award('Гран-при','🏆',grand,`Счёт ${Math.round(scores[grand])} у.е.`,'#caa106')}
-    ${award('Архитектор цепочки','🤝',architect,`Служение ${f0(service[architect]*100)}%`,'#27ae60')}
+    ${award('Архитектор цепочки','🤝',architect,`Вклад в здоровье ${f0(contrib[architect]*100)}%`,'#27ae60')}
     ${award('Антихлыст','📉',antiwhip,`Стабильность CV ${f1(cv[antiwhip]*100)}%`,'#2e5f8a')}
   </div>
   <div class="winner"><div class="t">🏆</div><h2>Лучшие в категории</h2>
@@ -1215,6 +1287,15 @@ function renderHistCard() {
   return h;
 }
 
+// Детерминированный прогноз ±15% — игроки видят его вместо точного спроса до итогов
+function genForecast(r) {
+  const dem = G.demand[r], noise = 0.15;
+  return dem.map((d, ci) => {
+    const n = ((Math.sin((r*5+ci*7)*1.618)+1)/2 - 0.5) * noise;
+    return Math.round(d * (1 + n));
+  });
+}
+
 function renderTeamMain() {
   const r = gs.round, phase = gs.phase;
   const isSub = (gs.submitted||[]).includes(me.teamId);
@@ -1234,17 +1315,18 @@ function renderTeamMain() {
 
   if (phase==='briefing' || phase==='negotiation') {
     const ev = G.events[r];
-    const dem = G.demand[r], prev = r>0?G.demand[r-1]:null;
+    const fc = genForecast(r), fcp = r>0?genForecast(r-1):null;
     let h = renderMyRosterCard(false);
     h += `<div class="phase-info"><div class="pn">${G.roundNames[r]}</div>
       <div class="pd">${G.phaseName[phase]}</div></div>`;
     if (ev && phase==='briefing') h+=`<div class="evt"><div class="ico">🚨</div><div><h3>${ev.t}</h3><p>${ev.d}</p></div></div>`;
     if (r===0 && phase==='briefing') h += renderHistCard();
+    h += `<div style="font-size:12px;color:var(--g5);margin-bottom:6px;font-weight:500">📊 Прогноз рынка · ${G.roundNames[r]} <span style="font-weight:400">(оценка ±15% — точные данные появятся после итогов тура)</span></div>`;
     h += `<div class="dem-grid">`;
     G.catIds.forEach((cat,i)=>{
-      const chg=prev?dem[i]-prev[i]:0;const cls=chg>0?'up':chg<0?'dn':'';
+      const chg=fcp?fc[i]-fcp[i]:0;const cls=chg>0?'up':chg<0?'dn':'';
       h+=`<div class="dcard ${cls}"><div class="cn">${cat} ${G.catNames[i]}</div>
-        <div class="cv">${dem[i]}</div><div class="cc">${!prev?'—':chg>0?`▲ +${chg}`:chg<0?`▼ ${chg}`:'—'}</div></div>`;
+        <div class="cv">~${fc[i]}</div><div class="cc">${!fcp?'—':chg>0?`▲ +${chg}`:chg<0?`▼ ${chg}`:'—'}</div></div>`;
     });
     h += `</div>`;
     if (phase==='negotiation') h += `<div class="card"><div class="card-t">💬 Используйте панель «Переговоры» справа</div>
@@ -1414,7 +1496,7 @@ function renderTeamDecisionForm(r) {
       h+=`<div class="cat-row" id="t-cr-${ci}">
         <div class="cat-rt">
           <span class="cat-nm" style="color:${G.catColor[ci]}">${cat} ${G.catNames[ci]}</span>
-          <label class="tgl"><input type="checkbox" id="t-a-${ci}" checked onchange="togTeamRow(${ci})"><span class="tgl-s"></span></label>
+          <label class="tgl" aria-label="${cat} ${G.catNames[ci]} — включить в заказ"><input type="checkbox" id="t-a-${ci}" checked onchange="togTeamRow(${ci})"><span class="tgl-s" aria-hidden="true"></span></label>
         </div>
         ${badges.length?dealBadge(badges.join(' · ')):''}
         <div class="frow">
@@ -1458,6 +1540,19 @@ function renderTeamResult(res, r) {
   if (type==='dist') h+=`<div class="mi"><div class="ml">Перевезено</div><div class="mv">${f0(res.del)}</div></div>
     <div class="mi"><div class="ml">Загрузка</div><div class="mv">${f1(res.coeff*100)}%</div></div>`;
   h += `</div></div>`;
+
+  // Actual demand reveal — players see real numbers only after results
+  if (G.demand && G.demand[r]) {
+    const dem = G.demand[r], prev = r>0?G.demand[r-1]:null;
+    h += `<div class="card"><div class="card-t">📊 Фактический спрос · ${G.roundNames[r]}</div>
+      <div class="dem-grid">`;
+    G.catIds.forEach((cat,i)=>{
+      const chg=prev?dem[i]-prev[i]:0;const cls=chg>0?'up':chg<0?'dn':'';
+      h+=`<div class="dcard ${cls}"><div class="cn">${cat} ${G.catNames[i]}</div>
+        <div class="cv">${dem[i]}</div><div class="cc">${!prev?'—':chg>0?`▲ +${chg}`:chg<0?`▼ ${chg}`:'—'}</div></div>`;
+    });
+    h += `</div></div>`;
+  }
 
   // History
   const hist = (gs.history||[]).filter(x=>x);
@@ -1797,9 +1892,11 @@ function toggleSecret() {
 function renderDots(containerId, round) {
   const el = document.getElementById(containerId);
   if (!el) return;
+  el.setAttribute('aria-label', `Туры: текущий Тур ${round+1}`);
   el.innerHTML = [1,2,3,4].map(n=>{
     const cls = n===round+1?'cur':n<=round?'done':'';
-    return `<div class="rdot ${cls}">${n}</div>`;
+    const lbl = n===round+1?`Тур ${n} — текущий`:n<=round?`Тур ${n} — завершён`:`Тур ${n} — предстоит`;
+    return `<div class="rdot ${cls}" aria-label="${lbl}">${n}</div>`;
   }).join('');
 }
 
