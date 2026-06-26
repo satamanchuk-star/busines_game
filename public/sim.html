@@ -1071,7 +1071,7 @@ function genNarrative(tid, dec, res) {
 
   } else {
     const profit=res.dProfit, dCoeff=res.dCoeff, delivered=res.totDelivered;
-    lines.push(`Тариф <b>${f1(dec.tariff)} млн руб/ед.</b> Перевезено: <b>${f0(delivered)} ед.</b>`);
+    lines.push(`Тариф <b>${f0(dec.tariff*1000)} ₽/ед</b> Перевезено: <b>${f0(delivered)} ед.</b>`);
     if(dCoeff>=0.96) lines.push(`🔥 Загрузка <b>${f0(dCoeff*100)}%</b> — мощности на пределе.`);
     else if(dCoeff>=0.72) lines.push(`✅ Загрузка <b>${f0(dCoeff*100)}%</b> — штатная работа.`);
     else lines.push(`📉 Загрузка <b>${f0(dCoeff*100)}%</b> — значительный простой мощностей.`);
@@ -1181,7 +1181,7 @@ function renderEditor(r){
     <div class="wif-grp"><div class="wlbl">🏭 Производители — выпуск</div>
       <table class="wtbl"><tbody>${supRows}</tbody></table></div>
     <div class="wif-grp"><div class="wlbl">🚛 Перевозчик — тариф и мощность</div>
-      <table class="wtbl"><tbody><tr><td>${TEAM_ICO.D} ${SIM.names.D}</td><td colspan="2" style="text-align:left">тариф ${wNum('w-tariff',f1(dec.tariff))}</td><td colspan="2" style="text-align:left">мощность ${wNum('w-cap',f0(dec.distCap))}</td></tr></tbody></table></div>
+      <table class="wtbl"><tbody><tr><td>${TEAM_ICO.D} ${SIM.names.D}</td><td colspan="2" style="text-align:left">тариф ${wNum('w-tariff',f0(dec.tariff*1000))} ₽/ед</td><td colspan="2" style="text-align:left">мощность ${wNum('w-cap',f0(dec.distCap))}</td></tr></tbody></table></div>
     <div class="wif-actions">
       <button class="btn btn-P btn-sm" onclick="applyEdits(${r})">↻ Пересчитать тур</button>
       <button class="btn btn-S btn-sm" onclick="resetRoundAuto(${r})">⟲ Вернуть авто</button>
@@ -1196,7 +1196,7 @@ function applyEdits(r){
     P.catIds.forEach((_,ci)=>{ const c=dec.rets[ri][ci]; c.ord=Math.max(0,gv('ord-'+ri+'-'+ci)); c.prc=prc; c.prm=prm; c.asm=1; });
   });
   SUPS.forEach((_,si)=>{ dec.sups[si]=Math.max(0,gv('sup-'+si)); });
-  dec.tariff=Math.max(0,gv('w-tariff')); dec.distCap=Math.max(0,gv('w-cap'));
+  dec.tariff=Math.max(0,gv('w-tariff')/1000); dec.distCap=Math.max(0,gv('w-cap'));   // ₽/ед → коэф
   if(!SIM.edited) SIM.edited={}; SIM.edited[r]=true;
   recalcRound(r); renderRound(r);
 }
@@ -1779,7 +1779,7 @@ function renderInsights() {
   const dProfit=SIM.totals['D'];
   const chainPft=RETS.reduce((s,t)=>s+SIM.totals[t],0)+SUPS.reduce((s,t)=>s+SIM.totals[t],0);
   const distShare=dProfit/(dProfit+chainPft+1);
-  if(distShare>0.35) insights.push({lvl:'warn',h:'🚛 Перевозчик забрал слишком большую маржу',t:`Тариф ${f1(dTariff)} млн руб/ед. дал перевозчику <b>${f0(distShare*100)}%</b> всей прибыли цепочки. Высокий тариф урезал маржу производителей и магазинов.`});
+  if(distShare>0.35) insights.push({lvl:'warn',h:'🚛 Перевозчик забрал слишком большую маржу',t:`Тариф ${f0(dTariff*1000)} ₽/ед дал перевозчику <b>${f0(distShare*100)}%</b> всей прибыли цепочки. Высокий тариф урезал маржу производителей и магазинов.`});
 
   // Scenario-specific
   if(SIM.scenarioId==='ideal') insights.push({lvl:'good',h:'📐 Эффект координации',t:`В этом сценарии прибыль цепочки на <b>30-50%</b> выше хаотичных сценариев. Это «потенциал координации» — то, что теряется когда каждый оптимизирует себя.`});
@@ -1824,7 +1824,7 @@ function genNegDialogue(pair, r) {
   // Format helpers
   const fmtV = (v, type) => {
     if (type === 'dsc') return v!=null ? `скидка ${Math.round(v*100)}%` : 'скидка';
-    if (type === 'tar') return v!=null ? `тариф ${parseFloat(v).toFixed(1)} млн руб/ед.` : 'тариф';
+    if (type === 'tar') return v!=null ? `тариф ${Math.round(parseFloat(v)*1000)} ₽/ед` : 'тариф';
     return '';
   };
 

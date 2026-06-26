@@ -527,12 +527,14 @@ function teamParams(tid){
   } else if(G.supIds.includes(tid)){
     const si=G.supIds.indexOf(tid);
     p.push(['Мощность','до '+G.maxProd[si]+' ед./тур'+(si===3?' (в Туре 3 квота 30 ед.)':'')]);
-    p.push(['Себестоимость',G.cost[si]+' млн руб/ед. · отпускная база '+G.opt[si]+' млн руб']);
-    p.push(['Особенность', G.fresh[si]?'⚠️ Скоропорт — остаток списывается в убыток':'Долгий срок — остаток сохраняет 80% стоимости']);
+    p.push(['Себестоимость', (G.cost[si]*1000)+' ₽/ед']);
+    p.push(['Отпускная (закупочная)', (G.opt[si]*1000)+' ₽/ед']);
+    p.push(['Рекоменд. розничная', (G.rosn[si]*1000)+' ₽/ед']);
+    p.push(['Особенность', G.fresh[si]?'⚠️ Скоропорт — остаток списывается в убыток':'Долгий срок — остаток переносится в след. тур']);
   } else {
     p.push(['Мощность доставки', G.distCap[0]+' ед./тур (в Туре 3 — '+G.distCap[2]+' ед.)']);
-    p.push(['Себестоимость перевозки','0.8 млн руб/ед.']);
-    p.push(['Тариф','диапазон 1.0–3.0 млн руб/ед., старт 1.5']);
+    p.push(['Себестоимость перевозки', (G.tCost*1000)+' ₽/ед']);
+    p.push(['Тариф (базовый)', 'диапазон '+(1*1000)+'–'+(3*1000)+' ₽/ед, старт '+(1.5*1000)]);
   }
   return p;
 }
@@ -557,7 +559,7 @@ function renderRoleEcon(r){
           <div style="font-size:11px;color:var(--g5)">${c}${G.fresh[ci]?' 🧊':''}</div>
           <div style="font-size:18px;font-weight:700;color:${inv[ci]>0?'var(--A)':'var(--g5)'}">${inv[ci]}</div></div>`).join('')}
         </div>
-        <div style="font-size:11px;color:var(--g5);margin-top:6px">Запас продаётся вместе с новыми поставками — можно заказать меньше. Хранение −1 млн руб/ед. Скоропорт (🧊) не переносится.</div></div>`;
+        <div style="font-size:11px;color:var(--g5);margin-top:6px">Запас продаётся вместе с новыми поставками — можно заказать меньше. Хранение −${G.hCost*1000} ₽/ед за тур. Скоропорт (🧊) не переносится.</div></div>`;
     }
     const PN=['Агрессивная','Стандарт','Премиальная','Люкс'];
     h+=`<div class="card"><div class="card-t">🏷️ Ценовые уровни (множители)</div>
@@ -1125,8 +1127,8 @@ function renderAdminDecisions(r) {
   const tarV = dSub ? (dDist.tariff ?? '') : '', capV = dSub ? (dDist.distCap ?? '') : '';
   h += `<div class="dist-bar">
     <h4>🚛 ${gs.names['D']}${dec['D']?' <span class="sub-ok">✓</span>':''}</h4>
-    <div class="fld" style="min-width:120px"><label>Тариф млн руб/ед.</label>
-      <input type="number" id="d-tar" value="${tarV}" placeholder="напр. 1.5" min="1" max="3" step="0.1"></div>
+    <div class="fld" style="min-width:120px"><label>Тариф ₽/ед</label>
+      <input type="number" id="d-tar" value="${tarV===''?'':tarV*1000}" placeholder="напр. 1500" min="1000" max="3000" step="50"></div>
     <div class="fld" style="min-width:120px"><label>Мощность ед.</label>
       <input type="number" id="d-cap" value="${capV}" placeholder="до ${dc}" min="0" max="500"></div>
     <div style="font-size:12px;color:var(--g5)">Маржа = (тариф − 0.8) × объём</div>
@@ -1248,7 +1250,7 @@ function renderAdminResults(r) {
   // Dist kpi
   h += `<div class="card mb3"><div class="card-t">🚛 ${G.LBL['D']} · ${gs.names['D']}</div>
     <div class="kpi-grid">
-      <div class="kpi kpi-n"><div class="kl">Тариф</div><div class="kv">${f1(res.tariff||1.5)}</div><div class="ks">млн руб/ед.</div></div>
+      <div class="kpi kpi-n"><div class="kl">Тариф</div><div class="kv">${f0((res.tariff||1.5)*1000)}</div><div class="ks">₽/ед</div></div>
       <div class="kpi kpi-n"><div class="kl">Перевезено</div><div class="kv">${f0(res.totDelivered)}</div><div class="ks">ед.</div></div>
       <div class="kpi ${res.dCoeff>=.95?'kpi-ok':res.dCoeff>=.7?'kpi-wn':'kpi-bad'}">
         <div class="kl">Загрузка</div><div class="kv">${f1(res.dCoeff*100)}%</div></div>
@@ -1382,7 +1384,7 @@ function fillTeamSection(teamId, data) {
     });
   }
   if (teamId==='D') {
-    const tEl=document.getElementById('d-tar'); if(tEl&&data.tariff!=null) tEl.value=data.tariff;
+    const tEl=document.getElementById('d-tar'); if(tEl&&data.tariff!=null) tEl.value=data.tariff*1000;
     const cEl=document.getElementById('d-cap'); if(cEl&&data.distCap!=null) cEl.value=data.distCap;
   }
 }
@@ -1603,17 +1605,17 @@ function renderTeamDecisionForm(r) {
   if (isDist) {
     const dc = G.distCap[r];
     const tarDeal = lastDeal(a=>a.structured.type==='tariff');
-    const tarVal = tarDeal ? tarDeal.structured.value : 1.5;
+    const tarVal = tarDeal ? tarDeal.structured.value : 1500;   // ₽/ед
     const prioDeals = myAgrs.filter(a=>a.structured.type==='priority');
     h += `<div class="card"><div class="card-t">🚛 ${G.LBL['D']} · ${gs.names['D']}</div>
       ${tarDeal?dealBadge(dealDesc(tarDeal.structured)):''}
-      <div class="frow"><div class="fld"><label>Тариф (млн руб/ед.)</label>
-        <input type="number" id="t-tar" value="${tarVal}" min="1" max="3" step="0.1"></div>
+      <div class="frow"><div class="fld"><label>Тариф (₽/ед)</label>
+        <input type="number" id="t-tar" value="${tarVal}" min="1000" max="3000" step="50"></div>
       <div class="fld"><label>Мощность (ед.)</label>
         <input type="number" id="t-cap" value="${dc}" min="0" max="500"></div></div>
       ${prioDeals.length?`<div style="font-size:11px;color:#166534;margin-top:6px">🤝 Приоритеты: ${prioDeals.map(a=>`${G.LBL[a.from===tid?a.to:a.from]} (${a.structured.value} ед.)`).join(', ')}</div>`:''}
       <p style="font-size:12px;color:var(--g5);margin-top:6px">
-        Диапазон тарифа: 1.0–3.0 млн руб/ед. Себест. перевозки: 0.8 млн руб/ед.${r===2?' ⚠️ Мощность ограничена!':''}</p>
+        Диапазон тарифа: 1000–3000 ₽/ед. Себест. перевозки: 800 ₽/ед.${r===2?' ⚠️ Мощность ограничена!':''}</p>
     </div>`;
   }
 
@@ -1927,7 +1929,7 @@ function submitTeamDecision() {
 
   if (isDist) {
     data = {
-      tariff: parseFloat(document.getElementById('t-tar')?.value)||1.5,
+      tariff: (parseFloat(document.getElementById('t-tar')?.value)||1500)/1000,   // ₽/ед → коэф. движка
       distCap: parseFloat(document.getElementById('t-cap')?.value)||G.distCap[r],
     };
   }
@@ -1954,7 +1956,7 @@ function submitTeamDecision() {
 const DEAL_TYPES = {
   discount:{label:'Скидка %',      vlabel:'Скидка, %',         cat:true,  unit:'%'},
   volume:  {label:'Объём ед.',     vlabel:'Объём, ед.',        cat:true,  unit:' ед.'},
-  tariff:  {label:'Тариф млн руб/ед.',vlabel:'Тариф, млн руб/ед.',   cat:false, unit:' млн руб/ед.'},
+  tariff:  {label:'Тариф ₽/ед',vlabel:'Тариф, ₽/ед',   cat:false, unit:' ₽/ед'},
   priority:{label:'Приоритет ед.', vlabel:'Приоритет в доставке, ед.', cat:false, unit:' ед.'},
 };
 // с кем эта команда может вести переговоры (по цепочке, как на карте)
@@ -1977,7 +1979,7 @@ function dealDesc(s){
   if(!s) return '';
   if(s.type==='discount') return `Скидка ${s.value}% на «${s.category}»`;
   if(s.type==='volume')   return `Объём ${s.value} ед. «${s.category}»`;
-  if(s.type==='tariff')   return `Тариф ${s.value} млн руб/ед.`;
+  if(s.type==='tariff')   return `Тариф ${s.value} ₽/ед`;
   if(s.type==='priority') return `Приоритет в доставке ${s.value} ед.`;
   return '';
 }
@@ -2030,7 +2032,7 @@ function renamTeam(tid, name) { ws_send({type:'rename',teamId:tid,name}); }
 
 function adminCalculate() {
   const r = gs.round;
-  const tariff = parseFloat(document.getElementById('d-tar')?.value)||1.5;
+  const tariff = (parseFloat(document.getElementById('d-tar')?.value)||1500)/1000;   // ₽/ед → коэф. движка
   const distCap = parseFloat(document.getElementById('d-cap')?.value)||G.distCap[r];
   const sups = G.supIds.map((_,si)=>parseFloat(document.getElementById(`sp-${si}`)?.value)||0);
   const rets = G.retIds.map((_,ri)=>G.catIds.map((_,ci)=>({
