@@ -111,6 +111,11 @@ body{font-family:'Onest',sans-serif;background:var(--g1);color:var(--g9);min-hei
 .pg-sub{color:var(--g5);font-size:13px;margin-top:3px}
 /* ── Demand ── */
 .dem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.hist-tbl{width:100%;font-size:12px;border-collapse:collapse}
+.hist-tbl th{color:var(--g5);text-align:left;font-weight:600;padding:4px 8px 6px 0}
+.hist-tbl td{padding:4px 8px 4px 0;color:var(--g9)}
+.hist-tbl tbody tr+tr td{border-top:1px solid var(--g2)}
+.hist-tbl td:first-child,.hist-tbl th:first-child{color:var(--g5)}
 .dcard{background:var(--W);border-radius:var(--r);padding:13px 15px;border-left:4px solid var(--g3);box-shadow:var(--sh)}
 .dcard.up{border-left-color:var(--OK)}.dcard.dn{border-left-color:var(--BD)}
 .dcard .cn{font-size:11px;color:var(--g5);margin-bottom:3px}
@@ -1656,6 +1661,39 @@ function renderTeamDecisionForm(r) {
   return h;
 }
 
+// Ролевая история спроса (НЕ общая рыночная): из gs.results, накапливается по турам.
+// Ритейлер — свой спрос по категориям; поставщик/дистрибьютор — разрез ритейлер↔поставщик.
+function histCard(title, head, rows){
+  return `<div class="card"><div class="card-t">${title}</div>
+    <table class="hist-tbl"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function renderDemandHistory(r){
+  const tid=me.teamId, ri=G.retIds.indexOf(tid), si=G.supIds.indexOf(tid);
+  const res=(gs.results||[]); const tours=[]; for(let t=0;t<=r;t++){ if(res[t]) tours.push(t); }
+  if(!tours.length) return '';
+  const num=v=>Math.round(v||0);
+  if(ri>=0){
+    const head=`<th>Тур</th>${G.catIds.map(c=>`<th>${c}</th>`).join('')}`;
+    const rows=tours.map(t=>{ const R=res[t];
+      const dem=G.catIds.map((c,ci)=>num((R.sold?.[ri]?.[ci]||0)+(R.def?.[ri]?.[ci]||0)));
+      return `<tr><td>Т${t+1}</td>${dem.map(v=>`<td>${v}</td>`).join('')}</tr>`; }).join('');
+    return histCard('📊 Ваш спрос по категориям (накопительно)', head, rows);
+  }
+  if(si>=0){
+    const head=`<th>Тур</th>${G.retIds.map(t=>`<th>${G.LBL[t]}</th>`).join('')}<th>Итого</th>`;
+    const rows=tours.map(t=>{ const R=res[t];
+      const col=G.retIds.map((_,rri)=>num(R.del?.[rri]?.[si]||0)); const tot=col.reduce((s,v)=>s+v,0);
+      return `<tr><td>Т${t+1}</td>${col.map(v=>`<td>${v}</td>`).join('')}<td><b>${tot}</b></td></tr>`; }).join('');
+    return histCard('📊 Заказы магазинов вам (накопительно)', head, rows);
+  }
+  // дистрибьютор: перевезено по магазинам (сумма по строке матрицы del)
+  const head=`<th>Тур</th>${G.retIds.map(t=>`<th>${G.LBL[t]}</th>`).join('')}<th>Итого</th>`;
+  const rows=tours.map(t=>{ const R=res[t];
+    const per=G.retIds.map((_,rri)=>num((R.del?.[rri]||[]).reduce((s,v)=>s+(v||0),0))); const tot=per.reduce((s,v)=>s+v,0);
+    return `<tr><td>Т${t+1}</td>${per.map(v=>`<td>${v}</td>`).join('')}<td><b>${tot}</b></td></tr>`; }).join('');
+  return histCard('📊 Перевезено по магазинам (накопительно)', head, rows);
+}
+
 function renderTeamResult(res, r) {
   const type = res.type;
   let profit = 0, osa = 0, extra = '';
@@ -1679,18 +1717,8 @@ function renderTeamResult(res, r) {
     <div class="mi"><div class="ml">Загрузка</div><div class="mv">${f1(res.coeff*100)}%</div></div>`;
   h += `</div></div>`;
 
-  // Actual demand reveal — players see real numbers only after results
-  if (G.demand && G.demand[r]) {
-    const dem = G.demand[r], prev = r>0?G.demand[r-1]:null;
-    h += `<div class="card"><div class="card-t">📊 Фактический спрос · ${G.roundNames[r]}</div>
-      <div class="dem-grid">`;
-    G.catIds.forEach((cat,i)=>{
-      const chg=prev?dem[i]-prev[i]:0;const cls=chg>0?'up':chg<0?'dn':'';
-      h+=`<div class="dcard ${cls}"><div class="cn">${cat} ${G.catNames[i]}</div>
-        <div class="cv">${dem[i]}</div><div class="cc">${!prev?'—':chg>0?`▲ +${chg}`:chg<0?`▼ ${chg}`:'—'}</div></div>`;
-    });
-    h += `</div></div>`;
-  }
+  // Ролевая история спроса (своя, накопительно) — вместо общего рыночного спроса
+  h += renderDemandHistory(r);
 
   // History
   const hist = (gs.history||[]).filter(x=>x);

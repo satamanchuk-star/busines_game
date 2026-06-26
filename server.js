@@ -264,6 +264,7 @@ function pubResult(res) {
            retOSA:res.retOSA, totDel:res.totDel, ordFromSup:res.ordFromSup,
            totDelivered:res.totDelivered, dCoeff:res.dCoeff, tariff:res.tariff,
            sold:res.sold, def:res.def, over:res.over, woff:res.woff, unsold:res.unsold,
+           del:res.del,   // матрица поставок [ритейлер][поставщик] — для ролевой истории спроса
            health:res.health, scores:res.scores, contrib:res.contrib, vol:res.vol,
            penalties:res.penalties };
 }
