@@ -1051,8 +1051,8 @@ function genNarrative(tid, dec, res) {
     } else if(totalDef>5) lines.push(`🟡 Небольшой дефицит <b>${f0(totalDef)} ед.</b>`);
     else lines.push(`✅ Полки заполнены, дефицит минимален.`);
 
-    if(totalWoff>2) lines.push(`🗑 Молочка/Фреш: <b>${f0(totalWoff)} ед.</b> испортилось и списано — потери ${f0(totalWoff*P.cost[1])} у.е.`);
-    else if(totalOver>15) lines.push(`📦 Перезаказ <b>${f0(totalOver)} ед.</b> — холдинг ${f0(totalOver*P.hCost)} у.е.`);
+    if(totalWoff>2) lines.push(`🗑 Молочка/Фреш: <b>${f0(totalWoff)} ед.</b> испортилось и списано — потери ${f0(totalWoff*P.cost[1])} млн руб`);
+    else if(totalOver>15) lines.push(`📦 Перезаказ <b>${f0(totalOver)} ед.</b> — холдинг ${f0(totalOver*P.hCost)} млн руб`);
     return {lines, osa, profit};
 
   } else if (SUPS.includes(tid)) {
@@ -1065,13 +1065,13 @@ function genNarrative(tid, dec, res) {
     if(fr>=0.96) lines.push(`✅ Fill-rate <b>${f0(fr*100)}%</b> — заказы выполнены.`);
     else if(fr>=0.78) lines.push(`🟡 Fill-rate <b>${f0(fr*100)}%</b> — нехватка ${f0(ord-del)} ед.`);
     else lines.push(`🔴 Fill-rate <b>${f0(fr*100)}%</b> — дефицит ${f0(ord-del)} ед. у ритейлеров.`);
-    if(isFr&&unsold>3) lines.push(`🗑 <b>${f0(unsold)} ед. Fresh</b> списано — убыток ${f0(unsold*P.cost[si])} у.е.`);
+    if(isFr&&unsold>3) lines.push(`🗑 <b>${f0(unsold)} ед. Fresh</b> списано — убыток ${f0(unsold*P.cost[si])} млн руб`);
     else if(!isFr&&unsold>12) lines.push(`📦 Остаток <b>${f0(unsold)} ед.</b> на складе.`);
     return {lines, osa:fr, profit};
 
   } else {
     const profit=res.dProfit, dCoeff=res.dCoeff, delivered=res.totDelivered;
-    lines.push(`Тариф <b>${f1(dec.tariff)} у.е./ед.</b> Перевезено: <b>${f0(delivered)} ед.</b>`);
+    lines.push(`Тариф <b>${f1(dec.tariff)} млн руб/ед.</b> Перевезено: <b>${f0(delivered)} ед.</b>`);
     if(dCoeff>=0.96) lines.push(`🔥 Загрузка <b>${f0(dCoeff*100)}%</b> — мощности на пределе.`);
     else if(dCoeff>=0.72) lines.push(`✅ Загрузка <b>${f0(dCoeff*100)}%</b> — штатная работа.`);
     else lines.push(`📉 Загрузка <b>${f0(dCoeff*100)}%</b> — значительный простой мощностей.`);
@@ -1107,7 +1107,7 @@ function genTeachMoment(r, res) {
   if(totalOver>30) moments.push({lvl:'warn',ico:'📦',t:'Перезапас в системе',
     d:`<b>${f0(totalOver)} ед.</b> лишнего товара заморозили деньги. Цепочка работала неэффективно.`});
   if(totalWoff>8) moments.push({lvl:'crit',ico:'🗑',t:'Списания скоропорта',
-    d:`<b>${f0(totalWoff)} ед.</b> Молочки и Фреша испортилось и выброшено. Стоимость: ${f0(totalWoff*P.cost[1])} у.е.`});
+    d:`<b>${f0(totalWoff)} ед.</b> Молочки и Фреша испортилось и выброшено. Стоимость: ${f0(totalWoff*P.cost[1])} млн руб`});
   if(dCoeff<0.65) moments.push({lvl:'warn',ico:'🚛',t:'Узкое место — логистика',
     d:`Перевозчик загружен на <b>${f0(dCoeff*100)}%</b>. Ограничение мощностей стало главной причиной дефицита.`});
   if(moments.length===0) moments.push({lvl:'good',ico:'✅',t:'Тур прошёл без критических проблем',
@@ -1403,7 +1403,7 @@ function renderRound(r) {
       </div>
       <div class="tc-lines">${narr.lines.map(l=>`<span>${l}</span>`).join('')}</div>
       <div class="pb-row"><span class="pb-lbl">Прибыль</span>
-        <span class="pb-val ${pc}">${p>=0?'+':''}${f0(p)} у.е.</span></div>
+        <span class="pb-val ${pc}">${p>=0?'+':''}${f0(p)} млн руб</span></div>
       <div class="pb-track"><div class="pb-fill" id="pbf-${r}-${tid}" style="width:0%;background:${bc}"></div></div>
     </div>`;
   }).join('');
@@ -1421,7 +1421,7 @@ function renderRound(r) {
     <div class="ckpi"><div class="cl">Списания</div><div class="cv ${totalWoff>5?'bad':totalWoff>1?'wn':'ok'}">${f0(totalWoff)}</div></div>
     <div class="ckpi"><div class="cl">Дист. загр.</div><div class="cv ${res.dCoeff>=.9?'ok':res.dCoeff>=.65?'wn':'bad'}">${f0(res.dCoeff*100)}%</div></div>
     <div class="ckpi" style="grid-column:1/-1;background:${hexA(sc.color,.12)};border:1px solid ${hexA(sc.color,.4)}">
-      <div class="cl">❤️ Здоровье цепочки (фонд ${f0(H*BONUS_FUND)} у.е. × вклад команды)</div>
+      <div class="cl">❤️ Здоровье цепочки (фонд ${f0(H*BONUS_FUND)} млн руб × вклад команды)</div>
       <div class="cv ${H>=.75?'ok':H>=.5?'wn':'bad'}">${f0(H*100)}%</div></div>
   `;
 
@@ -1521,9 +1521,9 @@ function renderAnalytics() {
   const retWin=RETS.reduce((a,b)=>SIM.totals[a]>SIM.totals[b]?a:b);
   const supWin=SUPS.reduce((a,b)=>SIM.totals[a]>SIM.totals[b]?a:b);
   document.getElementById('an-winners').innerHTML=`
-    <div class="wcard"><div class="wt">🛒 Ритейлер</div><div class="wn">${SIM.names[retWin]}</div><div class="ws">${LBL[retWin]} · ${f0(SIM.totals[retWin])} у.е.</div></div>
-    <div class="wcard"><div class="wt">🏭 Поставщик</div><div class="wn">${SIM.names[supWin]}</div><div class="ws">${LBL[supWin]} · ${f0(SIM.totals[supWin])} у.е.</div></div>
-    <div class="wcard" style="border-color:var(--PU)"><div class="wt">🚛 Дистрибьютор</div><div class="wn">${SIM.names['D']}</div><div class="ws">${LBL['D']} · ${f0(SIM.totals['D'])} у.е.</div></div>
+    <div class="wcard"><div class="wt">🛒 Ритейлер</div><div class="wn">${SIM.names[retWin]}</div><div class="ws">${LBL[retWin]} · ${f0(SIM.totals[retWin])} млн руб</div></div>
+    <div class="wcard"><div class="wt">🏭 Поставщик</div><div class="wn">${SIM.names[supWin]}</div><div class="ws">${LBL[supWin]} · ${f0(SIM.totals[supWin])} млн руб</div></div>
+    <div class="wcard" style="border-color:var(--PU)"><div class="wt">🚛 Дистрибьютор</div><div class="wn">${SIM.names['D']}</div><div class="ws">${LBL['D']} · ${f0(SIM.totals['D'])} млн руб</div></div>
   `;
 
   // Awards + score
@@ -1569,7 +1569,7 @@ function renderAwards() {
     <div class="aw-nm">${LBL[tid]} · ${SIM.names[tid]}</div>
     <div class="aw-s">${sub}</div></div>`;
   document.getElementById('an-awards').innerHTML=
-    card('Гран-при','🏆',grand,`Итоговый счёт ${f0(SIM.scores[grand])} у.е.`,'#ffd700')+
+    card('Гран-при','🏆',grand,`Итоговый счёт ${f0(SIM.scores[grand])} млн руб`,'#ffd700')+
     card('Архитектор цепочки','🤝',architect,`Вклад в здоровье ${f0(service[architect]*100)}%`,'#34c759')+
     card('Антихлыст','📉',antiwhip,`Самый стабильный объём (CV ${f1(cv[antiwhip]*100)}%)`,'#3d6cb5');
 }
@@ -1580,7 +1580,7 @@ function renderScoreChart() {
   document.getElementById('chart-score').innerHTML=
     `<div style="font-size:10px;color:var(--W3);margin-bottom:10px">
        <span style="color:var(--OK)">▰</span> личная прибыль ·
-       <span style="color:var(--PU)">▰</span> бонус здоровья (фонд ${BONUS_FUND} у.е./тур × H × личный вклад) ·
+       <span style="color:var(--PU)">▰</span> бонус здоровья (фонд ${BONUS_FUND} млн руб/тур × H × личный вклад) ·
        <span style="color:var(--BD)">▰</span> убыток</div>`+
     sorted.map((tid,i)=>{
       const pf=SIM.totals[tid], bonus=SIM.bonuses[tid];
@@ -1772,7 +1772,7 @@ function renderInsights() {
   const dProfit=SIM.totals['D'];
   const chainPft=RETS.reduce((s,t)=>s+SIM.totals[t],0)+SUPS.reduce((s,t)=>s+SIM.totals[t],0);
   const distShare=dProfit/(dProfit+chainPft+1);
-  if(distShare>0.35) insights.push({lvl:'warn',h:'🚛 Перевозчик забрал слишком большую маржу',t:`Тариф ${f1(dTariff)} у.е./ед. дал перевозчику <b>${f0(distShare*100)}%</b> всей прибыли цепочки. Высокий тариф урезал маржу производителей и магазинов.`});
+  if(distShare>0.35) insights.push({lvl:'warn',h:'🚛 Перевозчик забрал слишком большую маржу',t:`Тариф ${f1(dTariff)} млн руб/ед. дал перевозчику <b>${f0(distShare*100)}%</b> всей прибыли цепочки. Высокий тариф урезал маржу производителей и магазинов.`});
 
   // Scenario-specific
   if(SIM.scenarioId==='ideal') insights.push({lvl:'good',h:'📐 Эффект координации',t:`В этом сценарии прибыль цепочки на <b>30-50%</b> выше хаотичных сценариев. Это «потенциал координации» — то, что теряется когда каждый оптимизирует себя.`});
@@ -1817,7 +1817,7 @@ function genNegDialogue(pair, r) {
   // Format helpers
   const fmtV = (v, type) => {
     if (type === 'dsc') return v!=null ? `скидка ${Math.round(v*100)}%` : 'скидка';
-    if (type === 'tar') return v!=null ? `тариф ${parseFloat(v).toFixed(1)} у.е./ед.` : 'тариф';
+    if (type === 'tar') return v!=null ? `тариф ${parseFloat(v).toFixed(1)} млн руб/ед.` : 'тариф';
     return '';
   };
 
@@ -1958,7 +1958,7 @@ function animSession(sess, si, done) {
           if (sess.outcome.type === 'dsc')
             label = `✅ скидка ${Math.round(sess.outcome.val*100)}%`;
           else if (sess.outcome.type === 'tar')
-            label = `✅ тариф ${parseFloat(sess.outcome.val).toFixed(1)} у.е.`;
+            label = `✅ тариф ${parseFloat(sess.outcome.val).toFixed(1)} млн руб`;
         }
         outEl.textContent = label;
       } else {

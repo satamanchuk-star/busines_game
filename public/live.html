@@ -94,11 +94,12 @@ body{font-family:'Onest',sans-serif;background:var(--bg);color:var(--ink);
 .sub-section{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:13px 15px}
 .sub-title{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--ink3);
   font-weight:600;margin-bottom:10px}
-.sub-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:7px}
-.sub-cell{border-radius:8px;padding:9px 7px;text-align:center;
+.sub-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:8px}
+.sub-cell{border-radius:8px;padding:11px 9px;text-align:center;min-height:62px;
+  display:flex;flex-direction:column;justify-content:center;
   border:1px solid var(--line);background:var(--panel2);transition:all .3s}
-.sub-cell .tn{font-size:11px;color:var(--ink2);margin-bottom:4px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+.sub-cell .tn{font-size:12px;color:var(--ink2);margin-bottom:5px;
+  line-height:1.25;font-weight:600;word-break:break-word}
 .sub-cell .ts{font-size:9px;font-weight:700;border-radius:4px;padding:2px 6px;
   margin-top:3px;display:inline-block}
 .sub-cell.wait .ts{background:var(--line2);color:var(--ink3)}
@@ -593,7 +594,7 @@ function renderResults(r){
     `<div class="health-banner ${hCls}">
       <div style="font-size:28px">❤️</div>
       <div style="flex:1">
-        <div style="font-size:12px;color:var(--ink2)">Здоровье цепочки за тур · фонд ${f0(H*250)} у.е. × личный вклад</div>
+        <div style="font-size:12px;color:var(--ink2)">Здоровье цепочки за тур · фонд ${f0(H*250)} млн руб × личный вклад</div>
         <div class="hv ${H>=.75?'ok':H>=.5?'wn':'bad'}">${f0(H*100)}%</div>
       </div>
       <div style="font-size:11px;color:var(--ink2);max-width:260px">
@@ -705,7 +706,7 @@ function renderFinal(){
 
   return `<div style="text-align:center;font-size:26px;font-weight:800;color:var(--ink);margin-bottom:10px">🏆 Итоги игры</div>
   <div class="awards-row">
-    ${award('Гран-при','🏆',grand,`Счёт ${Math.round(scores[grand])} у.е.`,'#d97706')}
+    ${award('Гран-при','🏆',grand,`Счёт ${Math.round(scores[grand])} млн руб`,'#d97706')}
     ${award('Архитектор цепочки','🤝',architect,`Вклад в здоровье ${f0(contrib[architect]*100)}%`,'#15a34a')}
     ${award('Антихлыст','📉',antiwhip,`Стабильность CV ${f1(cv[antiwhip]*100)}%`,'#2563eb')}
   </div>

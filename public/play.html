@@ -406,10 +406,10 @@ body{font-family:'Onest',sans-serif;background:var(--g1);color:var(--g9);min-hei
     <h3>⏱ Таймер</h3>
     <div class="timer-btns">
       <button class="btn btn-S btn-sm" onclick="startTimer(3)">3 мин</button>
-      <button class="btn btn-S btn-sm" onclick="startTimer(12)">12 мин</button>
+      <button class="btn btn-S btn-sm" onclick="startTimer(5)">5 мин</button>
       <button class="btn btn-S btn-sm" onclick="startTimer(7)">7 мин</button>
       <button class="btn btn-S btn-sm" onclick="startTimer(8)">8 мин</button>
-      <button class="btn btn-S btn-sm" onclick="startTimer(5)">5 мин</button>
+      <button class="btn btn-S btn-sm" onclick="startTimer(12)">12 мин</button>
     </div>
     <button class="btn btn-S btn-sm" onclick="stopTimer()">⏹ Стоп</button>&nbsp;
     <button class="btn btn-S btn-sm" onclick="closeModal('m-timer')">Закрыть</button>
@@ -505,12 +505,12 @@ function teamParams(tid){
   } else if(G.supIds.includes(tid)){
     const si=G.supIds.indexOf(tid);
     p.push(['Мощность','до '+G.maxProd[si]+' ед./тур'+(si===3?' (в Туре 3 квота 30 ед.)':'')]);
-    p.push(['Себестоимость',G.cost[si]+' у.е./ед. · отпускная база '+G.opt[si]+' у.е.']);
+    p.push(['Себестоимость',G.cost[si]+' млн руб/ед. · отпускная база '+G.opt[si]+' млн руб']);
     p.push(['Особенность', G.fresh[si]?'⚠️ Скоропорт — остаток списывается в убыток':'Долгий срок — остаток сохраняет 80% стоимости']);
   } else {
     p.push(['Мощность доставки', G.distCap[0]+' ед./тур (в Туре 3 — '+G.distCap[2]+' ед.)']);
-    p.push(['Себестоимость перевозки','0.8 у.е./ед.']);
-    p.push(['Тариф','диапазон 1.0–3.0 у.е./ед., старт 1.5']);
+    p.push(['Себестоимость перевозки','0.8 млн руб/ед.']);
+    p.push(['Тариф','диапазон 1.0–3.0 млн руб/ед., старт 1.5']);
   }
   return p;
 }
@@ -960,18 +960,20 @@ function renderAdminDecisions(r) {
 
   let h = `<div class="pg-h fbet">
     <div><div class="pg-title">Тур ${r+1} — ${G.roundNames[r]} · Ввод решений</div>
-    <div class="pg-sub">Поля заполняются из решений команд автоматически. Можно скорректировать перед расчётом.</div></div>
+    <div class="pg-sub">Поля пустые — заполняются автоматически, когда команда подаёт решение (✓). Можно скорректировать перед расчётом.</div></div>
     <div style="font-size:12px;color:var(--g5)">Подано: <strong>${(gs.submitted||[]).length}/${G.allTeams.length}</strong></div>
   </div>`;
 
   // Dist
-  const tarV = dDist.tariff ?? 1.5, capV = dDist.distCap ?? dc;
+  // B3: поля пустые до подачи решения командой (не подставляем модельные дефолты)
+  const dSub = !!dec['D'];
+  const tarV = dSub ? (dDist.tariff ?? '') : '', capV = dSub ? (dDist.distCap ?? '') : '';
   h += `<div class="dist-bar">
     <h4>🚛 ${gs.names['D']}${dec['D']?' <span class="sub-ok">✓</span>':''}</h4>
-    <div class="fld" style="min-width:120px"><label>Тариф у.е./ед.</label>
-      <input type="number" id="d-tar" value="${tarV}" min="1" max="3" step="0.1"></div>
+    <div class="fld" style="min-width:120px"><label>Тариф млн руб/ед.</label>
+      <input type="number" id="d-tar" value="${tarV}" placeholder="напр. 1.5" min="1" max="3" step="0.1"></div>
     <div class="fld" style="min-width:120px"><label>Мощность ед.</label>
-      <input type="number" id="d-cap" value="${capV}" min="0" max="500"></div>
+      <input type="number" id="d-cap" value="${capV}" placeholder="до ${dc}" min="0" max="500"></div>
     <div style="font-size:12px;color:var(--g5)">Маржа = (тариф − 0.8) × объём</div>
   </div>`;
 
@@ -979,10 +981,11 @@ function renderAdminDecisions(r) {
   h += `<div class="sup-grid">`;
   G.supIds.forEach((sid,si)=>{
     const maxQ=G.maxProd[si], defQ=r===2&&si===3?30:maxQ;
-    const prodV = supDat[si]?.prod ?? defQ;
+    const sSub = !!dec[sid];
+    const prodV = sSub ? (supDat[si]?.prod ?? '') : '';   // B3: пусто до подачи
     h+=`<div class="sup-card"><h4>🏭 ${gs.names[sid]}${dec[sid]?' <span class="sub-ok">✓</span>':''}</h4>
       <div class="fld"><label>Производство</label>
-        <input type="number" id="sp-${si}" value="${prodV}" min="0" max="${maxQ}">
+        <input type="number" id="sp-${si}" value="${prodV}" placeholder="до ${maxQ}" min="0" max="${maxQ}">
         <span style="font-size:10px;color:var(--g5)">Макс ${maxQ}${r===2&&si===3?' / Квота 30':''}</span>
       </div></div>`;
   });
@@ -999,26 +1002,27 @@ function renderAdminDecisions(r) {
     </div><div class="ret-body">`;
     G.catIds.forEach((cat,ci)=>{
       const cd = rd?.cats?.[ci];
-      const defOrd = cd?.ord ?? Math.round(G.demand[r][ci]*G.fShare[ci][ri]);
+      // B3: заказ и скидка пустые, пока магазин не подал решение
+      const defOrd = isSub ? (cd?.ord ?? '') : '';
       const asm = cd ? !!cd.asm : true;
       const prc = cd?.prc ?? 1, prm = cd?.prm ?? 0;
-      // Скидка по категории ci = скидка поставщика ci этому ритейлеру ri.
-      // Если поставщик не подал — фолбэк на скидку из решения магазина (хранится долей).
-      const dscV = (supDat[ci]?.discounts?.[ri]) ?? (cd?.dsc!=null ? cd.dsc*100 : 0);
+      // B2: скидка = согласованная скидка из поданного решения магазина (авторитетна для расчёта),
+      // а не «discounts» поставщика (нулевое значение поставщика затирало договорённость).
+      const dscV = isSub ? (cd?.dsc!=null ? Math.round(cd.dsc*100) : '') : '';
       h += `<div class="cat-row${asm?'':' off'}" id="cr-${ri}-${ci}">
         <div class="cat-rt">
           <span class="cat-nm" style="color:${G.catColor[ci]}">${cat} ${G.catNames[ci]}</span>
           <label class="tgl" aria-label="${cat} ${G.catNames[ci]} — включить в заказ"><input type="checkbox" id="a-${ri}-${ci}" ${asm?'checked':''} onchange="togRow(${ri},${ci})"><span class="tgl-s" aria-hidden="true"></span></label>
         </div>
         <div class="frow">
-          <div class="fld"><label>Заказ</label><input type="number" id="o-${ri}-${ci}" value="${defOrd}" min="0"></div>
+          <div class="fld"><label>Заказ</label><input type="number" id="o-${ri}-${ci}" value="${defOrd}" placeholder="0" min="0"></div>
           <div class="fld"><label>Цена</label><select id="p-${ri}-${ci}">
             <option value="0"${op(prc,0)}>Агрессивная</option><option value="1"${op(prc,1)}>Стандарт</option><option value="2"${op(prc,2)}>Премиальная</option><option value="3"${op(prc,3)}>Люкс</option>
           </select></div>
         </div>
         <div class="frow">
           <div class="fld"><label>Промо</label><select id="pm-${ri}-${ci}"><option value="0"${op(prm,0)}>Нет</option><option value="1"${op(prm,1)}>Да</option></select></div>
-          <div class="fld"><label>Скидка пост. %</label><input type="number" id="ds-${ri}-${ci}" value="${Math.round(dscV)}" min="0" max="50"></div>
+          <div class="fld"><label>Скидка пост. %</label><input type="number" id="ds-${ri}-${ci}" value="${dscV}" placeholder="0" min="0" max="50"></div>
         </div>
       </div>`;
     });
@@ -1051,7 +1055,7 @@ function renderAdminResults(r) {
     h += `<div class="card mb3 ${''}" style="background:${hexA(H>=.75?'#27ae60':H>=.5?'#f39c12':'#e74c3c',.08)}">
       <div style="display:flex;align-items:center;gap:14px">
         <div style="font-size:30px">❤️</div>
-        <div style="flex:1"><div class="card-t" style="margin:0">Здоровье цепочки за тур — фонд ${f0(H*250)} у.е. × личный вклад команды</div>
+        <div style="flex:1"><div class="card-t" style="margin:0">Здоровье цепочки за тур — фонд ${f0(H*250)} млн руб × личный вклад команды</div>
           <div style="font-size:11px;color:var(--g5)">OSA ${f0(res.health.OSA*100)}% · дефицит-фактор ${f0(res.health.Deficit*100)}% · анти-хлыст ${f0(res.health.Bullwhip*100)}% · без списаний ${f0(res.health.Waste*100)}%</div></div>
         <div style="font-size:30px;font-weight:700;color:${H>=.75?'var(--OK)':H>=.5?'var(--WN)':'var(--BD)'}">${f0(H*100)}%</div>
       </div></div>`;
@@ -1086,12 +1090,12 @@ function renderAdminResults(r) {
   // Dist kpi
   h += `<div class="card mb3"><div class="card-t">🚛 ${G.LBL['D']} · ${gs.names['D']}</div>
     <div class="kpi-grid">
-      <div class="kpi kpi-n"><div class="kl">Тариф</div><div class="kv">${f1(res.tariff||1.5)}</div><div class="ks">у.е./ед.</div></div>
+      <div class="kpi kpi-n"><div class="kl">Тариф</div><div class="kv">${f1(res.tariff||1.5)}</div><div class="ks">млн руб/ед.</div></div>
       <div class="kpi kpi-n"><div class="kl">Перевезено</div><div class="kv">${f0(res.totDelivered)}</div><div class="ks">ед.</div></div>
       <div class="kpi ${res.dCoeff>=.95?'kpi-ok':res.dCoeff>=.7?'kpi-wn':'kpi-bad'}">
         <div class="kl">Загрузка</div><div class="kv">${f1(res.dCoeff*100)}%</div></div>
       <div class="kpi ${res.dProfit>=0?'kpi-ok':'kpi-bad'}">
-        <div class="kl">Прибыль</div><div class="kv">${f1(res.dProfit)}</div><div class="ks">у.е.</div></div>
+        <div class="kl">Прибыль</div><div class="kv">${f1(res.dProfit)}</div><div class="ks">млн руб</div></div>
     </div>
   </div>`;
 
@@ -1170,7 +1174,7 @@ function renderAdminFinal() {
   return `
   <div class="pg-h"><div class="pg-title">📊 Финальные итоги</div></div>
   <div class="g3 mb3">
-    ${award('Гран-при','🏆',grand,`Счёт ${Math.round(scores[grand])} у.е.`,'#caa106')}
+    ${award('Гран-при','🏆',grand,`Счёт ${Math.round(scores[grand])} млн руб`,'#caa106')}
     ${award('Архитектор цепочки','🤝',architect,`Вклад в здоровье ${f0(contrib[architect]*100)}%`,'#27ae60')}
     ${award('Антихлыст','📉',antiwhip,`Стабильность CV ${f1(cv[antiwhip]*100)}%`,'#2e5f8a')}
   </div>
@@ -1452,13 +1456,13 @@ function renderTeamDecisionForm(r) {
     const prioDeals = myAgrs.filter(a=>a.structured.type==='priority');
     h += `<div class="card"><div class="card-t">🚛 ${G.LBL['D']} · ${gs.names['D']}</div>
       ${tarDeal?dealBadge(dealDesc(tarDeal.structured)):''}
-      <div class="frow"><div class="fld"><label>Тариф (у.е./ед.)</label>
+      <div class="frow"><div class="fld"><label>Тариф (млн руб/ед.)</label>
         <input type="number" id="t-tar" value="${tarVal}" min="1" max="3" step="0.1"></div>
       <div class="fld"><label>Мощность (ед.)</label>
         <input type="number" id="t-cap" value="${dc}" min="0" max="500"></div></div>
       ${prioDeals.length?`<div style="font-size:11px;color:#166534;margin-top:6px">🤝 Приоритеты: ${prioDeals.map(a=>`${G.LBL[a.from===tid?a.to:a.from]} (${a.structured.value} ед.)`).join(', ')}</div>`:''}
       <p style="font-size:12px;color:var(--g5);margin-top:6px">
-        Диапазон тарифа: 1.0–3.0 у.е./ед. Себест. перевозки: 0.8 у.е./ед.${r===2?' ⚠️ Мощность ограничена!':''}</p>
+        Диапазон тарифа: 1.0–3.0 млн руб/ед. Себест. перевозки: 0.8 млн руб/ед.${r===2?' ⚠️ Мощность ограничена!':''}</p>
     </div>`;
   }
 
@@ -1528,7 +1532,7 @@ function renderTeamResult(res, r) {
   const H = res.chainH, score = res.score;
   let h = `<div class="my-result">
     <div class="label">Ваша прибыль · Тур ${r+1}</div>
-    <div class="value" style="color:${profit>=0?'#a7f3d0':'#fca5a5'}">${f1(profit)} у.е.</div>
+    <div class="value" style="color:${profit>=0?'#a7f3d0':'#fca5a5'}">${f1(profit)} млн руб</div>
     <div class="grid">
       <div class="mi"><div class="ml">OSA / Загрузка</div><div class="mv">${f1(osa*100)}%</div></div>`;
   if (H!=null) h+=`<div class="mi"><div class="ml">❤️ Здоровье цепочки</div><div class="mv">${f0(H*100)}%</div></div>`;
@@ -1599,8 +1603,8 @@ function renderTeamSide() {
     h += `</div></div>`;
   }
 
-  // Accepted agreements
-  const accepted = (gs.agreements||[]).filter(a=>a.from===tid||a.to===tid);
+  // Accepted agreements (B4: только текущий тур — прошлые договорённости не тянутся в новый тур)
+  const accepted = (gs.agreements||[]).filter(a=>(a.from===tid||a.to===tid)&&(a.round==null||a.round===gs.round));
   if (accepted.length) {
     h += `<div style="margin-bottom:10px"><div style="font-size:12px;font-weight:600;color:var(--OK);margin-bottom:6px">✅ Договорённости (${accepted.length})</div>
       <div class="prop-list">`;
@@ -1763,7 +1767,7 @@ function submitTeamDecision() {
 const DEAL_TYPES = {
   discount:{label:'Скидка %',      vlabel:'Скидка, %',         cat:true,  unit:'%'},
   volume:  {label:'Объём ед.',     vlabel:'Объём, ед.',        cat:true,  unit:' ед.'},
-  tariff:  {label:'Тариф у.е./ед.',vlabel:'Тариф, у.е./ед.',   cat:false, unit:' у.е./ед.'},
+  tariff:  {label:'Тариф млн руб/ед.',vlabel:'Тариф, млн руб/ед.',   cat:false, unit:' млн руб/ед.'},
   priority:{label:'Приоритет ед.', vlabel:'Приоритет в доставке, ед.', cat:false, unit:' ед.'},
 };
 // с кем эта команда может вести переговоры (по цепочке, как на карте)
@@ -1786,7 +1790,7 @@ function dealDesc(s){
   if(!s) return '';
   if(s.type==='discount') return `Скидка ${s.value}% на «${s.category}»`;
   if(s.type==='volume')   return `Объём ${s.value} ед. «${s.category}»`;
-  if(s.type==='tariff')   return `Тариф ${s.value} у.е./ед.`;
+  if(s.type==='tariff')   return `Тариф ${s.value} млн руб/ед.`;
   if(s.type==='priority') return `Приоритет в доставке ${s.value} ед.`;
   return '';
 }
