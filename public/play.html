@@ -532,6 +532,35 @@ function teamParams(tid){
   return p;
 }
 
+// Ролевая эконом-панель на тур (вместо общего «прогноза рынка»):
+// параметры роли + ценовые уровни (ритейлер) + мощность перевозчика + промо-буст.
+function renderRoleEcon(r){
+  const tid=me.teamId, params=teamParams(tid);
+  let h=`<div class="card"><div class="card-t">📋 Ваши параметры на тур</div>
+    <div style="display:flex;flex-direction:column;gap:4px">
+    ${params.map(([k,v])=>`<div style="display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:4px 0;border-bottom:1px solid var(--g2)">
+      <span style="color:var(--g5)">${k}</span><span style="color:var(--g9);font-weight:600;text-align:right">${v}</span></div>`).join('')}
+    </div></div>`;
+  if(G.retIds.includes(tid)){
+    const PN=['Агрессивная','Стандарт','Премиальная','Люкс'];
+    h+=`<div class="card"><div class="card-t">🏷️ Ценовые уровни (множители)</div>
+      <table style="width:100%;font-size:12px;border-collapse:collapse">
+        <thead><tr style="color:var(--g5);text-align:left">
+          <th style="padding:4px 6px 4px 0;font-weight:600">Уровень</th>
+          <th style="font-weight:600">Множ. цены</th><th style="font-weight:600">Множ. спроса</th></tr></thead>
+        <tbody>${G.price.map((p,i)=>`<tr>
+          <td style="padding:3px 6px 3px 0">${PN[i]||('Ур.'+(i+1))}</td>
+          <td>×${p.pm.toFixed(2)}</td><td>×${p.dm.toFixed(2)}</td></tr>`).join('')}</tbody>
+      </table></div>`;
+  }
+  h+=`<div class="card"><div class="card-t">🚛 Логистика и промо</div>
+    <div style="font-size:12px;color:var(--g7);line-height:1.65">
+      Транспортная мощность перевозчика на тур: <b>${G.distCap[r]} ед.</b>${r===2?' <span style="color:var(--BD)">⚠️ шок</span>':''}<br>
+      Промо-буст: при включённом промо <b>и</b> скидке поставщика <b>≥${Math.round((G.pThr||.1)*100)}%</b> спрос категории <b>×${G.pBoost||1.5}</b>.
+    </div></div>`;
+  return h;
+}
+
 // ═══════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════
@@ -1431,20 +1460,13 @@ function renderTeamMain() {
 
   if (phase==='briefing' || phase==='negotiation') {
     const ev = G.events[r];
-    const fc = genForecast(r), fcp = r>0?genForecast(r-1):null;
     let h = renderMyRosterCard(false);
     h += `<div class="phase-info"><div class="pn">${G.roundNames[r]}</div>
       <div class="pd">${G.phaseName[phase]}</div></div>`;
     if (ev && phase==='briefing') h+=`<div class="evt"><div class="ico">🚨</div><div><h3>${ev.t}</h3><p>${ev.d}</p></div></div>`;
     if (r===0 && phase==='briefing') h += renderHistCard();
-    h += `<div style="font-size:12px;color:var(--g5);margin-bottom:6px;font-weight:500">📊 Прогноз рынка · ${G.roundNames[r]} <span style="font-weight:400">(оценка ±15% — точные данные появятся после итогов тура)</span></div>`;
-    h += `<div class="dem-grid">`;
-    G.catIds.forEach((cat,i)=>{
-      const chg=fcp?fc[i]-fcp[i]:0;const cls=chg>0?'up':chg<0?'dn':'';
-      h+=`<div class="dcard ${cls}"><div class="cn">${cat} ${G.catNames[i]}</div>
-        <div class="cv">~${fc[i]}</div><div class="cc">${!fcp?'—':chg>0?`▲ +${chg}`:chg<0?`▼ ${chg}`:'—'}</div></div>`;
-    });
-    h += `</div>`;
+    // Вместо общего «прогноза рынка» — ваши ролевые параметры (точный спрос скрыт до итогов)
+    h += renderRoleEcon(r);
     if (phase==='negotiation') h += `<div class="card"><div class="card-t">💬 Используйте панель «Переговоры» справа</div>
       <p style="font-size:13px;color:var(--g5)">Скидка, тариф и объём при принятии автоматически попадут в вашу форму решений. «Приоритет» — договорённость на честность: учитывайте её сами при вводе.</p></div>`;
     return h;

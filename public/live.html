@@ -481,23 +481,35 @@ function renderHistLive(){
   return h+`</table></div>`;
 }
 
+// Эконом-инфо на проектор (вместо спроса потребителя): мощность · ценовые уровни · промо-буст
+function renderEconLive(r){
+  const PN=['Агрессивная','Стандарт','Премиальная','Люкс'];
+  const rows=G.price.map((p,i)=>`<tr><td style="padding:3px 10px 3px 0">${PN[i]||('Ур.'+(i+1))}</td><td style="padding:3px 14px 3px 0">×${p.pm.toFixed(2)}</td><td>×${p.dm.toFixed(2)}</td></tr>`).join('');
+  return `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
+    <div style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px">
+      <div style="font-size:12px;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">🚛 Транспортная мощность</div>
+      <div style="font-size:30px;font-weight:800;color:${r===2?'var(--bad)':'var(--good)'}">${G.distCap[r]} <span style="font-size:14px;color:var(--ink2)">ед.${r===2?' ⚠️ шок':''}</span></div>
+    </div>
+    <div style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px">
+      <div style="font-size:12px;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">🏷️ Ценовые уровни ритейлера</div>
+      <table style="font-size:13px;color:var(--ink);border-collapse:collapse"><thead><tr style="color:var(--ink3);text-align:left;font-size:11px"><th style="padding-right:10px">Уровень</th><th style="padding-right:14px">Цена</th><th>Спрос</th></tr></thead><tbody>${rows}</tbody></table>
+    </div>
+    <div style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px">
+      <div style="font-size:12px;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">📈 Промо-буст</div>
+      <div style="font-size:14px;color:var(--ink);line-height:1.6">Промо ритейлера <b>+</b> скидка поставщика <b>≥${Math.round(G.pThr*100)}%</b> → спрос категории <b style="color:var(--good)">×${G.pBoost}</b></div>
+    </div>
+  </div>`;
+}
+
 function renderBriefing(r){
-  const ev=G.events[r],dem=G.demand[r],prev=r>0?G.demand[r-1]:null;
+  const ev=G.events[r];
   let h='';
   if(ev) h+=`<div class="evt${r===2?'':' promo'}"><div class="ico">${r===2?'🚨':'📢'}</div>
     <div><h3>${ev.t}</h3><p>${ev.d}</p></div></div>`;
   if(r===0) h+=renderHistLive();
-  h+=`<div class="dem-grid">`;
-  G.catIds.forEach((cat,i)=>{
-    const chg=prev?dem[i]-prev[i]:0,cls=chg>0?'up':chg<0?'dn':'';
-    h+=`<div class="dcard ${cls}">
-      <div class="cn">${cat} · ${G.catNames[i]}</div>
-      <div class="cv">${dem[i]}</div>
-      <div class="cc">${!prev?'':chg>0?`▲ +${chg} ед.`:chg<0?`▼ ${chg} ед.`:'= без изм.'}</div>
-    </div>`;
-  });
-  h+=`</div>
-  <div class="sub-section">
+  // Точный спрос потребителя скрыт до итогов — показываем рыночные условия
+  h+=renderEconLive(r);
+  h+=`<div class="sub-section">
     <div class="sub-title">Статус подключений</div>
     <div class="sub-grid" id="live-subgrid">${renderSubCells()}</div>
   </div>`;
@@ -540,13 +552,10 @@ function renderNegotiation(r){
     <div class="hot-note">Можно торговаться и за рамками подсвеченных пар. Сделок заключено: <b>${deals.length}</b></div>
   </div>
   <div class="chain-kpi">
-    ${G.catIds.map((cat,i)=>`<div class="ck">
-      <div class="cl">${cat} · Спрос</div>
-      <div class="cv nt">${G.demand[r][i]}</div>
-    </div>`).join('')}
     <div class="ck"><div class="cl">Мощность перевозчика</div>
-      <div class="cv ${r===2?'bad':'ok'}">${G.distCap[r]}</div>
-    </div>
+      <div class="cv ${r===2?'bad':'ok'}">${G.distCap[r]}</div></div>
+    <div class="ck"><div class="cl">Промо-буст</div>
+      <div class="cv ok">≥${Math.round(G.pThr*100)}% → ×${G.pBoost}</div></div>
   </div>`;
 }
 
@@ -565,13 +574,10 @@ function renderDecisions(r){
     <div class="sub-grid" id="live-subgrid">${renderSubCells()}</div>
   </div>
   <div class="chain-kpi">
-    ${G.catIds.map((cat,i)=>`<div class="ck">
-      <div class="cl">${cat} · Спрос</div>
-      <div class="cv nt">${G.demand[r][i]}</div>
-    </div>`).join('')}
     <div class="ck"><div class="cl">Дист. мощность</div>
-      <div class="cv ${r===2?'bad':'nt'}">${G.distCap[r]}</div>
-    </div>
+      <div class="cv ${r===2?'bad':'nt'}">${G.distCap[r]}</div></div>
+    <div class="ck"><div class="cl">Промо-буст</div>
+      <div class="cv nt">≥${Math.round(G.pThr*100)}% → ×${G.pBoost}</div></div>
   </div>`;
 }
 
