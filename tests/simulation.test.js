@@ -160,7 +160,7 @@ function sanitizeDec(r, d) {
   };
 }
 
-function calcRound(r, dRaw) {
+function calcRound(r, dRaw, invArg) {
   const d = sanitizeDec(r, dRaw);
   const { tariff, distCap, sups, rets, caps } = d;
   const prod  = SUPS.map((_,si)=>Math.min(sups[si]||0, caps[si]));
@@ -176,21 +176,25 @@ function calcRound(r, dRaw) {
     let v=P.demand[r][ci]*P.fShare[ci][ri]*P.price[x.prc??1].dm;
     if(x.prm&&(x.dsc||0)>=P.pThr) v*=P.pBoost; return v;
   }));
-  const sold=[],def=[],over=[],woff=[],osa=[];
-  RETS.forEach((_,ri)=>{sold.push([]);def.push([]);over.push([]);woff.push([]);osa.push([]);
+  // Перенос запасов (зеркало engine.js): стартовый запас нескоропорта с прошлого тура
+  const inv = invArg || RETS.map(()=>SUPS.map(()=>0));
+  const sold=[],def=[],over=[],woff=[],osa=[],newInv=[];
+  RETS.forEach((_,ri)=>{sold.push([]);def.push([]);over.push([]);woff.push([]);osa.push([]);newInv.push([]);
     SUPS.forEach((_,ci)=>{
-      const s=Math.min(del[ri][ci],aD[ri][ci]),ov=Math.max(0,del[ri][ci]-s);
-      sold[ri].push(s); def[ri].push(Math.max(0,aD[ri][ci]-s));
-      over[ri].push(ov); woff[ri].push(P.fresh[ci]?ov:0);
+      const startInv=P.fresh[ci]?0:(inv[ri]?.[ci]||0);
+      const avail=startInv+del[ri][ci];
+      const s=Math.min(avail,aD[ri][ci]),leftover=Math.max(0,avail-aD[ri][ci]);
+      sold[ri].push(s); def[ri].push(Math.max(0,aD[ri][ci]-avail));
+      over[ri].push(leftover); woff[ri].push(P.fresh[ci]?leftover:0);
+      newInv[ri].push(P.fresh[ci]?0:leftover);
       osa[ri].push(aD[ri][ci]>0?s/aD[ri][ci]:1);
     });
   });
   const retProfit=RETS.map((_,ri)=>{let p=0;
     SUPS.forEach((_,ci)=>{const x=rets[ri][ci];if(!x.asm)return;
       const opt=P.opt[ci]*(1-x.dsc),rosn=P.rosn[ci]*P.price[x.prc].pm;
-      const salv=P.fresh[ci]?0:P.salv*opt*over[ri][ci];
       const hold=P.fresh[ci]?0:over[ri][ci]*P.hCost;
-      p+=rosn*sold[ri][ci]-(opt+tariff)*del[ri][ci]+salv-hold;});return p;});
+      p+=rosn*sold[ri][ci]-(opt+tariff)*del[ri][ci]-hold;});return p;});
   const tD=SUPS.map((_,si)=>RETS.reduce((s,_,ri)=>s+del[ri][si],0));
   const supProfit=SUPS.map((_,si)=>{let rev=0;
     RETS.forEach((_,ri)=>{const opt=P.opt[si]*(1-((rets[ri]?.[si]?.dsc)||0));rev+=opt*del[ri][si];});
@@ -199,7 +203,7 @@ function calcRound(r, dRaw) {
   const retOSA=RETS.map((_,ri)=>{const td=aD[ri].reduce((s,v)=>s+v,0);
     return td>0?aD[ri].reduce((a,v,ci)=>a+sold[ri][ci],0)/td:1;});
   return {r,tariff,distCap:d.distCap,dCoeff:dC,totDelivered:totDel,d,prod,sC,del,actDem:aD,
-          sold,def,over,woff,osa,retProfit,supProfit,dProfit:(tariff-P.tCost)*totDel,
+          sold,def,over,woff,osa,newInv,retProfit,supProfit,dProfit:(tariff-P.tCost)*totDel,
           retOSA,totDel:tD,unsold:SUPS.map((_,si)=>Math.max(0,avail[si]-tD[si]))};
 }
 
@@ -437,6 +441,7 @@ async function runGame() {
   });
 
   const roundResults = [];
+  let refInv = null;   // эталонный перенос запасов между турами (как G.invByRound на сервере)
 
   // ── 4 тура ──
   for (let r = 0; r < 4; r++) {
@@ -485,8 +490,9 @@ async function runGame() {
     );
     const teamResults = await Promise.all(teamResultPromises);
 
-    // Эталонный расчёт для сверки
-    const expected = calcRound(r, dec);
+    // Эталонный расчёт для сверки (с переносом запасов, как на сервере)
+    const expected = calcRound(r, dec, refInv);
+    refInv = expected.newInv;   // остаток нескоропорта → стартовый запас след. тура
     const expectedH = chainHealth(expected);
     roundResults.push({ r, result: result.result, expected, expectedH });
 

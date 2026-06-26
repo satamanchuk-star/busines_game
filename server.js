@@ -167,6 +167,7 @@ function mkState() {
     timer: { on:false, end:null, mins:0 },
     decisions: {},     // {[round]: {[teamId]: {submitted, data}}}
     results: [],
+    invByRound: [],    // [round]: стартовый запас ритейлеров [ri][ci] (перенос нескоропорта)
     manual: {},        // {[round]: {[teamId]: score}}
     proposals: [],
     agreements: [],
@@ -371,7 +372,11 @@ function handle(ws, msg) {
       return;
     }
     if (cmd==='calculate') {
-      const res = calcRound(G.round, p.dec);
+      // Перенос запасов: стартовый запас этого тура = остаток с прошлого (или нули в Туре 1)
+      const startInv = (G.invByRound && G.invByRound[G.round]) || null;
+      const res = calcRound(G.round, p.dec, startInv ? { inv: startInv } : undefined);
+      if (!G.invByRound) G.invByRound = [];
+      G.invByRound[G.round+1] = res.newInv;   // остаток нескоропорта → стартовый запас след. тура
       // ─ Штрафы за нарушение договорённостей (структурные сделки с qty) ─
       // Формат agreement.structured: {ret:'R1', sup:'S1', qty:50}
       // Штраф = excess_units × cost[si] × pStrafCoef; платит нарушитель (поставщик = недопоставил, ритейлер = недовыбрал)

@@ -547,6 +547,18 @@ function renderRoleEcon(r){
       <span style="color:var(--g5)">${k}</span><span style="color:var(--g9);font-weight:600;text-align:right">${v}</span></div>`).join('')}
     </div></div>`;
   if(G.retIds.includes(tid)){
+    // Текущий запас = нескоропорт-остаток с прошлого тура (перенос)
+    const ri=G.retIds.indexOf(tid), prev=r>0?(gs.results||[])[r-1]:null;
+    const inv=G.catIds.map((c,ci)=>(prev&&!G.fresh[ci])?Math.round(prev.over?.[ri]?.[ci]||0):0);
+    if(prev){
+      h+=`<div class="card"><div class="card-t">📦 Текущий запас (перенесён с прошлого тура)</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${G.catIds.map((c,ci)=>`<div style="flex:1;min-width:74px;text-align:center;background:var(--g1);border-radius:8px;padding:8px 6px">
+          <div style="font-size:11px;color:var(--g5)">${c}${G.fresh[ci]?' 🧊':''}</div>
+          <div style="font-size:18px;font-weight:700;color:${inv[ci]>0?'var(--A)':'var(--g5)'}">${inv[ci]}</div></div>`).join('')}
+        </div>
+        <div style="font-size:11px;color:var(--g5);margin-top:6px">Запас продаётся вместе с новыми поставками — можно заказать меньше. Хранение −1 млн руб/ед. Скоропорт (🧊) не переносится.</div></div>`;
+    }
     const PN=['Агрессивная','Стандарт','Премиальная','Люкс'];
     h+=`<div class="card"><div class="card-t">🏷️ Ценовые уровни (множители)</div>
       <table style="width:100%;font-size:12px;border-collapse:collapse">

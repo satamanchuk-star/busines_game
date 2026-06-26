@@ -58,23 +58,30 @@
       let v = P.demand[r][ci] * P.fShare[ci][ri] * P.price[x.prc ?? 1].dm;
       if (x.prm && (x.dsc || 0) >= P.pThr) v *= P.pBoost; return v;
     }));
-    const sold = [], def = [], over = [], woff = [], osa = [];
-    RETS.forEach((_, ri) => { sold.push([]); def.push([]); over.push([]); woff.push([]); osa.push([]);
+    // Перенос запасов (только ритейлеры, только нескоропорт): стартовый запас с прошлого тура.
+    // opts.inv[ri][ci] — остаток, перенесённый из прошлого тура; по умолчанию нули (Тур 1 / песочница).
+    const inv = (opts && opts.inv) || RETS.map(() => SUPS.map(() => 0));
+    const sold = [], def = [], over = [], woff = [], osa = [], newInv = [];
+    RETS.forEach((_, ri) => { sold.push([]); def.push([]); over.push([]); woff.push([]); osa.push([]); newInv.push([]);
       SUPS.forEach((_, ci) => {
-        const s = Math.min(del[ri][ci], aD[ri][ci]), ov = Math.max(0, del[ri][ci] - s);
-        sold[ri].push(s); def[ri].push(Math.max(0, aD[ri][ci] - s));
-        over[ri].push(ov); woff[ri].push(P.fresh[ci] ? ov : 0);
+        const startInv = P.fresh[ci] ? 0 : (inv[ri]?.[ci] || 0);   // скоропорт не переносится
+        const avail = startInv + del[ri][ci];                       // доступно к продаже = запас + поставка
+        const s = Math.min(avail, aD[ri][ci]);
+        const leftover = Math.max(0, avail - aD[ri][ci]);
+        sold[ri].push(s); def[ri].push(Math.max(0, aD[ri][ci] - avail));
+        over[ri].push(leftover); woff[ri].push(P.fresh[ci] ? leftover : 0);
+        newInv[ri].push(P.fresh[ci] ? 0 : leftover);                // нескоропорт переносится в след. тур
         osa[ri].push(aD[ri][ci] > 0 ? s / aD[ri][ci] : 1);
       });
     });
-    // Ритейлер платит за всё ПОСТАВЛЕННОЕ (закупка + тариф), выручка — только с проданного.
-    // Fresh-перезапас теряется полностью; прочий перезапас сохраняет salv×закупка минус холдинг.
+    // Ритейлер платит за НОВЫЕ поставки (закупка + тариф); выручка — с проданного (м.б. из запаса).
+    // Нескоропорт-остаток физически переносится (хранение −hCost/ед), его ценность реализуется
+    // при продаже в следующем туре. Скоропорт-остаток списывается (woff). Salvage-кредит убран.
     const retProfit = RETS.map((_, ri) => { let p = 0;
       SUPS.forEach((_, ci) => { const x = rets[ri][ci]; if (!x.asm) return;
         const opt = P.opt[ci] * (1 - x.dsc), rosn = P.rosn[ci] * P.price[x.prc].pm;
-        const salv = P.fresh[ci] ? 0 : P.salv * opt * over[ri][ci];
         const hold = P.fresh[ci] ? 0 : over[ri][ci] * P.hCost;
-        p += rosn * sold[ri][ci] - (opt + tariff) * del[ri][ci] + salv - hold; }); return p; });
+        p += rosn * sold[ri][ci] - (opt + tariff) * del[ri][ci] - hold; }); return p; });
     const tD = SUPS.map((_, si) => RETS.reduce((s, _, ri) => s + del[ri][si], 0));
     const supProfit = SUPS.map((_, si) => { let rev = 0;
       RETS.forEach((_, ri) => { const opt = P.opt[si] * (1 - ((rets[ri]?.[si]?.dsc) || 0)); rev += opt * del[ri][si]; });
@@ -83,7 +90,7 @@
     const retOSA = RETS.map((_, ri) => { const td = aD[ri].reduce((s, v) => s + v, 0);
       return td > 0 ? aD[ri].reduce((a, v, ci) => a + sold[ri][ci], 0) / td : 1; });
     return { r, tariff, distCap, dCoeff: dC, totDelivered: totDel, totAS, d, prod, avail, ordFromSup: oFS, supC: sC,
-             del, actDem: aD, sold, def, over, woff, osa, retProfit, supProfit, dProfit: (tariff - P.tCost) * totDel,
+             del, actDem: aD, sold, def, over, woff, osa, newInv, retProfit, supProfit, dProfit: (tariff - P.tCost) * totDel,
              retOSA, totDel: tD, unsold: SUPS.map((_, si) => Math.max(0, avail[si] - tD[si])) };
   }
 
