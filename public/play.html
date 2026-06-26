@@ -78,6 +78,23 @@ body{font-family:'Onest',sans-serif;background:var(--g1);color:var(--g9);min-hei
 .phase-btn{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;border:none;background:transparent;cursor:pointer;width:100%;font-size:13px;color:var(--g7);transition:all .15s;text-align:left}
 .phase-btn:hover{background:var(--g1)}
 .phase-btn.cur{background:var(--P);color:#fff;font-weight:600}
+.phase-btn .ph-n{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--g3);color:var(--g7);font-size:10px;font-weight:700;flex:0 0 auto}
+.phase-btn.cur .ph-n{background:#fff;color:var(--P)}
+.phase-btn.done .ph-n{background:#15a34a;color:#fff}
+.phase-btn.future{color:var(--g5)}
+.phase-btn.locked{opacity:.5;cursor:not-allowed}
+.guide{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#eef3ff;border:1px solid #d7e3ff;border-left:4px solid var(--P);border-radius:10px;padding:11px 15px;margin-bottom:12px}
+.guide-step{font-size:11px;color:var(--g5);text-transform:uppercase;letter-spacing:.4px}
+.guide-todo{font-size:14px;color:var(--g9);font-weight:600;margin-top:2px}
+.guide-r{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.guide-why{font-size:12px;color:#b45309}
+.guide-override{font-size:12px;color:var(--g5)}
+.flash-hint{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#b45309;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:all .25s;z-index:9999}
+.flash-hint.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.pulse-btn{animation:pulseB 1.5s ease-in-out infinite}
+@keyframes pulseB{0%,100%{box-shadow:0 0 0 0 rgba(37,99,235,.45)}50%{box-shadow:0 0 0 7px rgba(37,99,235,0)}}
+.hint-ok{color:#15a34a;font-weight:700}
+.sub-ok-badge{background:#dcfce7;color:#166534;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:700}
 .team-status{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;font-size:12px;margin-bottom:2px}
 .team-status .dot{width:8px;height:8px;border-radius:50%;background:var(--g3);flex-shrink:0}
 .team-status.connected .dot{background:var(--OK)}
@@ -322,14 +339,14 @@ body{font-family:'Onest',sans-serif;background:var(--g1);color:var(--g9);min-hei
   <div class="admin-body">
     <!-- SIDEBAR -->
     <aside class="sidebar">
-      <div class="sb-title">Фазы</div>
-      <button class="phase-btn" onclick="setPhase('lobby')">🏠 Лобби</button>
-      <button class="phase-btn" onclick="setPhase('roles')">🎲 Роли</button>
-      <button class="phase-btn" onclick="setPhase('briefing')">📢 Брифинг</button>
-      <button class="phase-btn" onclick="setPhase('negotiation')">🤝 Переговоры</button>
-      <button class="phase-btn" onclick="setPhase('decisions')">✏️ Решения</button>
-      <button class="phase-btn" onclick="setPhase('results')">📊 Расчёт</button>
-      <button class="phase-btn" onclick="setPhase('final')">🏆 Финал</button>
+      <div class="sb-title">Шаги тура</div>
+      <button class="phase-btn" data-ph="lobby" onclick="goPhase('lobby')"><span class="ph-n">1</span>🏠 Лобби</button>
+      <button class="phase-btn" data-ph="roles" onclick="goPhase('roles')"><span class="ph-n">2</span>🎲 Роли</button>
+      <button class="phase-btn" data-ph="briefing" onclick="goPhase('briefing')"><span class="ph-n">3</span>📢 Брифинг</button>
+      <button class="phase-btn" data-ph="negotiation" onclick="goPhase('negotiation')"><span class="ph-n">4</span>🤝 Переговоры</button>
+      <button class="phase-btn" data-ph="decisions" onclick="goPhase('decisions')"><span class="ph-n">5</span>✏️ Решения</button>
+      <button class="phase-btn" data-ph="results" onclick="goPhase('results')"><span class="ph-n">6</span>📊 Расчёт</button>
+      <button class="phase-btn" data-ph="final" onclick="goPhase('final')"><span class="ph-n">7</span>🏆 Финал</button>
 
       <div class="sb-title mt3" style="margin-top:14px">Туры</div>
       <div style="display:flex;gap:4px;flex-wrap:wrap">
@@ -785,6 +802,87 @@ function show(id) {
 // ═══════════════════════════════════════
 // ADMIN RENDER
 // ═══════════════════════════════════════
+// ════ ПОТОК ШАГОВ ВЕДУЩЕГО (лента · мягкие гейты · подсказки) ════
+const FLOW = ['lobby','roles','briefing','negotiation','decisions','results','final'];
+const STEP_TODO = {
+  lobby:'Дождитесь подключения команд. Когда готовы — перейдите к ролям.',
+  roles:'Раздайте роли командам (кнопка «🎲 Раздать роли» слева), затем — брифинг.',
+  briefing:'Объявите командам условия тура. Готовы — открывайте переговоры.',
+  negotiation:'Запустите таймер переговоров. Команды договариваются между собой.',
+  decisions:'Дождитесь, пока команды подадут решения, затем рассчитайте тур.',
+  results:'Разберите итоги тура на проекторе. Затем — следующий тур.',
+  final:'Игра окончена. Награждение — на проекторе.'
+};
+function teamsMissing(){ return G.allTeams.filter(t=>!(gs.submitted||[]).includes(t)); }
+// Гейт перехода на target-фазу → {ok, why, soft}
+function gateTo(target){
+  if(target==='briefing' && !gs.rolesDealt)
+    return {ok:false, why:'Сначала раздайте роли командам (кнопка «Раздать роли»)'};
+  if(target==='results'){
+    const m=teamsMissing();
+    if(m.length) return {ok:false, soft:true,
+      why:'Не подали решение: '+m.map(t=>G.LBL[t]||t).join(', ')};
+  }
+  return {ok:true};
+}
+// Главное действие текущего шага → {label, act, gate?}
+function stepCTA(){
+  const r=gs.round;
+  switch(gs.phase){
+    case 'lobby':       return {label:'Перейти к ролям →', act:"goPhase('roles')"};
+    case 'roles':       return {label:'К брифингу →', act:"goPhase('briefing')", gate:gateTo('briefing')};
+    case 'briefing':    return {label:'Открыть переговоры →', act:"goPhase('negotiation')"};
+    case 'negotiation': return {label:'К решениям →', act:"goPhase('decisions')"};
+    case 'decisions':   return {label:'⚡ Рассчитать тур', act:"adminCalcGated()", gate:gateTo('results')};
+    case 'results':     return r<3 ? {label:`Тур ${r+2} →`, act:'adminNext()'} : {label:'🏆 Финал →', act:"goPhase('final')"};
+    default:            return null;
+  }
+}
+// Переход с гейтом: открыт — идём; soft — спросим подтверждение; иначе — подсказка
+function goPhase(target){
+  const g=gateTo(target);
+  if(g.ok){ setPhase(target); return; }
+  if(g.soft){ if(confirm(g.why+'\n\nВсё равно перейти?')) setPhase(target); return; }
+  flashHint(g.why);
+}
+function adminCalcGated(){
+  const g=gateTo('results');
+  if(!g.ok){
+    if(!confirm('Не все команды подали решение.\n'+g.why+
+      '\n\nРассчитать без них? Неподанные посчитаются как бездействие.')) return;
+  }
+  adminCalculate();
+}
+let _hintT=null;
+function flashHint(msg){
+  let el=document.getElementById('flash-hint');
+  if(!el){ el=document.createElement('div'); el.id='flash-hint'; el.className='flash-hint'; document.body.appendChild(el); }
+  el.textContent='⚠️ '+msg; el.classList.add('on');
+  clearTimeout(_hintT); _hintT=setTimeout(()=>el.classList.remove('on'),3500);
+}
+// Ведущий-баннер: текущий шаг + что делать + кнопка «дальше» (с гейтом и подсказкой что мешает)
+function renderGuide(){
+  const cta=stepCTA(), todo=STEP_TODO[gs.phase]||'';
+  let h=`<div class="guide">
+    <div class="guide-l">
+      <div class="guide-step">Текущий шаг · <b>${G.phaseName[gs.phase]||gs.phase}</b></div>
+      <div class="guide-todo">${todo}</div>
+    </div>`;
+  if(cta){
+    const gated=cta.gate && !cta.gate.ok;
+    h+=`<div class="guide-r">`;
+    if(gated){
+      h+=`<button class="btn btn-P" disabled title="${cta.gate.why}">🔒 ${cta.label}</button>
+          <div class="guide-why">⚠️ ${cta.gate.why}</div>`;
+      if(cta.gate.soft) h+=`<a href="#" onclick="adminCalcGated();return false" class="guide-override">рассчитать без них →</a>`;
+    } else {
+      h+=`<button class="btn btn-P" onclick="${cta.act}">${cta.label}</button>`;
+    }
+    h+=`</div>`;
+  }
+  return h+`</div>`;
+}
+
 function renderAdmin() {
   renderAdminHeader();
   renderAdminSidebar();
@@ -807,11 +905,19 @@ function renderAdminHeader() {
 }
 
 function renderAdminSidebar() {
-  // Phase buttons
+  // Phase buttons — состояние шага: done / current / future / locked
+  const ci = FLOW.indexOf(gs.phase);
   document.querySelectorAll('.phase-btn').forEach(b => {
-    const ph = b.getAttribute('onclick').match(/'(\w+)'/)?.[1];
+    const ph = b.getAttribute('data-ph');
+    const i = FLOW.indexOf(ph);
     const active = ph===gs.phase;
+    const g = gateTo(ph);
+    const locked = i>ci && !g.ok && !g.soft;   // жёстко закрытый будущий шаг
     b.classList.toggle('cur', active);
+    b.classList.toggle('done', i>=0 && i<ci);
+    b.classList.toggle('future', i>ci && !active);
+    b.classList.toggle('locked', locked);
+    b.title = locked ? g.why : '';
     b.setAttribute('aria-current', active ? 'step' : 'false');
   });
   // Teams
@@ -840,6 +946,9 @@ function renderAdminContent() {
     h += `<div class="announce-bar">📢 ${escHtml(gs.announce)}
       <button class="btn-xs btn-S" style="margin-left:auto" onclick="clearAnnounce()">✕</button></div>`;
   }
+
+  // Ведущий-гайд: текущий шаг + что делать + кнопка «дальше» с гейтом
+  if (phase!=='final') h += renderGuide();
 
   if (phase==='lobby') {
     h += renderAdminLobby();
@@ -1030,8 +1139,11 @@ function renderAdminDecisions(r) {
   });
   h += `</div>`;
 
-  h += `<div style="display:flex;gap:8px;margin-top:4px">
-    <button class="btn btn-ok btn-lg" onclick="adminCalculate()">⚡ Рассчитать тур</button>
+  const calcGate = gateTo('results');
+  h += `<div style="display:flex;gap:10px;margin-top:4px;align-items:center;flex-wrap:wrap">
+    <button class="btn btn-ok btn-lg" onclick="adminCalcGated()">⚡ Рассчитать тур</button>
+    ${calcGate.ok ? '<span style="font-size:12px;color:var(--OK)">✓ Все команды подали — можно считать</span>'
+      : `<span style="font-size:12px;color:var(--WN)">⚠️ ${calcGate.why}</span>`}
   </div>`;
 
   return h;
@@ -1659,12 +1771,25 @@ function renderTeamSide() {
 function renderTeamActions() {
   const phase = gs.phase;
   const isSub = (gs.submitted||[]).includes(me.teamId);
-  document.getElementById('t-hint').textContent =
-    phase==='decisions'?'Заполните форму решений':
-    phase==='negotiation'?'Переговоры · отправляйте предложения':'';
+  const hintEl = document.getElementById('t-hint');
   const acts = document.getElementById('t-actions');
+  // Подсказка «что делать сейчас» для участника — на каждой фазе своя
+  const HINT = {
+    lobby:'Вы в игре. Ждём, пока ведущий начнёт.',
+    roles:'Изучите роли и характеры вашей команды.',
+    briefing:'Изучите рынок и условия тура. Совещайтесь — скоро переговоры.',
+    negotiation:'Договаривайтесь с партнёрами и фиксируйте сделки (кнопка «Принять»).',
+    decisions: isSub ? '✓ Решение принято — ждём остальные команды.'
+                     : '👉 Ваш шаг: заполните и подайте решение команды.',
+    results:'Смотрите итоги тура на проекторе.',
+    final:'Игра окончена — итоги на экране.'
+  };
+  hintEl.textContent = HINT[phase]||'';
+  hintEl.classList.toggle('hint-ok', phase==='decisions' && isSub);
   if (phase==='decisions' && !isSub) {
-    acts.innerHTML = `<button class="btn btn-ok" onclick="submitTeamDecision()">✅ Подать решение</button>`;
+    acts.innerHTML = `<button class="btn btn-ok pulse-btn" onclick="submitTeamDecision()">✅ Подать решение</button>`;
+  } else if (phase==='decisions' && isSub) {
+    acts.innerHTML = `<span class="sub-ok-badge">✓ Подано</span>`;
   } else {
     acts.innerHTML = '';
   }
