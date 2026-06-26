@@ -348,10 +348,12 @@ const TEAMS=[
   {id:'D', name:'Дистрибьютор',    type:'Дистрибьютор', kind:'dist',ico:'🚛',col:'#d97706',char:'coop'},
 ];
 const T={}; TEAMS.forEach(t=>T[t.id]=t);
+// Цвета col синхронизированы с единой палитрой CHARS_PALETTE (gameconfig.js);
+// demo.html — standalone-объяснялка, поэтому держим копию + свои пастельные фоны.
 const CHARS={
   tough:   {ico:'🦁',name:'Жёсткий',     col:'#dc2626',soft:'#fdecec',line:'#f6cccc',q:'Скидку ниже 8% не рассматриваю.'},
   analyst: {ico:'📊',name:'Аналитик',     col:'#2563eb',soft:'#eef3ff',line:'#d7e3ff',q:'По расчётам, 6% — оптимально.'},
-  cunning: {ico:'🦊',name:'Хитрый',       col:'#9333ea',soft:'#f6edfd',line:'#e8d3fa',q:'У меня есть альтернативные предложения…'},
+  cunning: {ico:'🦊',name:'Хитрый',       col:'#b45309',soft:'#fbf1e6',line:'#f0d9bd',q:'У меня есть альтернативные предложения…'},
   stubborn:{ico:'😤',name:'Упрямый',      col:'#ea580c',soft:'#fdf0e8',line:'#f7d8c2',q:'Моя позиция неизменна.'},
   coop:    {ico:'🤝',name:'Кооперативный',col:'#15a34a',soft:'#ecfaf0',line:'#c9eed5',q:'Давайте найдём взаимовыгодное решение.'},
 };

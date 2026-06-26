@@ -39,7 +39,7 @@ const P = CONFIG;   // экономика и константы движка —
 
 // ━━━ ДВИЖОК — единственная копия в public/engine.js (его же грузит sim.html, его же тестируют) ━━━
 const ENGINE = require('./public/engine.js');
-const { sanitizeDec, calcRound, chainHealth, contribOf, roundProfit } = ENGINE;
+const { sanitizeDec, calcRound, chainHealth, contribOf, roundProfit, volOf } = ENGINE;
 
 // ━━━ ОБОЗНАЧЕНИЯ (внутренние ключи R/S/D, отображение Р/П/Д) ━━━
 const LBL = CONFIG.LBL;
@@ -112,13 +112,17 @@ const ROLE_SETS = {
      watch:'Слишком высокий тариф → меньше заказов → ниже загрузка → меньше прибыль. Ищите баланс.'},
   ],
 };
-const CHARS = {
-  'Жёсткий':       {ico:'🦁',clr:'#f85149',desc:'Диктует условия, почти не уступает'},
-  'Кооперативный': {ico:'🤝',clr:'#3fb950',desc:'Ищет win-win, легко идёт навстречу'},
-  'Хитрый':        {ico:'🦊',clr:'#d29922',desc:'Завышает запрос, делает ложные уступки'},
-  'Упрямый':       {ico:'😤',clr:'#f0883e',desc:'Держит позицию, не реагирует на аргументы'},
-  'Аналитик':      {ico:'📊',clr:'#58a6ff',desc:'Обосновывает цифрами, принимает взвешенно'},
+// Иконка+цвет берём из единой палитры (gameconfig), локально добавляем desc.
+const CHAR_DESC = {
+  'Жёсткий':       'Диктует условия, почти не уступает',
+  'Кооперативный': 'Ищет win-win, легко идёт навстречу',
+  'Хитрый':        'Завышает запрос, делает ложные уступки',
+  'Упрямый':       'Держит позицию, не реагирует на аргументы',
+  'Аналитик':      'Обосновывает цифрами, принимает взвешенно',
 };
+const CHARS = Object.fromEntries(
+  Object.entries(CONFIG.CHARS_PALETTE).map(([k, v]) => [k, {...v, desc: CHAR_DESC[k]}])
+);
 const CHAR_NAMES = Object.keys(CHARS);
 const BONUS_FUND = CONFIG.bonusFund; // фонд здоровья цепочки за тур (единый источник — gameconfig.js)
 const teamType = tid => RETS.includes(tid)?'ret':SUPS.includes(tid)?'sup':'dist';
@@ -260,7 +264,7 @@ function pubResult(res) {
            retOSA:res.retOSA, totDel:res.totDel, ordFromSup:res.ordFromSup,
            totDelivered:res.totDelivered, dCoeff:res.dCoeff, tariff:res.tariff,
            sold:res.sold, def:res.def, over:res.over, woff:res.woff, unsold:res.unsold,
-           health:res.health, scores:res.scores, contrib:res.contrib,
+           health:res.health, scores:res.scores, contrib:res.contrib, vol:res.vol,
            penalties:res.penalties };
 }
 function myResult(res, tid) {
@@ -387,9 +391,10 @@ function handle(ws, msg) {
       res.penalties = {ret:retPenalty, sup:supPenalty};
       // Здоровье цепочки и счёт команд за тур: бонус = H × фонд × личный вклад
       res.health = chainHealth(res);
-      res.contrib = {}; res.bonus = {}; res.scores = {};
+      res.contrib = {}; res.bonus = {}; res.scores = {}; res.vol = {};
       ALL_TEAMS.forEach(t=>{
         res.contrib[t] = contribOf(res,t);
+        res.vol[t]     = volOf(res,t);                              // своё прохождение за тур (для награды «Антихлыст»)
         res.bonus[t]   = res.health.H*BONUS_FUND*res.contrib[t];   // бонус здоровья (до оценки ведущего)
         res.scores[t]  = roundProfit(res,t) + res.bonus[t];         // нейтральный счёт; оценку применяет recomputeScores
       });

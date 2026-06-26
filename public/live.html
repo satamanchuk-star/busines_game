@@ -265,13 +265,7 @@ const G = Object.assign({}, GAME_CONFIG, {
   ],
   phaseName:{lobby:'Лобби',roles:'Распределение ролей',briefing:'Брифинг',negotiation:'Переговоры',decisions:'Решения',results:'Расчёт',final:'Финал'},
   phaseIco:{lobby:'🏠',roles:'🎲',briefing:'📢',negotiation:'🤝',decisions:'✏️',results:'📊',final:'🏆'},
-  CHARS:{
-    'Жёсткий':{ico:'🦁',clr:'#dc2626'},
-    'Кооперативный':{ico:'🤝',clr:'#15a34a'},
-    'Хитрый':{ico:'🦊',clr:'#d97706'},
-    'Упрямый':{ico:'😤',clr:'#d97706'},
-    'Аналитик':{ico:'📊',clr:'#2563eb'},
-  },
+  CHARS:GAME_CONFIG.CHARS_PALETTE,  // единая палитра (gameconfig.js); раньше Хитрый/Упрямый совпадали по цвету
   type:t=>GAME_CONFIG.retIds.includes(t)?'ret':GAME_CONFIG.supIds.includes(t)?'sup':'dist',
 });
 
@@ -669,8 +663,11 @@ function renderFinal(){
     const ri=RET.indexOf(t),si=SUP.indexOf(t);
     // Архитектор — АВТОРИТЕТНЫЙ серверный вклад в здоровье (res.contrib), не локальная эвристика
     contrib[t]=results.reduce((s,res)=>s+(res.contrib?.[t]||0),0)/results.length;
-    // Антихлыст — вариативность объёма по турам (CV)
+    // Антихлыст — вариативность объёма по турам (CV).
+    // Объём берём из АВТОРИТЕТНОГО серверного res.vol (как и contrib), а не выводим на клиенте.
     const series=results.map(res=>{
+      if(res.vol&&res.vol[t]!=null) return res.vol[t];
+      // fallback для старых результатов без vol
       if(ri>=0) return (res.def?.[ri]||[]).reduce((s,v)=>s+v,0)+(res.sold?.[ri]||[]).reduce((s,v)=>s+v,0);
       if(si>=0) return res.totDel?.[si]||0;
       return res.totDelivered||0;

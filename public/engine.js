@@ -118,5 +118,22 @@
     return res.dProfit;
   }
 
-  return { RETS, SUPS, clamp01, cln, sanitizeDec, calcRound, chainHealth, contribOf, roundProfit };
+  // Каноничное «своё прохождение» команды за тур — основа награды «Антихлыст»
+  // (минимальная вариативность объёма по турам). Считается на сервере, чтобы
+  // награда не зависела от клиентской эвристики (см. contribOf — тот же принцип).
+  //   Ритейлер     — спрос, фактически пришедший на полку (продано + дефицит)
+  //   Поставщик    — отгружено (totDel)
+  //   Дистрибьютор — перевезено (totDelivered)
+  function volOf(res, tid) {
+    const ri = RETS.indexOf(tid), si = SUPS.indexOf(tid);
+    if (ri >= 0) {
+      const sold = (res.sold[ri] || []).reduce((s, v) => s + v, 0);
+      const def  = (res.def[ri]  || []).reduce((s, v) => s + v, 0);
+      return sold + def;
+    }
+    if (si >= 0) return res.totDel[si] || 0;
+    return res.totDelivered || 0;
+  }
+
+  return { RETS, SUPS, clamp01, cln, sanitizeDec, calcRound, chainHealth, contribOf, roundProfit, volOf };
 });

@@ -444,7 +444,7 @@ const G = Object.assign({}, GAME_CONFIG, {
     {t:'Стабилизация',d:'Рынок восстанавливается. Молочка=115, Снеки=90, Деликатесы=35. Восстановите сервис и маржу.'},
   ],
   phaseName:{lobby:'Лобби',roles:'Распределение ролей',briefing:'Брифинг',negotiation:'Переговоры',decisions:'Решения',results:'Расчёт',final:'Финал'},
-  CHARS:{'Жёсткий':{ico:'🦁',clr:'#e74c3c'},'Кооперативный':{ico:'🤝',clr:'#27ae60'},'Хитрый':{ico:'🦊',clr:'#f39c12'},'Упрямый':{ico:'😤',clr:'#e8522a'},'Аналитик':{ico:'📊',clr:'#2e5f8a'}},
+  CHARS:GAME_CONFIG.CHARS_PALETTE,  // единая палитра (gameconfig.js)
   type:t=>GAME_CONFIG.retIds.includes(t)?'ret':GAME_CONFIG.supIds.includes(t)?'sup':'dist',
   roleData:{
     R1:{name:'Дискаунтер',roles:['Коммерческий директор','Директор по логистике','Финансовый директор'],
