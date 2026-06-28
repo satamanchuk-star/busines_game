@@ -184,6 +184,24 @@ body{font-family:'Onest',sans-serif;background:var(--bg);color:var(--ink);
 .hot-status{font-size:11px;color:var(--warn);margin-top:4px;font-weight:700}
 .hot-card.struck .hot-status{color:var(--good)}
 .hot-note{font-size:11px;color:var(--ink3);margin-top:8px}
+/* Активная пара переговоров — крупно */
+.big-pair{display:flex;align-items:stretch;justify-content:center;gap:18px;margin-bottom:22px}
+.big-node{flex:0 0 210px;background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:22px;text-align:center}
+.big-node.ret{border-color:#2563eb}.big-node.sup{border-color:#15a34a}.big-node.dist{border-color:#b45309}
+.big-node .bn-ico{font-size:50px;line-height:1}
+.big-node .bn-lbl{font-size:21px;font-weight:800;color:var(--ink);margin-top:8px}
+.big-node .bn-team{font-size:14px;color:var(--ink2);margin-top:2px}
+.big-mid{flex:1;max-width:360px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.big-arrow{font-size:42px;color:var(--ibs)}
+.big-subj{font-size:16px;color:var(--ink);text-align:center;line-height:1.4}
+.big-done{font-size:17px;font-weight:800;color:var(--good)}
+.big-wait{font-size:15px;font-weight:700;color:var(--warn)}
+.pair-list{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.pair-chip{display:flex;align-items:center;gap:7px;font-size:13px;padding:8px 13px;border-radius:20px;border:1px solid var(--line);background:var(--panel);color:var(--ink2)}
+.pair-chip.on{border-color:var(--ibs);background:var(--ibs-soft);color:var(--ibs);font-weight:700}
+.pair-chip.struck{background:#f0fdf4;border-color:var(--good);color:#166534}
+.pair-chip .pc-n{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;background:var(--line);font-size:11px;font-weight:700;color:var(--ink2)}
+.pair-chip.on .pc-n{background:var(--ibs);color:#fff}
 
 /* ── Bottom bar ── */
 .bbar{background:var(--panel);border-top:1px solid var(--line);padding:7px 24px;
@@ -270,24 +288,7 @@ const G = Object.assign({}, GAME_CONFIG, {
   type:t=>GAME_CONFIG.retIds.includes(t)?'ret':GAME_CONFIG.supIds.includes(t)?'sup':'dist',
 });
 
-const NEG_HOT = [
-  [ {from:'R1',to:'S1',subj:'скидку на бакалею'},
-    {from:'R2',to:'D', subj:'тариф за доставку'},
-    {from:'R3',to:'S4',subj:'объём поставки деликатесов'},
-    {from:'R4',to:'S4',subj:'приоритет на деликатесы (Премиум)'} ],
-  [ {from:'R1',to:'S3',subj:'промо-скидку на снеки'},
-    {from:'R2',to:'S2',subj:'промо-скидку на молочку'},
-    {from:'R3',to:'D', subj:'надбавку за большой объём'},
-    {from:'R4',to:'D', subj:'спецтариф на доставку (Премиум)'} ],
-  [ {from:'R1',to:'D', subj:'приоритет в доставке при дефиците'},
-    {from:'R2',to:'D', subj:'приоритет в доставке при дефиците'},
-    {from:'R3',to:'S4',subj:'долю в дефицитной квоте деликатесов'},
-    {from:'R4',to:'S4',subj:'гарантированную квоту деликатесов при дефиците'} ],
-  [ {from:'R1',to:'S1',subj:'долгосрочную скидку на бакалею'},
-    {from:'R3',to:'S4',subj:'восстановление объёма деликатесов'},
-    {from:'R2',to:'D', subj:'снижение тарифа за доставку'},
-    {from:'R4',to:'S1',subj:'люкс-бакалею по фиксированной цене'} ],
-];
+const NEG_HOT = GAME_CONFIG.negHot;   // единый источник пар (gameconfig.js)
 
 function hexA(hex,a){const h=hex.replace('#','');return `rgba(${parseInt(h.slice(0,2),16)},${parseInt(h.slice(2,4),16)},${parseInt(h.slice(4,6),16)},${a})`;}
 
@@ -518,45 +519,34 @@ function renderBriefing(r){
 
 function renderNegotiation(r){
   const hot=NEG_HOT[r]||[];
+  const idx=Math.min(gs.negPair||0, Math.max(0,hot.length-1));
+  const active=hot[idx];
   const deals=(gs.agreements||[]).filter(a=>a.round===r);
-  const node=(t)=>`<div class="nmap-node ${G.type(t)}">
-      <div class="nmap-ico">${t==='D'?'🚛':G.type(t)==='sup'?'🏭':'🛒'}</div>
-      <div class="nmap-nm">${G.LBL[t]}</div>
-      <div class="nmap-team">${gs?.names?.[t]||''}</div>
+  const struckOf=d=>deals.some(a=>(a.from===d.from&&a.to===d.to)||(a.from===d.to&&a.to===d.from));
+  const bigNode=t=>`<div class="big-node ${G.type(t)}">
+    <div class="bn-ico">${t==='D'?'🚛':G.type(t)==='sup'?'🏭':'🛒'}</div>
+    <div class="bn-lbl">${G.LBL[t]}</div>
+    <div class="bn-team">${gs?.names?.[t]||''}</div></div>`;
+  // Сделки активной пары — «интерактив» после старта таймера
+  const pairDeals = active ? deals.filter(a=>(a.from===active.from&&a.to===active.to)||(a.from===active.to&&a.to===active.from)) : [];
+  let h=`<div style="text-align:center;font-size:19px;font-weight:800;color:var(--ink);margin-bottom:3px">🤝 Переговоры · ${G.roundNames[r]}</div>
+    <div style="text-align:center;font-size:13px;color:var(--ink2);margin-bottom:18px">Пара ${idx+1} из ${hot.length} · ведущий переключает фокус</div>`;
+  if(active){
+    h+=`<div class="big-pair">
+      ${bigNode(active.from)}
+      <div class="big-mid">
+        <div class="big-arrow">⇄</div>
+        <div class="big-subj">обсуждают: <b>${active.subj}</b></div>
+        ${struckOf(active)?'<div class="big-done">✅ договорились</div>':'<div class="big-wait">⏳ идёт обсуждение</div>'}
+        ${pairDeals.length?`<div style="font-size:13px;color:#166534;text-align:center">📋 ${pairDeals.map(a=>a.text).join(' · ')}</div>`:''}
+      </div>
+      ${bigNode(active.to)}
     </div>`;
-  return `<div class="phase-screen" style="flex:0;margin-bottom:12px">
-    <div class="ps-ico">🤝</div>
-    <div class="ps-ph">Переговоры</div>
-    <div class="ps-rd">${G.roundNames[r]} · Договоритесь вживую, итог зафиксируйте в своём устройстве</div>
-  </div>
-  <div class="nmap">
-    <div class="nmap-row">${G.supIds.map(node).join('')}</div>
-    <div class="nmap-mid">
-      <div class="nmap-link">▲ Магазины закупают у производителей · скидки и объёмы ▲</div>
-      ${node('D')}
-      <div class="nmap-link">▼ Перевозчик доставляет всем · тариф и приоритет ▼</div>
-    </div>
-    <div class="nmap-row">${G.retIds.map(node).join('')}</div>
-  </div>
-  <div class="hot-section">
-    <div class="sub-title">🔥 Горячие сделки этого тура — на них стоит сфокусироваться</div>
-    <div class="hot-grid">
-      ${hot.map(d=>{
-        const struck=deals.some(a=>(a.from===d.from&&a.to===d.to)||(a.from===d.to&&a.to===d.from));
-        return `<div class="hot-card${struck?' struck':''}">
-          <div class="hot-pair"><b>${G.LBL[d.from]}</b><span class="hot-arrow">⇄</span><b>${G.LBL[d.to]}</b></div>
-          <div class="hot-subj">${d.subj}</div>
-          <div class="hot-status">${struck?'✅ договорились':'⏳ обсуждается'}</div>
-        </div>`;}).join('')}
-    </div>
-    <div class="hot-note">Можно торговаться и за рамками подсвеченных пар. Сделок заключено: <b>${deals.length}</b></div>
-  </div>
-  <div class="chain-kpi">
-    <div class="ck"><div class="cl">Мощность перевозчика</div>
-      <div class="cv ${r===2?'bad':'ok'}">${G.distCap[r]}</div></div>
-    <div class="ck"><div class="cl">Промо-буст</div>
-      <div class="cv ok">≥${Math.round(G.pThr*100)}% → ×${G.pBoost}</div></div>
-  </div>`;
+  }
+  h+=`<div class="pair-list">${hot.map((d,i)=>`<div class="pair-chip ${i===idx?'on':''} ${struckOf(d)?'struck':''}">
+    <span class="pc-n">${i+1}</span> ${G.LBL[d.from]} ⇄ ${G.LBL[d.to]} ${struckOf(d)?'✅':''}</div>`).join('')}</div>
+  <div style="text-align:center;font-size:12px;color:var(--ink3);margin-top:14px">Сделок заключено в этом туре: <b>${deals.length}</b> · договариваться можно и вне подсвеченной пары</div>`;
+  return h;
 }
 
 function renderDecisions(r){

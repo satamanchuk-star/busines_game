@@ -168,6 +168,7 @@ function mkState() {
     decisions: {},     // {[round]: {[teamId]: {submitted, data}}}
     results: [],
     invByRound: [],    // [round]: стартовый запас ритейлеров [ri][ci] (перенос нескоропорта)
+    negPair: 0,        // индекс активной пары переговоров (в gameconfig.negHot[round])
     manual: {},        // {[round]: {[teamId]: score}}
     proposals: [],
     agreements: [],
@@ -228,7 +229,7 @@ const bcastAll = msg => bcast(msg);
 // ━━━ STATE VIEWS ━━━
 function pubView() {
   return {
-    phase:G.phase, round:G.round, names:G.names, timer:G.timer, announce:G.announce,
+    phase:G.phase, round:G.round, names:G.names, timer:G.timer, announce:G.announce, negPair:G.negPair,
     submitted: subList(),
     connected: [...new Set([...clients.values()].filter(c=>c.teamId).map(c=>c.teamId))],
     results: G.results.map(pubResult),
@@ -346,7 +347,15 @@ function handle(ws, msg) {
     }
     const { cmd, p={} } = msg;
 
-    if (cmd==='phase')  { G.phase=p.phase; bcastAll({type:'upd',phase:G.phase}); }
+    if (cmd==='phase')  {
+      G.phase=p.phase;
+      if (p.phase==='negotiation') G.negPair=0;   // сброс активной пары при входе в переговоры
+      bcastAll({type:'upd',phase:G.phase,negPair:G.negPair});
+    }
+    if (cmd==='negPair') {   // ведущий листает активную пару переговоров
+      G.negPair = Math.max(0, parseInt(p.idx)||0);
+      bcastAll({type:'upd',negPair:G.negPair});
+    }
     if (cmd==='timer')  {
       G.timer = p.on ? {on:true,end:Date.now()+p.mins*60000,mins:p.mins} : {on:false,end:null,mins:0};
       bcastAll({type:'upd',timer:G.timer});
