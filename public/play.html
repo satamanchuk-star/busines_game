@@ -789,6 +789,8 @@ function onMsg(msg) {
     case 'teamSub':
       // Admin received a team submission — auto-fill their form section
       if (me.role==='admin') fillTeamSection(msg.teamId, msg.data);
+      if (me.role==='admin' && msg.anomaly && msg.anomaly.length)
+        flashHint(`⚠️ ${G.LBL[msg.teamId]||msg.teamId}: аномальные значения — ${msg.anomaly.join('; ')}`);
       if (!gs.submitted) gs.submitted=[];
       if(!gs.submitted.includes(msg.teamId)) gs.submitted.push(msg.teamId);
       renderAdminSidebar();
@@ -930,6 +932,54 @@ function renderGuide(){
     h+=`</div>`;
   }
   return h+`</div>`;
+}
+
+// ── Выгрузка в Excel (KPI + формулы). Библиотека грузится лениво, только по клику ведущего ──
+const _xl = v => Math.round((v||0)*100)/100;
+function profitOf(res,t){
+  const ri=G.retIds.indexOf(t), si=G.supIds.indexOf(t);
+  return ri>=0?(res.retProfit?.[ri]||0):si>=0?(res.supProfit?.[si]||0):(res.dProfit||0);
+}
+function exportExcel(){
+  if(typeof XLSX!=='undefined'){ doExportExcel(); return; }
+  flashHint('Готовлю выгрузку…');
+  const s=document.createElement('script'); s.src='/xlsx.min.js';
+  s.onload=doExportExcel; s.onerror=()=>flashHint('Не удалось загрузить библиотеку Excel');
+  document.head.appendChild(s);
+}
+function doExportExcel(){
+  const results=(gs.results||[]).filter(r=>r);
+  if(!results.length){ flashHint('Нет данных для выгрузки'); return; }
+  const wb=XLSX.utils.book_new();
+  // Лист «Итоги» — по командам, со ЖИВОЙ формулой счёта (= прибыль + бонус)
+  const rows=[['Команда','Роль','Прибыль ∑, млн руб','Ср. вклад в здоровье','Бонус ∑, млн руб','Итоговый счёт']];
+  G.allTeams.forEach(t=>{
+    const role=G.retIds.includes(t)?'Ритейлер':G.supIds.includes(t)?'Поставщик':'Дистрибьютор';
+    let profit=0,bonus=0,contribSum=0;
+    results.forEach(res=>{ profit+=profitOf(res,t); bonus+=res.bonus?.[t]||0; contribSum+=res.contrib?.[t]||0; });
+    rows.push([G.LBL[t]+' · '+(gs.names?.[t]||t), role, _xl(profit), _xl(contribSum/results.length), _xl(bonus), _xl((gs.scores?.[t]??(profit+bonus)))]);
+  });
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  for(let r=2;r<=rows.length;r++) ws['F'+r]={t:'n', f:`C${r}+E${r}`};   // счёт = прибыль + бонус (формула Excel)
+  XLSX.utils.book_append_sheet(wb, ws, 'Итоги');
+  // Лист «Формулы KPI» — интерпретация расчёта
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
+    ['KPI','Формула','Пояснение'],
+    ['Прибыль ритейлера','rosn×наценка×продано − (отпускная×(1−скидка)+тариф)×поставка − хранение×остаток','Выручка с проданного (м.б. из запаса) минус закупка новых поставок и хранение'],
+    ['Прибыль поставщика','Σ отпускная×(1−скидка)×поставка − производство×себестоимость','Выручка по ритейлерам минус себестоимость'],
+    ['Прибыль дистрибьютора','(тариф − себест.перевозки)×перевезено','Маржа на тарифе'],
+    ['Здоровье цепочки H','0.35·OSA + 0.25·(1−дефицит) + 0.25·антихлыст + 0.15·(1−списания)','Общий для всех — стимул к кооперации'],
+    ['Вклад в бонус','ритейлер: OSA; поставщик: fill-rate; дистрибьютор: доля довезённого','Личный вклад [0..1]; бездействие = 0'],
+    ['Бонус за тур','H × 250 × вклад','Фонд здоровья × личный вклад'],
+    ['Итоговый счёт','Σ(прибыль + бонус) по турам','Критерий победы'],
+  ]), 'Формулы KPI');
+  // Листы по турам — детализация
+  results.forEach(res=>{
+    const rr=[['Команда','Прибыль','Вклад','Бонус','Счёт за тур']];
+    G.allTeams.forEach(t=>rr.push([G.LBL[t]+' · '+(gs.names?.[t]||t), _xl(profitOf(res,t)), _xl(res.contrib?.[t]||0), _xl(res.bonus?.[t]||0), _xl(res.scores?.[t]||0)]));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rr), 'Тур '+(res.r+1));
+  });
+  XLSX.writeFile(wb, `FMCG_итоги_${new Date().toISOString().slice(0,10)}.xlsx`);
 }
 
 // Панель ведущего: активная пара переговоров + листание (отражается на проекторе)
@@ -1229,6 +1279,7 @@ function renderAdminResults(r) {
     <div><div class="pg-title">${G.roundNames[r]} — Итоги тура</div>
     <div class="pg-sub">Перевозчик: загрузка ${f1(res.dCoeff*100)}% · перевезено ${f0(res.totDelivered)} ед.</div></div>
     <div class="flex gap2">
+      <button class="btn btn-S" onclick="exportExcel()">📥 Excel</button>
       ${r<3?`<button class="btn btn-P" onclick="adminNext()">Тур ${r+2} →</button>`:`<button class="btn btn-P" onclick="setPhase('final')">🏆 Финал →</button>`}
     </div>
   </div>`;
@@ -1335,6 +1386,8 @@ function renderAdminFinal() {
   const supWin=G.supIds.reduce((a,b)=>profit[a]>profit[b]?a:b);
   const architect=G.allTeams.reduce((a,b)=>contrib[a]>=contrib[b]?a:b);
   const antiwhip=G.allTeams.reduce((a,b)=>cv[a]<=cv[b]?a:b);
+  const avgScore=G.allTeams.reduce((s,t)=>s+(scores[t]||0),0)/G.allTeams.length;
+  const distGood=(scores['D']||0)>avgScore;   // C4: приз дистрибьютору при счёте выше среднего
 
   let cDef=0,cOv=0,cWo=0;
   results.forEach(res=>{ for(let ri=0;ri<3;ri++)for(let ci=0;ci<4;ci++){cDef+=res.def?.[ri]?.[ci]||0;cOv+=res.over?.[ri]?.[ci]||0;cWo+=res.woff?.[ri]?.[ci]||0;}});
@@ -1356,14 +1409,15 @@ function renderAdminFinal() {
   }).join('');
 
   return `
-  <div class="pg-h"><div class="pg-title">📊 Финальные итоги</div></div>
+  <div class="pg-h fbet"><div class="pg-title">📊 Финальные итоги</div>
+    <button class="btn btn-S" onclick="exportExcel()">📥 Выгрузка в Excel</button></div>
   <div class="g3 mb3">
     ${award('Гран-при','🏆',grand,`Счёт ${Math.round(scores[grand])} млн руб`,'#caa106')}
     ${award('Архитектор цепочки','🤝',architect,`Вклад в здоровье ${f0(contrib[architect]*100)}%`,'#27ae60')}
     ${award('Антихлыст','📉',antiwhip,`Стабильность CV ${f1(cv[antiwhip]*100)}%`,'#2e5f8a')}
   </div>
   <div class="winner"><div class="t">🏆</div><h2>Лучшие в категории</h2>
-    <p>🛒 Ритейлер: <b>${gs.names[retWin]}</b> &nbsp;·&nbsp; 🏭 Поставщик: <b>${gs.names[supWin]}</b></p></div>
+    <p>🛒 Ритейлер: <b>${gs.names[retWin]}</b> &nbsp;·&nbsp; 🏭 Поставщик: <b>${gs.names[supWin]}</b> &nbsp;·&nbsp; 🚛 Дистрибьютор: <b>${distGood?gs.names['D']:'— ниже среднего'}</b></p></div>
   <div class="card mb3"><div class="card-t">🏆 Общий рейтинг · Счёт = прибыль + здоровье цепочки</div>
     <table class="tbl"><thead><tr><th>#</th><th>Команда</th><th>Прибыль∑</th><th>Итоговый счёт</th></tr></thead>
     <tbody>${rows}</tbody></table></div>
@@ -1987,7 +2041,17 @@ function submitTeamDecision() {
     }));
   }
 
-  ws_send({ type:'submit', round:r, data });
+  // C2: проверка аномальных значений (за пределами клэмпов движка) → алерт игроку
+  const anomalies=[];
+  if(isRet) data.cats.forEach((c,ci)=>{
+    if(c.ord>G.maxOrd) anomalies.push(`Заказ «${G.catIds[ci]}»: ${c.ord} > макс ${G.maxOrd} ед.`);
+    if(c.dsc>G.maxDsc) anomalies.push(`Скидка «${G.catIds[ci]}»: ${Math.round(c.dsc*100)}% > макс ${Math.round(G.maxDsc*100)}%`);
+  });
+  if(isSup) (data.discounts||[]).forEach((d,ridx)=>{ if(d>G.maxDsc*100) anomalies.push(`Скидка ${G.LBL[G.retIds[ridx]]}: ${d}% > макс ${Math.round(G.maxDsc*100)}%`); });
+  if(isDist && data.tariff>G.maxTariff) anomalies.push(`Тариф: ${Math.round(data.tariff*1000)} ₽/ед > макс ${Math.round(G.maxTariff*1000)} ₽/ед`);
+  if(anomalies.length && !confirm('⚠️ Аномальные значения (движок их срежет):\n\n'+anomalies.join('\n')+'\n\nПодать всё равно?')) return;
+
+  ws_send({ type:'submit', round:r, data, anomaly: anomalies.length?anomalies:null });
   mySubmitted = true;
   renderTeam();
 }

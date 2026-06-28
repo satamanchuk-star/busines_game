@@ -681,6 +681,9 @@ function renderFinal(){
   const supWin=SUP.reduce((a,b)=>profit[a]>profit[b]?a:b);
   const architect=G.allTeams.reduce((a,b)=>contrib[a]>=contrib[b]?a:b);
   const antiwhip=G.allTeams.reduce((a,b)=>cv[a]<=cv[b]?a:b);
+  // C4: приз дистрибьютору — только если его итоговый счёт выше среднего по всем командам
+  const avgScore=G.allTeams.reduce((s,t)=>s+(scores[t]||0),0)/G.allTeams.length;
+  const distGood=(scores['D']||0)>avgScore;
 
   const award=(t,ico,tid,sub,clr)=>`<div class="award" style="border-color:${clr}">
     <div class="at" style="color:${clr}">${ico} ${t}</div>
@@ -709,6 +712,7 @@ function renderFinal(){
   <div class="awards-row" style="margin-bottom:14px">
     <div class="winner-card"><div class="wtype">🛒 Лучший ритейлер</div><div class="wname">${gs.names?.[retWin]||retWin}</div></div>
     <div class="winner-card"><div class="wtype">🏭 Лучший поставщик</div><div class="wname">${gs.names?.[supWin]||supWin}</div></div>
+    <div class="winner-card"${distGood?'':' style="opacity:.5"'}><div class="wtype">🚛 Лучший дистрибьютор</div><div class="wname">${distGood?(gs.names?.['D']||'Дистрибьютор'):'не заработал · ниже среднего'}</div></div>
   </div>
   <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:13px 15px">
     <div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);margin-bottom:8px;font-weight:600">Общий рейтинг · Счёт = прибыль + здоровье цепочки</div>

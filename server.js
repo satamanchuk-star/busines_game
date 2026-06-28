@@ -444,7 +444,7 @@ function handle(ws, msg) {
     if (!G.decisions[round]) G.decisions[round]={};
     G.decisions[round][me.teamId]={submitted:true,data,by:'team',at:Date.now()};
     bcastAll({type:'upd',submitted:subList()});
-    clients.forEach((c,w)=>{ if(c.role==='admin') tx(w,{type:'teamSub',teamId:me.teamId,round,data}); });
+    clients.forEach((c,w)=>{ if(c.role==='admin') tx(w,{type:'teamSub',teamId:me.teamId,round,data,anomaly:msg.anomaly||null}); });
     tx(ws, {type:'upd',submitted:subList()});
     console.log(`  → ${me.teamId} submitted R${round+1}`);
     return;
