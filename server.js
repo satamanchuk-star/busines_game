@@ -1,5 +1,5 @@
 'use strict';
-try { require('dotenv').config(); } catch (e) { /* .env опционален */ }
+try { require('dotenv').config({ path: require('path').join(__dirname, '.env') }); } catch (e) { /* .env опционален */ }
 const express = require('express');
 const { WebSocketServer } = require('ws');
 const http = require('http');

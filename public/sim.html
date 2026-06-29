@@ -1052,7 +1052,7 @@ function genNarrative(tid, dec, res) {
     else lines.push(`✅ Полки заполнены, дефицит минимален.`);
 
     if(totalWoff>2) lines.push(`🗑 Молочка/Фреш: <b>${f0(totalWoff)} ед.</b> испортилось и списано — потери ${f0(totalWoff*P.cost[1])} млн руб`);
-    else if(totalOver>15) lines.push(`📦 Перезаказ <b>${f0(totalOver)} ед.</b> — холдинг ${f0(totalOver*P.hCost)} млн руб`);
+    else if(totalOver>5) lines.push(`📦 Остаток <b>${f0(totalOver)} ед.</b> нескоропорта перешёл в запас след. тура — хранение −${f0(totalOver*P.hCost)} млн руб`);
     return {lines, osa, profit};
 
   } else if (SUPS.includes(tid)) {
@@ -1569,6 +1569,9 @@ function renderAwards() {
     cv[tid]= m>0?Math.sqrt(v)/m:0;
   });
   const antiwhip=ALL.reduce((a,b)=>cv[a]<=cv[b]?a:b);
+  // Лучший дистрибьютор — счёт выше среднего по всем командам
+  const avg=ALL.reduce((s,t)=>s+SIM.scores[t],0)/ALL.length;
+  const distGood=SIM.scores['D']>avg;
 
   const card=(t,ico,tid,sub,clr)=>`<div class="award" style="border-color:${clr}">
     <span class="aw-ico">${ico}</span>
@@ -1578,7 +1581,8 @@ function renderAwards() {
   document.getElementById('an-awards').innerHTML=
     card('Гран-при','🏆',grand,`Итоговый счёт ${f0(SIM.scores[grand])} млн руб`,'#ffd700')+
     card('Архитектор цепочки','🤝',architect,`Вклад в здоровье ${f0(service[architect]*100)}%`,'#34c759')+
-    card('Антихлыст','📉',antiwhip,`Самый стабильный объём (CV ${f1(cv[antiwhip]*100)}%)`,'#3d6cb5');
+    card('Антихлыст','📉',antiwhip,`Самый стабильный объём (CV ${f1(cv[antiwhip]*100)}%)`,'#3d6cb5')+
+    (distGood?card('Лучший дистрибьютор','🚚','D',`Счёт ${f0(SIM.scores['D'])} — выше среднего ${f0(avg)}`,'#b45309'):'');
 }
 
 function renderScoreChart() {
