@@ -134,7 +134,7 @@ body{font-family:'Onest',sans-serif;background:var(--g1);color:var(--g9);min-hei
 .ret-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:14px}
 .ret-card{background:var(--W);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
 .ret-hdr{padding:10px 14px;font-weight:700;font-size:13px;color:#fff;display:flex;align-items:center;justify-content:space-between}
-.ret-hdr.r0{background:#2e5f8a}.ret-hdr.r1{background:#7b3fa0}.ret-hdr.r2{background:#1a7a5e}.ret-hdr.r3{background:#8b5cf6}
+.ret-hdr.r0{background:#2563eb}.ret-hdr.r1{background:#4f46e5}.ret-hdr.r2{background:#7c3aed}.ret-hdr.r3{background:#1e40af}
 .ret-body{padding:10px}
 .cat-row{border:1px solid var(--g2);border-radius:7px;padding:9px 11px;margin-bottom:7px}
 .cat-row.off{opacity:.35;pointer-events:none}
@@ -458,8 +458,8 @@ body{font-family:'Onest',sans-serif;background:var(--g1);color:var(--g9);min-hei
 // Здесь только презентационные данные play.html.
 // ═══════════════════════════════════════
 const G = Object.assign({}, GAME_CONFIG, {
-  catColor: ['#2e5f8a','#1a7a5e','#7b3fa0','#c0392b'],
-  retColors:['#2e5f8a','#7b3fa0','#1a7a5e','#8b5cf6'],
+  // catColor наследуется из gameconfig (единый цвет-язык); retColors различают 4 магазина (тир — синий)
+  retColors:['#2563eb','#4f46e5','#7c3aed','#1e40af'],
   events:[
     null,
     {t:'Промо-инициатива',d:'Спрос на снеки вырос до 110. Промо-буст ×1.5 — только при скидке производителя ≥10% и включённом промо.'},
@@ -1414,7 +1414,7 @@ function renderAdminFinal() {
   <div class="g3 mb3">
     ${award('Гран-при','🏆',grand,`Счёт ${Math.round(scores[grand])} млн руб`,'#caa106')}
     ${award('Архитектор цепочки','🤝',architect,`Вклад в здоровье ${f0(contrib[architect]*100)}%`,'#27ae60')}
-    ${award('Антихлыст','📉',antiwhip,`Стабильность CV ${f1(cv[antiwhip]*100)}%`,'#2e5f8a')}
+    ${award('Антихлыст','📉',antiwhip,`Стабильность CV ${f1(cv[antiwhip]*100)}%`,'#2563eb')}
   </div>
   <div class="winner"><div class="t">🏆</div><h2>Лучшие в категории</h2>
     <p>🛒 Ритейлер: <b>${gs.names[retWin]}</b> &nbsp;·&nbsp; 🏭 Поставщик: <b>${gs.names[supWin]}</b> &nbsp;·&nbsp; 🚛 Дистрибьютор: <b>${distGood?gs.names['D']:'— ниже среднего'}</b></p></div>

@@ -187,7 +187,7 @@ body{font-family:'Onest',sans-serif;background:var(--bg);color:var(--ink);
 /* Активная пара переговоров — крупно */
 .big-pair{display:flex;align-items:stretch;justify-content:center;gap:18px;margin-bottom:22px}
 .big-node{flex:0 0 210px;background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:22px;text-align:center}
-.big-node.ret{border-color:#2563eb}.big-node.sup{border-color:#15a34a}.big-node.dist{border-color:#b45309}
+.big-node.ret{border-color:var(--ret)}.big-node.sup{border-color:var(--sup)}.big-node.dist{border-color:var(--dist)}
 .big-node .bn-ico{font-size:50px;line-height:1}
 .big-node .bn-lbl{font-size:21px;font-weight:800;color:var(--ink);margin-top:8px}
 .big-node .bn-team{font-size:14px;color:var(--ink2);margin-top:2px}
@@ -411,12 +411,32 @@ function renderSubmitGrid(){
   sg.innerHTML=renderSubCells();
 }
 
+// Лента цепочки поставок — наглядно показывает 3 звена и направление потоков (смысл игры)
+function renderChainStrip(){
+  const node=(ico,t,sub,clr)=>`<div style="flex:1;min-width:0;text-align:center;background:var(--panel);border:1.5px solid ${clr};border-top:4px solid ${clr};border-radius:14px;padding:16px 12px">
+    <div style="font-size:36px;line-height:1">${ico}</div>
+    <div style="font-size:18px;font-weight:800;color:${clr};margin-top:5px">${t}</div>
+    <div style="font-size:12px;color:var(--ink2);margin-top:1px">${sub}</div></div>`;
+  const flow=`<div style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:0 4px">
+    <div style="font-size:13px;font-weight:700;color:var(--sup)">товар →</div>
+    <div style="font-size:12px;color:var(--ink3)">← заказы, ₽</div></div>`;
+  return `<div style="width:100%;max-width:840px;margin-bottom:16px">
+    <div style="font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink3);font-weight:600;margin-bottom:8px;text-align:center">Цепочка поставок · товар идёт вниз, заказы и деньги — вверх</div>
+    <div style="display:flex;align-items:stretch;gap:6px">
+      ${node('🏭','Поставщики','производят · П1–П4','var(--sup)')}
+      ${flow}
+      ${node('🚛','Дистрибьютор','возит всем · Д','var(--dist)')}
+      ${flow}
+      ${node('🛒','Магазины','продают · Р1–Р4','var(--ret)')}
+    </div></div>`;
+}
 function renderLobby(){
   return `<div class="phase-screen">
     <div class="ps-ico">🏠</div>
     <div class="ps-ph">Добро пожаловать!</div>
     <div class="ps-rd">Команды подключаются · ${(gs.connected||[]).length} из ${G.allTeams.length} онлайн</div>
-    <div class="sub-section" style="width:100%;max-width:800px">
+    ${renderChainStrip()}
+    <div class="sub-section" style="width:100%;max-width:840px">
       <div class="sub-title">Статус команд</div>
       <div class="sub-grid" id="live-subgrid">${renderSubCells()}</div>
     </div>
