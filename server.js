@@ -53,6 +53,11 @@ function normTeam(t) {
   if(LBL2ID[t]) return LBL2ID[t];        // Р1 / П1 / Д (кириллица)
   return t;
 }
+// Санитизация пользовательского текста (имена команд, реплики сделок): убираем HTML-опасное
+// в ЕДИНОЙ точке приёма → все экраны (включая проектор) защищены от stored-XSS.
+function safeStr(s, max = 48) {
+  return String(s == null ? "" : s).replace(/[<>"'`]/g, "").replace(/[\x00-\x1f\x7f]/g, " ").trim().slice(0, max);
+}
 
 // ━━━ ВНУТРИКОМАНДНЫЕ РОЛИ (роль[0] = Директор, ведёт переговоры) ━━━
 // duty — короткая подпись; desc — что делает; decide — что решает в форме; watch — на что смотреть
@@ -321,7 +326,7 @@ function handle(ws, msg) {
       if (!ALL_TEAMS.includes(teamId))
         return tx(ws, {type:'err', msg:`Неверный код команды: ${msg.teamId}`});
     }
-    Object.assign(me, { role, teamId: teamId||null, name: name||(role==='admin'?'Ведущий':teamId) });
+    Object.assign(me, { role, teamId: teamId||null, name: safeStr(name)||(role==='admin'?'Ведущий':teamId) });
     const sv = role==='admin' ? adminView() : role==='team' ? teamView(teamId) : pubView();
     tx(ws, { type:'joined', role, teamId, state: sv });
     bcastAll({ type:'userEvent', event:'join', user:{id:me.id,role,teamId,name:me.name} });
@@ -334,7 +339,7 @@ function handle(ws, msg) {
   // ─ RENAME ─
   if (msg.type === 'rename') {
     const tid = me.role==='admin' ? msg.teamId : me.teamId;
-    if (tid && ALL_TEAMS.includes(tid)) G.names[tid] = msg.name;
+    if (tid && ALL_TEAMS.includes(tid)) G.names[tid] = safeStr(msg.name) || tid;
     bcastAll({ type:'upd', names: G.names });
     return;
   }
@@ -456,7 +461,7 @@ function handle(ws, msg) {
   if (msg.type === 'proposal') {
     if (!me.teamId) return;
     const prop = { id:`${Date.now()}-${Math.random().toString(36).slice(2,6)}`,
-      round:G.round, from:me.teamId, to:msg.to, text:msg.text,
+      round:G.round, from:me.teamId, to:msg.to, text:safeStr(msg.text, 160),
       structured:msg.structured||null, status:'pending', at:Date.now() };
     G.proposals.push(prop);
     clients.forEach((c,w)=>{
