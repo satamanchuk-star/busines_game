@@ -538,35 +538,51 @@ function renderBriefing(r){
 }
 
 function renderNegotiation(r){
-  const hot=NEG_HOT[r]||[];
-  const idx=Math.min(gs.negPair||0, Math.max(0,hot.length-1));
-  const active=hot[idx];
+  const stage=gs.negStage||'A', wave=gs.negWave||0;
+  const cfg=G.negActive(stage, wave);
   const deals=(gs.agreements||[]).filter(a=>a.round===r);
-  const struckOf=d=>deals.some(a=>(a.from===d.from&&a.to===d.to)||(a.from===d.to&&a.to===d.from));
-  const bigNode=t=>`<div class="big-node ${G.type(t)}">
-    <div class="bn-ico">${t==='D'?'🚛':G.type(t)==='sup'?'🏭':'🛒'}</div>
-    <div class="bn-lbl">${G.LBL[t]}</div>
-    <div class="bn-team">${gs?.names?.[t]||''}</div></div>`;
-  // Сделки активной пары — «интерактив» после старта таймера
-  const pairDeals = active ? deals.filter(a=>(a.from===active.from&&a.to===active.to)||(a.from===active.to&&a.to===active.from)) : [];
-  let h=`<div style="text-align:center;font-size:19px;font-weight:800;color:var(--ink);margin-bottom:3px">🤝 Переговоры · ${G.roundNames[r]}</div>
-    <div style="text-align:center;font-size:13px;color:var(--ink2);margin-bottom:18px">Пара ${idx+1} из ${hot.length} · ведущий переключает фокус</div>`;
-  if(active){
-    h+=`<div class="big-pair">
-      ${bigNode(active.from)}
-      <div class="big-mid">
-        <div class="big-arrow">⇄</div>
-        <div class="big-subj">обсуждают: <b>${active.subj}</b></div>
-        ${struckOf(active)?'<div class="big-done">✅ договорились</div>':'<div class="big-wait">⏳ идёт обсуждение</div>'}
-        ${pairDeals.length?`<div style="font-size:13px;color:#166534;text-align:center">📋 ${pairDeals.map(a=>a.text).join(' · ')}</div>`:''}
+  const struck=(a,b)=>deals.some(d=>(d.from===a&&d.to===b)||(d.from===b&&d.to===a));
+  const between=(a,b)=>deals.filter(d=>(d.from===a&&d.to===b)||(d.from===b&&d.to===a));
+  const ico=t=>t==='D'?'🚛':G.type(t)==='sup'?'🏭':'🛒';
+  const clr=t=>`var(--${G.type(t)})`;
+  const node=(t,sz)=>`<div style="text-align:center">
+    <div style="font-size:${sz||32}px;line-height:1">${ico(t)}</div>
+    <div style="font-size:15px;font-weight:800;color:${clr(t)}">${G.LBL[t]}</div>
+    <div style="font-size:11px;color:var(--ink2)">${gs?.names?.[t]||''}</div></div>`;
+  let head, body;
+  if(stage==='A'){
+    head=`Раунд 1 · Волна ${wave+1} из 4 · магазины ↔ поставщики (за 4 волны каждый с каждым)`;
+    body=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:900px">
+      ${cfg.pairs.map(p=>{const done=struck(p.a,p.b), dl=between(p.a,p.b);
+        return `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--panel);border:1.5px solid ${done?'var(--good)':'var(--line)'};border-radius:14px;padding:14px 16px">
+          ${node(p.a,30)}
+          <div style="text-align:center;flex:1;min-width:0">
+            <div style="font-size:22px;color:var(--ibs);line-height:1">⇄</div>
+            <div style="font-size:12px;color:var(--ink2)">поставка «${p.cat}»</div>
+            <div style="font-size:12px;font-weight:700;color:${done?'var(--good)':'var(--warn)'}">${done?'✅ договор':'⏳ идёт'}</div>
+            ${dl.length?`<div style="font-size:11px;color:#166534">${dl.map(a=>a.text).join(' · ')}</div>`:''}
+          </div>
+          ${node(p.b,30)}
+        </div>`;}).join('')}
+    </div>`;
+  } else {
+    const mag=cfg.spotlight;
+    head=`Раунд 2 · ${G.LBL[mag]} + дистрибьютор и все поставщики · спотлайт ${wave+1} из 4`;
+    body=`<div style="display:flex;align-items:center;gap:22px;width:100%;max-width:960px;justify-content:center;flex-wrap:wrap">
+      <div style="flex:0 0 190px;background:var(--panel);border:2px solid var(--ret);border-top:5px solid var(--ret);border-radius:16px;padding:18px">${node(mag,46)}</div>
+      <div style="font-size:28px;color:var(--ibs)">⇄</div>
+      <div style="flex:1;min-width:280px;display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px">
+        ${cfg.parties.map(t=>{const done=struck(mag,t);
+          return `<div style="background:var(--panel);border:1.5px solid ${done?'var(--good)':clr(t)};border-radius:12px;padding:10px 8px;text-align:center">
+            ${node(t,26)}
+            <div style="font-size:11px;font-weight:700;color:${done?'var(--good)':'var(--warn)'};margin-top:2px">${done?'✅':'⏳'}</div></div>`;}).join('')}
       </div>
-      ${bigNode(active.to)}
     </div>`;
   }
-  h+=`<div class="pair-list">${hot.map((d,i)=>`<div class="pair-chip ${i===idx?'on':''} ${struckOf(d)?'struck':''}">
-    <span class="pc-n">${i+1}</span> ${G.LBL[d.from]} ⇄ ${G.LBL[d.to]} ${struckOf(d)?'✅':''}</div>`).join('')}</div>
-  <div style="text-align:center;font-size:12px;color:var(--ink3);margin-top:14px">Сделок заключено в этом туре: <b>${deals.length}</b> · договариваться можно и вне подсвеченной пары</div>`;
-  return h;
+  return `<div style="text-align:center;font-size:19px;font-weight:800;color:var(--ink);margin-bottom:3px">🤝 Переговоры · ${G.roundNames[r]}</div>
+    <div style="text-align:center;font-size:13px;color:var(--ink2);margin-bottom:18px">${head}</div>
+    <div style="display:flex;justify-content:center">${body}</div>
+    <div style="text-align:center;font-size:12px;color:var(--ink3);margin-top:16px">Сделок заключено в этом туре: <b>${deals.length}</b></div>`;
 }
 
 function renderDecisions(r){

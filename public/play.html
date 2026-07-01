@@ -983,26 +983,31 @@ function doExportExcel(){
   XLSX.writeFile(wb, `FMCG_итоги_${new Date().toISOString().slice(0,10)}.xlsx`);
 }
 
-// Панель ведущего: активная пара переговоров + листание (отражается на проекторе)
+// Панель ведущего: раунды и волны переговоров (отражается на проекторе)
 function renderAdminNegControls(r){
-  const hot=(G.negHot&&G.negHot[r])||[];
-  if(!hot.length) return '';
-  const idx=Math.min(gs.negPair||0, Math.max(0,hot.length-1));
-  const active=hot[idx];
+  const stage=gs.negStage||'A', wave=gs.negWave||0;
+  const cfg=G.negActive(stage, wave);
+  const desc = stage==='A'
+    ? cfg.pairs.map(p=>`${G.LBL[p.a]}⇄${G.LBL[p.b]}`).join(' · ')
+    : `${G.LBL[cfg.spotlight]} + Дистрибьютор + все поставщики`;
   return `<div class="card" style="border-left:3px solid var(--A)">
-    <div class="card-t">🤝 Активная пара переговоров — крупно на проекторе</div>
-    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-      <button class="btn btn-S" ${idx<=0?'disabled':''} onclick="negPair(${idx-1})">← Пред.</button>
-      <div style="flex:1;min-width:170px;text-align:center">
-        <div style="font-size:15px;font-weight:700;color:var(--g9)">${active?`${G.LBL[active.from]} ⇄ ${G.LBL[active.to]}`:'—'}</div>
-        <div style="font-size:12px;color:var(--g5)">${active?active.subj:''} · пара ${idx+1}/${hot.length}</div>
-      </div>
-      <button class="btn btn-P" ${idx>=hot.length-1?'disabled':''} onclick="negPair(${idx+1})">След. пара →</button>
+    <div class="card-t">🤝 Переговоры — управление (крупно на проекторе)</div>
+    <div style="display:flex;gap:6px;margin-bottom:10px">
+      <button class="btn ${stage==='A'?'btn-P':'btn-S'} btn-sm" onclick="negNav('A',0)">Раунд 1 · 4 пары</button>
+      <button class="btn ${stage==='B'?'btn-P':'btn-S'} btn-sm" onclick="negNav('B',0)">Раунд 2 · спотлайт</button>
     </div>
-    <div style="font-size:11px;color:var(--g5);margin-top:8px">Переключайте фокус зала на следующую пару. Команды могут договариваться и вне подсвеченной пары.</div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <button class="btn btn-S" ${wave<=0?'disabled':''} onclick="negNav('${stage}',${wave-1})">← Волна</button>
+      <div style="flex:1;min-width:180px;text-align:center">
+        <div style="font-size:15px;font-weight:700;color:var(--g9)">Волна ${wave+1} / 4</div>
+        <div style="font-size:12px;color:var(--g5)">${desc}</div>
+      </div>
+      <button class="btn btn-P" ${wave>=3?'disabled':''} onclick="negNav('${stage}',${wave+1})">Волна →</button>
+    </div>
+    <div style="font-size:11px;color:var(--g5);margin-top:8px">Р1: 4 пары магазин↔поставщик, за 4 волны каждый встречает каждого. Р2: один магазин с дистрибьютором и всеми поставщиками, магазин меняется 4 раза.</div>
   </div>`;
 }
-function negPair(idx){ if(me.role==='admin') ws_send({type:'cmd',cmd:'negPair',p:{idx}}); }
+function negNav(stage, wave){ if(me.role==='admin') ws_send({type:'cmd',cmd:'negNav',p:{stage,wave}}); }
 
 function renderAdmin() {
   renderAdminHeader();
@@ -1875,10 +1880,15 @@ function renderTeamSide() {
     h += `</div></div>`;
   }
 
-  // Send proposal form
+  // Send proposal form — в переговорах получатель ограничен текущей волной (пара/спотлайт)
   if (phase==='negotiation'||phase==='decisions') {
-    const others = negPartners(tid);
+    const cp = myNegCounterparts(tid);
+    const others = phase==='negotiation' ? cp.list : negPartners(tid);
+    if (phase==='negotiation' && !others.length) {
+      h += `<div class="prop-form" style="text-align:center;color:var(--g5);font-size:13px;padding:16px">⏳ Сейчас вы не в активной паре. Дождитесь своей волны — ведущий переключает раунды и волны на проекторе.</div>`;
+    } else {
     h += `<div class="prop-form"><h4>📤 Отправить предложение</h4>
+      ${phase==='negotiation'?`<div style="font-size:12px;color:var(--A);font-weight:700;margin-bottom:6px">Сейчас: ${others.map(t=>G.LBL[t]).join(', ')}${cp.cat?` · поставка «${cp.cat}»`:''}</div>`:''}
       <div class="fld" style="margin-bottom:6px"><label>Кому</label>
         <select id="prop-to" onchange="updPropTypes()">${others.map(t=>`<option value="${t}">${G.LBL[t]||t} · ${gs.names[t]||t}</option>`).join('')}</select></div>
       <div class="frow" style="margin-bottom:6px">
@@ -1898,6 +1908,7 @@ function renderTeamSide() {
         <textarea id="prop-text" style="width:100%;height:44px;border:1px solid var(--g3);border-radius:6px;padding:6px;font-size:12px;resize:vertical;font-family:inherit" placeholder="напр. при заказе ≥30 ед."></textarea></div>
       <button class="btn btn-P btn-sm" style="width:100%;justify-content:center" onclick="sendProposal()">Отправить</button>
     </div>`;
+    }
   }
 
   // Sent proposals
@@ -1919,18 +1930,31 @@ function renderTeamSide() {
   updPropTypes();
 }
 
+// Кто мой контрагент(ы) в текущей волне переговоров ({list:[], cat, spotlight})
+function myNegCounterparts(tid){
+  const stage=gs.negStage||'A', wave=gs.negWave||0;
+  const cfg=G.negActive(stage, wave);
+  if(stage==='A'){
+    const p=cfg.pairs.find(x=>x.a===tid||x.b===tid);
+    return p ? {list:[p.a===tid?p.b:p.a], cat:p.cat} : {list:[]};   // Д в раунде A не в паре
+  }
+  if(cfg.spotlight===tid) return {list:cfg.parties, spotlight:true}; // магазин — со всеми
+  if(cfg.parties.includes(tid)) return {list:[cfg.spotlight]};      // Д/поставщик — с магазином
+  return {list:[]};                                                  // прочие магазины ждут
+}
 function renderTeamActions() {
   const phase = gs.phase;
   const isSub = (gs.submitted||[]).includes(me.teamId);
   const hintEl = document.getElementById('t-hint');
   const acts = document.getElementById('t-actions');
-  // Сигнал активной пары: если ведущий фокусирует зал на нашей паре — выделяем
-  const hot=(G.negHot&&G.negHot[gs.round])||[];
-  const actv=hot[Math.min(gs.negPair||0, Math.max(0,hot.length-1))];
-  const inActive = actv && (actv.from===me.teamId || actv.to===me.teamId);
+  // Сигнал текущей пары/волны переговоров
+  const cp = myNegCounterparts(me.teamId);
+  const inActive = cp.list.length>0;
   const negHint = inActive
-    ? `🔴 Ваша очередь на проекторе: обсуждаете с ${G.LBL[actv.from===me.teamId?actv.to:actv.from]} — ${actv.subj}`
-    : 'Договаривайтесь с партнёрами и фиксируйте сделки (кнопка «Принять»).';
+    ? (cp.spotlight
+        ? '🔴 Ваша очередь на проекторе: договаривайтесь с дистрибьютором и всеми поставщиками'
+        : `🔴 Ваша очередь: обсуждаете с ${cp.list.map(t=>G.LBL[t]).join(', ')}${cp.cat?` — поставка «${cp.cat}»`:''}`)
+    : 'Сейчас вы не в активной паре — дождитесь своей волны (ведущий переключает).';
   // Подсказка «что делать сейчас» для участника — на каждой фазе своя
   const HINT = {
     lobby:'Вы в игре. Ждём, пока ведущий начнёт.',
