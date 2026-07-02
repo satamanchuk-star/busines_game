@@ -288,7 +288,6 @@ const G = Object.assign({}, GAME_CONFIG, {
   type:t=>GAME_CONFIG.retIds.includes(t)?'ret':GAME_CONFIG.supIds.includes(t)?'sup':'dist',
 });
 
-const NEG_HOT = GAME_CONFIG.negHot;   // единый источник пар (gameconfig.js)
 
 function hexA(hex,a){const h=hex.replace('#','');return `rgba(${parseInt(h.slice(0,2),16)},${parseInt(h.slice(2,4),16)},${parseInt(h.slice(4,6),16)},${a})`;}
 

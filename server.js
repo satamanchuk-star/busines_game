@@ -58,6 +58,24 @@ function normTeam(t) {
 function safeStr(s, max = 48) {
   return String(s == null ? "" : s).replace(/[<>"'`]/g, "").replace(/[\x00-\x1f\x7f]/g, " ").trim().slice(0, max);
 }
+// Валидация структурной сделки из переговоров: тип/категория из белого списка, числа клэмпятся.
+// Иначе крафт (напр. огромный qty) мог бы накрутить штраф за нарушение договорённости.
+function sanitizeStructured(s) {
+  if (!s || typeof s !== 'object') return null;
+  const TYPES = ['supply','discount','volume','tariff','priority'];
+  if (!TYPES.includes(s.type)) return null;
+  const num = (v, max) => Math.max(0, Math.min(max, +v || 0));
+  const cat = CONFIG.catIds.includes(s.category) ? s.category : null;
+  if (s.type === 'supply') {
+    const vol = num(s.volume, CONFIG.maxOrd);
+    return { type:'supply', category:cat,
+             discount: num(s.discount, CONFIG.maxDsc*100), volume: vol, qty: vol,
+             ret: ALL_TEAMS.includes(s.ret) ? s.ret : null,
+             sup: ALL_TEAMS.includes(s.sup) ? s.sup : null };
+  }
+  const cap = s.type === 'tariff' ? CONFIG.maxTariff*1000 : CONFIG.maxOrd;
+  return { type: s.type, category: cat, value: num(s.value, cap) };
+}
 
 // ━━━ ВНУТРИКОМАНДНЫЕ РОЛИ (роль[0] = Директор, ведёт переговоры) ━━━
 // duty — короткая подпись; desc — что делает; decide — что решает в форме; watch — на что смотреть
@@ -447,7 +465,9 @@ function handle(ws, msg) {
   // ─ TEAM SUBMIT DECISION ─
   if (msg.type === 'submit') {
     if (me.role!=='team') return;
-    const {round,data}=msg;
+    const round = Math.max(0, Math.min(3, parseInt(msg.round))); // клэмп 0..3 — иначе произвольный ключ
+    const data = msg.data;
+    if (!Number.isInteger(round)) return;
     if (!G.decisions[round]) G.decisions[round]={};
     G.decisions[round][me.teamId]={submitted:true,data,by:'team',at:Date.now()};
     bcastAll({type:'upd',submitted:subList()});
@@ -460,9 +480,11 @@ function handle(ws, msg) {
   // ─ PROPOSAL ─
   if (msg.type === 'proposal') {
     if (!me.teamId) return;
+    const to = normTeam(msg.to);
+    if (!ALL_TEAMS.includes(to) || to===me.teamId) return;   // получатель — валидная чужая команда
     const prop = { id:`${Date.now()}-${Math.random().toString(36).slice(2,6)}`,
-      round:G.round, from:me.teamId, to:msg.to, text:safeStr(msg.text, 160),
-      structured:msg.structured||null, status:'pending', at:Date.now() };
+      round:G.round, from:me.teamId, to, text:safeStr(msg.text, 160),
+      structured:sanitizeStructured(msg.structured), status:'pending', at:Date.now() };
     G.proposals.push(prop);
     clients.forEach((c,w)=>{
       if(c.teamId===prop.to||c.teamId===prop.from||c.role==='admin') tx(w,{type:'proposal',prop});

@@ -1535,15 +1535,6 @@ function renderHistCard() {
   return h;
 }
 
-// Детерминированный прогноз ±15% — игроки видят его вместо точного спроса до итогов
-function genForecast(r) {
-  const dem = G.demand[r], noise = 0.15;
-  return dem.map((d, ci) => {
-    const n = ((Math.sin((r*5+ci*7)*1.618)+1)/2 - 0.5) * noise;
-    return Math.round(d * (1 + n));
-  });
-}
-
 function renderTeamMain() {
   const r = gs.round, phase = gs.phase;
   const isSub = (gs.submitted||[]).includes(me.teamId);
