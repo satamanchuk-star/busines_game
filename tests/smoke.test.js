@@ -13,6 +13,16 @@ const printHtml = read('public/print.html');
 const demoHtml = read('public/demo.html');
 const startScript = read('start.sh');
 
+// Скрипты play/live/sim/demo вынесены из инлайна в отдельные .js (рефактор монолитов).
+// Разметка/CSS остались в HTML, поведение — в .js. Контентные проверки идут по
+// объединённому источнику: тест не должен ломаться от того, где физически лежит код.
+const playJs = read('public/play.js');
+const liveJs = read('public/live.js');
+const demoJs = read('public/demo.js');
+const playSrc = playHtml + '\n' + playJs;
+const liveSrc = liveHtml + '\n' + liveJs;
+const demoSrc = demoHtml + '\n' + demoJs;
+
 assert.strictEqual(config.allTeams.length, 9, 'game config should expose 9 teams');
 assert.deepStrictEqual(config.retIds, ['R1', 'R2', 'R3', 'R4'], 'retailers should include R4');
 assert.deepStrictEqual(
@@ -41,18 +51,18 @@ assert(indexHtml.includes('9 команд'), 'landing page should show 9 teams')
 assert(indexHtml.includes('<div class="role-name">Премиум</div>'), 'landing page should include Premium retailer');
 
 assert(
-  playHtml.includes('<option value="3"${op(prc,3)}>Люкс</option>'),
+  playSrc.includes('<option value="3"${op(prc,3)}>Люкс</option>'),
   'admin decision form should preserve the Lux price option'
 );
 assert(playHtml.includes('.ret-hdr.r3'), 'admin retailer cards should style the fourth retailer');
-assert(!playHtml.includes("['R1','R2','R3','R4']"), 'play screen should not hard-code retailer ids');
-assert(!playHtml.includes("['S1','S2','S3','S4']"), 'play screen should not hard-code supplier ids');
+assert(!playSrc.includes("['R1','R2','R3','R4']"), 'play screen should not hard-code retailer ids');
+assert(!playSrc.includes("['S1','S2','S3','S4']"), 'play screen should not hard-code supplier ids');
 
-assert(!liveHtml.includes('/8 подали решения'), 'projector footer should not hard-code 8 submitted teams');
-assert(!liveHtml.includes('из 8 онлайн'), 'projector lobby should not hard-code 8 online teams');
-assert(liveHtml.includes('${G.allTeams.length}'), 'projector should use the configured team count');
-assert(!liveHtml.includes("['R1','R2','R3','R4']"), 'projector should not hard-code retailer ids');
-assert(!liveHtml.includes("['S1','S2','S3','S4']"), 'projector should not hard-code supplier ids');
+assert(!liveSrc.includes('/8 подали решения'), 'projector footer should not hard-code 8 submitted teams');
+assert(!liveSrc.includes('из 8 онлайн'), 'projector lobby should not hard-code 8 online teams');
+assert(liveSrc.includes('${G.allTeams.length}'), 'projector should use the configured team count');
+assert(!liveSrc.includes("['R1','R2','R3','R4']"), 'projector should not hard-code retailer ids');
+assert(!liveSrc.includes("['S1','S2','S3','S4']"), 'projector should not hard-code supplier ids');
 
 assert(printHtml.includes('4 тура · 9 команд · до 36 участников'), 'print cover should show 9 teams');
 assert(printHtml.includes('<!-- Р4 Премиум -->'), 'print role cards should include Premium retailer');
@@ -62,9 +72,9 @@ assert(startScript.includes('R1 R2 R3 R4 S1 S2 S3 S4 D'), 'start script should p
 // ничего не вычисляет, данные сценарные). Поэтому проверяем не загрузку общего конфига,
 // а консистентность со структурой 9 команд и синхронность спроса с эталоном (анти-дрейф).
 config.allTeams.forEach(team =>
-  assert(demoHtml.includes(`{id:'${team}'`), `demo should list team ${team} in its ACTORS`));
+  assert(demoSrc.includes(`{id:'${team}'`), `demo should list team ${team} in its ACTORS`));
 config.demand.forEach((row, idx) =>
-  assert(demoHtml.includes(`demand:[${row.join(',')}]`),
+  assert(demoSrc.includes(`demand:[${row.join(',')}]`),
     `demo round ${idx + 1} demand should match the shared game config (no drift)`));
 
 // ─── Константы штрафной системы (используются в calculate) ───
